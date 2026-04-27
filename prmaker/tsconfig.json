@@ -36,6 +36,7 @@
   "exclude": [
     "node_modules",
     "castfolio-v4",
-    "castfolio-v5"
+    "castfolio-v5",
+    "docs"
   ]
 }
