@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ExternalLink, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 
-const containerVariants = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const containerVariants: any = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -16,7 +17,8 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const itemVariants: any = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -25,7 +27,8 @@ const itemVariants = {
   },
 };
 
-const scaleVariants = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const scaleVariants: any = {
   hidden: { opacity: 0, scale: 0.95 },
   visible: {
     opacity: 1,
@@ -36,7 +39,6 @@ const scaleVariants = {
 
 export default function PortfolioDetailPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
 
   // Mock data - replace with actual data from API
   const portfolio = {
@@ -380,7 +382,7 @@ export default function PortfolioDetailPage() {
               className="text-3xl md:text-4xl font-light leading-relaxed"
               style={{ fontFamily: 'Georgia, serif' }}
             >
-              "{portfolio.testimonial.text}"
+              &quot;{portfolio.testimonial.text}&quot;
             </motion.p>
 
             <motion.div variants={itemVariants} className="flex flex-col items-center gap-4">
@@ -409,7 +411,7 @@ export default function PortfolioDetailPage() {
         <div className="max-w-4xl mx-auto px-6 md:px-12 text-center space-y-8">
           <motion.div variants={itemVariants} className="space-y-4">
             <h2 className="text-3xl md:text-4xl font-light" style={{ fontFamily: 'Georgia, serif' }}>
-              Let's Create Something Remarkable
+              Let&apos;s Create Something Remarkable
             </h2>
             <p className="text-gray-600 font-light">
               Ready to transform your brand or launch your next project?

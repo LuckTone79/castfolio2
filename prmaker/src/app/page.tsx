@@ -1,13 +1,14 @@
+"use client";
 import Link from "next/link";
 
 const ArrowRight = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 12h14M12 5l7 7-7 7"/>
+    <path d="M5 12h14M12 5l7 7-7 7" />
   </svg>
 );
 const CheckIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12"/>
+    <polyline points="20 6 9 17 4 12" />
   </svg>
 );
 
@@ -15,8 +16,8 @@ const features = [
   {
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14 2H6a2 2 0 00-2 2v16l2.5-1.5L9 20l2.5-1.5L14 20l2.5-1.5L19 20V8z"/>
-        <path d="M14 2v6h5M16 13H8M16 17H8M10 9H8"/>
+        <path d="M14 2H6a2 2 0 00-2 2v16l2.5-1.5L9 20l2.5-1.5L14 20l2.5-1.5L19 20V8z" />
+        <path d="M14 2v6h5M16 13H8M16 17H8M10 9H8" />
       </svg>
     ),
     title: "자료 수집",
@@ -26,8 +27,8 @@ const features = [
   {
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="3"/>
-        <path d="M3 9h18M9 21V9"/>
+        <rect x="3" y="3" width="18" height="18" rx="3" />
+        <path d="M3 9h18M9 21V9" />
       </svg>
     ),
     title: "PR 페이지 제작",
@@ -37,8 +38,8 @@ const features = [
   {
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-        <circle cx="12" cy="12" r="3"/>
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+        <circle cx="12" cy="12" r="3" />
       </svg>
     ),
     title: "미리보기 검토",
@@ -48,9 +49,9 @@ const features = [
   {
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="5" width="20" height="14" rx="2"/>
-        <path d="M2 10h20"/>
-        <circle cx="16" cy="14" r="1" fill="currentColor" stroke="none"/>
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <path d="M2 10h20" />
+        <circle cx="16" cy="14" r="1" fill="currentColor" stroke="none" />
       </svg>
     ),
     title: "견적 & 결제",
@@ -60,8 +61,8 @@ const features = [
   {
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="3"/>
-        <path d="M3 9h18M9 21V9M12 6v1M16 6v1"/>
+        <rect x="3" y="3" width="18" height="18" rx="3" />
+        <path d="M3 9h18M9 21V9M12 6v1M16 6v1" />
       </svg>
     ),
     title: "QR 납품",
@@ -71,8 +72,8 @@ const features = [
   {
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
-        <polyline points="16 7 22 7 22 13"/>
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+        <polyline points="16 7 22 7 22 13" />
       </svg>
     ),
     title: "월 정산",
@@ -82,12 +83,12 @@ const features = [
 ];
 
 const steps = [
-  { num: "01", title: "방송인 등록",    desc: "이름, 포지션, 연락처 입력" },
-  { num: "02", title: "자료 수집",      desc: "제출 링크 발송 또는 직접 입력" },
+  { num: "01", title: "방송인 등록", desc: "이름, 포지션, 연락처 입력" },
+  { num: "02", title: "자료 수집", desc: "제출 링크 발송 또는 직접 입력" },
   { num: "03", title: "PR 페이지 제작", desc: "테마 선택 후 빌더로 편집" },
-  { num: "04", title: "검토 & 결제",   desc: "미리보기 확인 후 견적 발송" },
-  { num: "05", title: "배포 & 납품",   desc: "공개 링크 + QR 코드 전달" },
-  { num: "06", title: "월 정산",        desc: "수익 85% 익월 1일 정산" },
+  { num: "04", title: "검토 & 결제", desc: "미리보기 확인 후 견적 발송" },
+  { num: "05", title: "배포 & 납품", desc: "공개 링크 + QR 코드 전달" },
+  { num: "06", title: "월 정산", desc: "수익 85% 익월 1일 정산" },
 ];
 
 const faqs = [
@@ -383,8 +384,8 @@ export default function LandingPage() {
             <div className="flex justify-center gap-8 mt-8 pt-8" style={{ borderTop: "1px solid rgba(124,92,252,0.2)" }}>
               {[
                 { label: "별도 월정액", value: "없음" },
-                { label: "정산 주기",  value: "월 1회" },
-                { label: "최소 금액",  value: "₩10,000" },
+                { label: "정산 주기", value: "월 1회" },
+                { label: "최소 금액", value: "₩10,000" },
               ].map(item => (
                 <div key={item.label} className="text-center">
                   <p className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>{item.value}</p>
