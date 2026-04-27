@@ -1,0 +1,145 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helpers
+    // ===============================================================
+    function isAuth() {
+      return request.auth != null;
+    }
+    function isMe(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+    function isOwnerEmail() {
+      // owner bootstrap — custom claims 전환 전까지 유지
+      // 이메일 대소문자 구분 문제 해결을 위해 .lower() 사용
+      return isAuth() && request.auth.token.email.lower() == "luck2s7912@gmail.com";
+    }
+    function ownerRole() {
+      return isAuth() && (
+        isOwnerEmail() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['owner', 'admin'])
+      );
+    }
+    function myDoc() {
+      // 현재 문서의 agentId가 나인지
+      return isAuth() && resource.data.agentId == request.auth.uid;
+    }
+
+    // ===============================================================
+    // users
+    // ===============================================================
+    match /users/{userId} {
+      allow get: if true;
+      allow list, create, update, delete: if isAuth();
+    }
+
+    // ===============================================================
+    // talents
+    // ===============================================================
+    match /talents/{talentId} {
+      allow get: if isAuth();
+      allow list: if isAuth() || resource.data.intakeToken != null;
+      allow create, update, delete: if isAuth();
+    }
+
+    // ===============================================================
+    // pages
+    // ===============================================================
+    match /pages/{pageId} {
+      allow get: if resource.data.isPublished == true || isAuth();
+      allow list: if isAuth() || resource.data.isPublished == true;
+      allow create: if isAuth();
+      allow update, delete: if myDoc() || ownerRole();
+    }
+
+    // ===============================================================
+    // pricing_plans
+    // ===============================================================
+    match /pricing_plans/{planId} {
+      allow get: if true; // 공개 checkout에서 읽기 필요
+      allow list: if isAuth() || resource.data.isActive == true;
+      allow create: if isAuth();
+      allow update, delete: if myDoc() || ownerRole();
+    }
+
+    // ===============================================================
+    // checkout_sessions
+    // ===============================================================
+    match /checkout_sessions/{sessionId} {
+      allow get: if isAuth() || true; // 결제 완료 화면에서 필요
+      allow list: if isAuth();
+      allow create: if true; // caster(public) 생성 가능
+      allow update: if isAuth();
+      allow delete: if ownerRole();
+    }
+
+    // ===============================================================
+    // sales
+    // ===============================================================
+    match /sales/{saleId} {
+      allow get: if isAuth();
+      allow list: if isAuth();
+      allow create: if isAuth();
+      allow update, delete: if myDoc() || ownerRole();
+    }
+
+    // ===============================================================
+    // platform_ledger
+    // ===============================================================
+    match /platform_ledger/{ledgerId} {
+      allow get, list: if isAuth();
+      allow create: if isAuth();
+      allow update: if ownerRole();
+      allow delete: if false;
+    }
+
+    // ===============================================================
+    // settlements
+    // ===============================================================
+    match /settlements/{settlementId} {
+      allow get, list: if isAuth();
+      allow create, update: if isAuth();
+      allow delete: if ownerRole();
+    }
+
+    // ===============================================================
+    // audit_logs
+    // ===============================================================
+    match /audit_logs/{logId} {
+      allow get, list: if isAuth();
+      allow create: if isAuth();
+      allow update, delete: if false;
+    }
+
+    // ===============================================================
+    // work_activity_logs
+    // ===============================================================
+    match /work_activity_logs/{logId} {
+      allow get, list: if isAuth();
+      allow create: if isAuth();
+      allow update, delete: if false;
+    }
+
+    // ===============================================================
+    // intake_submissions
+    // ===============================================================
+    match /intake_submissions/{submissionId} {
+      allow get: if true; // 공개 폼에서 읽기
+      allow list: if isAuth();
+      allow create: if true; // caster 제출
+      allow update, delete: if isAuth();
+    }
+
+    // ===============================================================
+    // page_views
+    // ===============================================================
+    match /page_views/{viewId} {
+      allow get, list: if isAuth();
+      allow create: if true;
+      allow update, delete: if false;
+    }
+  }
+}

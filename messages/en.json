@@ -1,0 +1,41 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "confirm": "Confirm",
+    "close": "Close"
+  },
+  "nav": {
+    "home": "Home",
+    "talents": "Talents",
+    "projects": "Projects",
+    "intake": "Intake",
+    "pricing": "Pricing",
+    "quotes": "Quotes",
+    "settlements": "Settlements",
+    "help": "Help",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "hero": {
+    "tagline_placeholder": "Enter your tagline (30 chars recommended)",
+    "position_placeholder": "Position (e.g. Show Host, Announcer)"
+  },
+  "profile": {
+    "intro_placeholder": "Enter your introduction (500 chars recommended)"
+  },
+  "contact": {
+    "title": "Contact",
+    "channels": "Contact Channels"
+  },
+  "page": {
+    "preview_banner": "⚠️ This page is a preview. Not yet published.",
+    "language": "Language"
+  }
+}

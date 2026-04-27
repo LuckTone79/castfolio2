@@ -1,0 +1,41 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "back": "返回",
+    "loading": "加载中...",
+    "error": "发生错误",
+    "success": "操作成功",
+    "confirm": "确认",
+    "close": "关闭"
+  },
+  "nav": {
+    "home": "首页",
+    "talents": "艺人",
+    "projects": "项目",
+    "intake": "资料收集",
+    "pricing": "产品/定价",
+    "quotes": "报价/订单",
+    "settlements": "结算",
+    "help": "帮助",
+    "settings": "设置",
+    "logout": "退出"
+  },
+  "hero": {
+    "tagline_placeholder": "请输入一句话介绍（建议30字以内）",
+    "position_placeholder": "职位（如：主持人、播音员）"
+  },
+  "profile": {
+    "intro_placeholder": "请输入个人简介（建议500字以内）"
+  },
+  "contact": {
+    "title": "联系方式",
+    "channels": "联系渠道"
+  },
+  "page": {
+    "preview_banner": "⚠️ 此页面为预览版，尚未正式发布。",
+    "language": "语言"
+  }
+}

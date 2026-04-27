@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"C:\\\\Users\\\\LUCK2\\\\OneDrive\\\\문서\\\\개발\\\\프로그램\\\\PR Maker/src\" -name \"*.ts\" -o -name \"*.tsx\" 2>/dev/null | sort)",
+      "Bash(mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/types\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/themes\")",
+      "Bash(cd \"C:\\\\Users\\\\LUCK2\\\\OneDrive\\\\문서\\\\개발\\\\프로그램\\\\PR Maker\" && pnpm add clsx 2>&1 | tail -5)",
+      "Bash(mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/talents/[id]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/projects/[id]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/pages/[id]/draft\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/pages/[id]/preview\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/pages/[id]/publish\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/orders/[id]/confirm-payment\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/notifications\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/upload\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/public/intake/[token]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/public/review/[token]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/users/onboarding\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/users/me\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/settlements/run\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/qr\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/api/audit\")",
+      "Bash(mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/p/[slug]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/preview/[previewToken]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/submit/[token]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/review/[token]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/quote/[token]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/delivered/[token]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/guide\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/demo/[themeId]\")",
+      "Bash(mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/dashboard/projects/[id]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/dashboard/builder/[projectId]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/dashboard/talents/[id]\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/dashboard/help\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/admin/users\" && mkdir -p \"C:/Users/LUCK2/OneDrive/문서/개발/프로그램/PR Maker/src/app/admin/audit\")",
+      "Bash(cd \"C:\\\\Users\\\\LUCK2\\\\OneDrive\\\\문서\\\\개발\\\\프로그램\\\\PR Maker\" && pnpm prisma generate 2>&1 | tail -10)",
+      "Bash(cd \"C:\\\\Users\\\\LUCK2\\\\OneDrive\\\\문서\\\\개발\\\\프로그램\\\\PR Maker\" && pnpm add -D ts-node 2>&1 | tail -5)",
+      "Bash(cd \"C:\\\\Users\\\\LUCK2\\\\OneDrive\\\\문서\\\\개발\\\\프로그램\\\\PR Maker\" && pnpm prisma generate 2>&1 | grep -E \"\\(Generated|Error|warning\\)\" | head -5)",
+      "Bash(cd \"C:\\\\Users\\\\LUCK2\\\\OneDrive\\\\문서\\\\개발\\\\프로그램\\\\PR Maker\" && pnpm build 2>&1 | tail -40)",
+      "Bash(cd \"C:\\\\Users\\\\LUCK2\\\\OneDrive\\\\문서\\\\개발\\\\프로그램\\\\PR Maker\" && cp next.config.ts next.config.mjs.bak && cat next.config.ts | sed 's/import createNextIntlPlugin/import createNextIntlPlugin/' > /dev/null && echo done)",
+      "Bash(cd \"C:\\\\Users\\\\LUCK2\\\\OneDrive\\\\문서\\\\개발\\\\프로그램\\\\PR Maker\" && rm next.config.ts && pnpm build 2>&1 | tail -50)",
+      "Bash(cd \"C:\\\\Users\\\\LUCK2\\\\OneDrive\\\\문서\\\\개발\\\\프로그램\\\\PR Maker\" && pnpm build 2>&1 | tail -50)",
+      "mcp__mcp-registry__search_mcp_registry",
+      "WebSearch",
+      "Bash(npm list:*)",
+      "mcp__Claude_Preview__preview_start",
+      "WebFetch(domain:mcp.figma.com)",
+      "Bash(claude mcp:*)",
+      "Bash(npx vite:*)"
+    ]
+  }
+}

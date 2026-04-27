@@ -1,0 +1,41 @@
+{
+  "common": {
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "back": "뒤로",
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "success": "완료되었습니다",
+    "confirm": "확인",
+    "close": "닫기"
+  },
+  "nav": {
+    "home": "홈",
+    "talents": "방송인",
+    "projects": "프로젝트",
+    "intake": "자료 요청",
+    "pricing": "상품/가격정책",
+    "quotes": "견적/주문",
+    "settlements": "정산",
+    "help": "도움말",
+    "settings": "설정",
+    "logout": "로그아웃"
+  },
+  "hero": {
+    "tagline_placeholder": "한 줄 소개를 입력하세요 (30자 이내 권장)",
+    "position_placeholder": "포지션 (예: 쇼호스트, 아나운서)"
+  },
+  "profile": {
+    "intro_placeholder": "자기소개를 입력하세요 (500자 이내 권장)"
+  },
+  "contact": {
+    "title": "연락하기",
+    "channels": "연락처 채널"
+  },
+  "page": {
+    "preview_banner": "⚠️ 이 페이지는 미리보기입니다. 정식 배포 전입니다.",
+    "language": "언어"
+  }
+}

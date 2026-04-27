@@ -1,0 +1,109 @@
+{
+  "common": {
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "create": "생성",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "success": "완료되었습니다",
+    "confirm": "확인",
+    "close": "닫기",
+    "search": "검색",
+    "filter": "필터",
+    "export": "내보내기",
+    "submit": "제출",
+    "send": "발송",
+    "preview": "미리보기",
+    "publish": "배포",
+    "draft": "임시저장",
+    "required": "필수",
+    "optional": "선택"
+  },
+  "nav": {
+    "home": "홈",
+    "talents": "방송인",
+    "projects": "프로젝트",
+    "intake": "자료 요청",
+    "pricing": "상품/가격",
+    "quotes": "견적/주문",
+    "settlements": "정산",
+    "help": "도움말",
+    "settings": "설정",
+    "logout": "로그아웃"
+  },
+  "status": {
+    "draft": "초안",
+    "preview": "미리보기",
+    "published": "공개",
+    "inactive": "비공개",
+    "paid": "결제완료",
+    "pending": "대기",
+    "delivered": "납품완료",
+    "settled": "정산완료",
+    "active": "활성",
+    "suspended": "정지",
+    "new": "신규"
+  },
+  "pr": {
+    "hero": {
+      "cta_portfolio": "포트폴리오 보기",
+      "cta_contact": "연락하기"
+    },
+    "profile": {
+      "title": "프로필"
+    },
+    "career": {
+      "title": "경력"
+    },
+    "portfolio": {
+      "title": "포트폴리오",
+      "videos": "방송 영상",
+      "photos": "사진"
+    },
+    "strength": {
+      "title": "강점"
+    },
+    "contact": {
+      "title": "연락처"
+    },
+    "footer": {
+      "powered": "Powered by Castfolio"
+    },
+    "preview_banner": "이 페이지는 미리보기입니다. 정식 배포 전입니다.",
+    "language": "언어 선택"
+  },
+  "intake": {
+    "title": "자료 제출",
+    "name_ko": "이름 (한글)",
+    "name_en": "이름 (영문)",
+    "tagline": "한 줄 소개",
+    "intro": "자기소개",
+    "career": "경력 사항",
+    "strengths": "강점/특기",
+    "videos": "방송 영상 URL",
+    "sns": "SNS 링크",
+    "email": "이메일",
+    "kakao": "카카오톡 ID",
+    "photos": "사진 첨부",
+    "other": "기타 요청사항",
+    "expired": "이 링크는 만료되었습니다",
+    "complete": "제출이 완료되었습니다. 감사합니다!"
+  },
+  "quote": {
+    "expired": "이 견적은 만료되었습니다. 담당자에게 문의해주세요.",
+    "payment_guide": "결제 방법: 아래 담당자에게 연락하여 결제를 진행해주세요.",
+    "contact_agent": "담당자 연락",
+    "inquire": "문의하기"
+  },
+  "delivered": {
+    "congratulations": "축하합니다! PR 페이지가 완성되었습니다.",
+    "view_page": "PR 페이지 보기",
+    "download_qr": "QR 코드 다운로드",
+    "revision_policy": "수정 정책 안내"
+  }
+}

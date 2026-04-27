@@ -1,0 +1,48 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "loading": "加载中...",
+    "error": "发生错误",
+    "success": "操作成功",
+    "confirm": "确认",
+    "close": "关闭"
+  },
+  "pr": {
+    "hero": {
+      "cta_portfolio": "查看作品集",
+      "cta_contact": "联系我们"
+    },
+    "profile": { "title": "个人资料" },
+    "career": { "title": "职业经历" },
+    "portfolio": { "title": "作品集", "videos": "视频", "photos": "照片" },
+    "strength": { "title": "优势" },
+    "contact": { "title": "联系方式" },
+    "footer": { "powered": "Powered by Castfolio" },
+    "preview_banner": "这是预览页面，尚未正式发布。",
+    "language": "语言"
+  },
+  "intake": {
+    "title": "提交资料",
+    "expired": "此链接已过期",
+    "complete": "提交完成，谢谢！"
+  },
+  "quote": {
+    "expired": "此报价已过期，请联系负责人。",
+    "payment_guide": "请联系以下负责人进行付款。",
+    "contact_agent": "联系负责人",
+    "inquire": "咨询"
+  },
+  "delivered": {
+    "congratulations": "恭喜！您的PR页面已完成。",
+    "view_page": "查看PR页面",
+    "download_qr": "下载二维码",
+    "revision_policy": "修改政策"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "에이전트(사용자) 정보",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "company": { "type": "string" },
+        "phone": { "type": "string" },
+        "commissionRate": { "type": "number" },
+        "role": { "type": "string", "enum": ["admin", "agent"] },
+        "status": { "type": "string", "enum": ["active", "suspended"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Talent": {
+      "title": "Talent",
+      "description": "방송인 정보",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "agentId": { "type": "string" },
+        "nameKo": { "type": "string" },
+        "nameEn": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "position": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "active", "inactive"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["agentId", "nameKo", "status"]
+    },
+    "Page": {
+      "title": "Page",
+      "description": "방송인 PR 홈페이지 데이터",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "talentId": { "type": "string" },
+        "agentId": { "type": "string" },
+        "slug": { "type": "string" },
+        "theme": { "type": "string" },
+        "accentColor": { "type": "string" },
+        "content": { "type": "object" },
+        "isPublished": { "type": "boolean" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "viewsCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["talentId", "agentId", "slug", "theme"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "판매 및 수수료 내역",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "agentId": { "type": "string" },
+        "talentId": { "type": "string" },
+        "pageId": { "type": "string" },
+        "amount": { "type": "number" },
+        "commission": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "status": { "type": "string", "enum": ["confirmed", "settled"] },
+        "confirmedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["agentId", "talentId", "amount", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "사용자 프로필"
+    },
+    "/talents/{talentId}": {
+      "schema": "Talent",
+      "description": "방송인 목록"
+    },
+    "/pages/{pageId}": {
+      "schema": "Page",
+      "description": "PR 홈페이지 데이터"
+    },
+    "/sales/{saleId}": {
+      "schema": "Sale",
+      "description": "판매 내역"
+    }
+  }
+}

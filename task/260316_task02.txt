@@ -1,0 +1,564 @@
+# 코드 리뷰 보고서
+## 지침서(v1.4) vs 실제 구현 코드 대조 분석
+
+> 작성일: 2026-03-16
+> 분석 대상: src.zip (25개 파일) + CASTFOLIO_CLAUDE_CODE_TASK_v1.4_FINAL.md
+
+---
+
+## 분석 요약
+
+| 구분 | 건수 |
+|------|------|
+| 🔴 심각 (보안/데이터 무결성) | 8건 |
+| 🟠 중요 (지침서 위반/기능 누락) | 19건 |
+| 🟡 개선 권장 (품질/안정성) | 14건 |
+
+---
+
+## 🔴 심각 — 즉시 수정 필요
+
+### 1. `createServiceClient()`에 쿠키가 불필요하게 포함됨
+**파일:** `src/lib/supabase/server.ts` (35~57행)
+
+**문제:** SERVICE_ROLE 클라이언트는 모든 RLS를 우회하는 서버 전용 클라이언트인데, `cookies()`를 읽어서 사용자 세션 쿠키를 주입하고 있습니다. SERVICE_ROLE 키를 사용하면 쿠키가 무의미할 뿐 아니라, 세션 쿠키를 덮어쓸 위험이 있습니다.
+
+**지침서 규칙 A:** "SUPABASE_SERVICE_ROLE_KEY는 서버 전용이다."
+
+**수정 방향:**
+```typescript
+export function createServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } }
+  );
+}
+```
+
+---
+
+### 2. `hashIp()` — 보안상 부적절한 해싱
+**파일:** `src/lib/utils.ts` (42~50행)
+
+**문제:** IP 해싱에 단순 djb2 해시를 사용하고 있습니다. 이는 **암호학적 해시가 아니며**, 충돌이 빈번하고 역산이 용이합니다. IPv4 주소는 약 43억 개뿐이므로 무차별 대입으로 원본 IP를 쉽게 복원할 수 있습니다.
+
+**지침서 Task 5-3:** "IP를 SHA-256 해시"
+
+**현재 코드:**
+```typescript
+export function hashIp(ip: string): string {
+  let hash = 0;
+  for (let i = 0; i < ip.length; i++) {
+    const char = ip.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(16).padStart(8, "0");
+}
+```
+
+**수정 방향:**
+```typescript
+import { createHash } from "crypto";
+export function hashIp(ip: string): string {
+  return createHash("sha256").update(ip + process.env.IP_HASH_SALT).digest("hex");
+}
+```
+
+---
+
+### 3. `cn()` 유틸 — clsx를 import만 하고 미사용 (기능 결함)
+**파일:** `src/lib/utils.ts` (1~4행)
+
+**문제:** `clsx`의 `ClassValue` 타입을 import하지만 실제 `clsx()` 함수를 사용하지 않고, 단순 `filter(Boolean).join(" ")`으로 대체합니다. 이는 clsx의 핵심 기능(조건부 클래스, 객체/배열 지원)이 동작하지 않습니다.
+
+```typescript
+import { type ClassValue } from "clsx"; // 타입만 가져옴
+export function cn(...inputs: ClassValue[]) {
+  return inputs.filter(Boolean).join(" "); // clsx 미사용
+}
+```
+
+**수정 방향:**
+```typescript
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+```
+
+---
+
+### 4. `generateOrderNumber()` — 중복 가능성
+**파일:** `src/lib/utils.ts` (7~11행)
+
+**문제:** `Math.random()`으로 4자리 랜덤 숫자를 생성하여 주문번호를 만듭니다. 같은 날 9000건 이상의 주문이 아니어도 **생일 문제**에 의해 ~50건만으로도 약 1% 충돌 확률이 발생합니다.
+
+```typescript
+const rand = Math.floor(Math.random() * 9000) + 1000;
+return `CF-${date}-${rand}`;
+```
+
+**수정 방향:** DB의 auto-increment 또는 해당 날짜의 기존 주문 수를 세어 순차 채번해야 합니다.
+```typescript
+// DB에서 해당 날짜 마지막 번호 조회 후 +1
+const count = await prisma.order.count({
+  where: { orderNumber: { startsWith: `CF-${date}` } }
+});
+return `CF-${date}-${String(count + 1).padStart(4, "0")}`;
+```
+
+---
+
+### 5. Admin 공지 알림 API — Talent에 대한 알림이 User 자신에게 감
+**파일:** `src/app/api/quotes/route.ts` (73~80행)
+
+**문제:** 견적 발송 시 알림이 **Talent이 아닌 User 자신에게** 전송됩니다.
+
+```typescript
+if (send && project.talent.email) {
+  await sendNotification({
+    userId: user.id,         // ← User 자신에게 알림
+    type: "quote_sent",
+    // ...
+    emailTo: user.email,     // ← User 자신의 이메일
+  });
+}
+```
+
+**지침서 Task 8-1:** "quote_sent: 견적 발송 → **Talent에게**"
+
+**수정 방향:** Talent에게 이메일 알림, User에게는 대시보드 확인 알림을 별도로 보내야 합니다.
+
+---
+
+### 6. 공개 Delivered API — 토큰 검증 누락
+**파일:** `src/app/api/public/delivered/[token]/route.ts`
+
+**문제:** `previewToken`으로 직접 DB 조회하며, 별도의 토큰 검증 함수(`requireDeliveredToken`)를 사용하지 않습니다. 유효성/만료 검증이 없어 모든 previewToken으로 납품 정보에 접근할 수 있습니다.
+
+**지침서 규칙 H:** "공개 토큰 API 첫 줄: 토큰 검증 함수 (세션 검사 금지)"
+**지침서 Task 1-2:** "`requireDeliveredToken(token)` — 만료 여부/연결 엔티티/상태까지 함께 검증"
+
+---
+
+### 7. `quotes/[id]/route.ts` — form action으로 PATCH 불가
+**파일:** `src/app/dashboard/quotes/[id]/page.tsx` (115~119행)
+
+**문제:** HTML `<form>`의 `method` 속성에 "PATCH"를 사용하고 있지만, HTML form은 GET/POST만 지원합니다. 이 코드는 실제로 동작하지 않습니다.
+
+```tsx
+<form action={`/api/quotes/${quote.id}`} method="PATCH">
+  <input type="hidden" name="action" value="send" />
+  <button type="submit">견적서 발송</button>
+</form>
+```
+
+**수정 방향:** Client Component로 변경하고 `fetch` API를 사용하거나, Next.js Server Action을 활용해야 합니다.
+
+---
+
+### 8. `requireUser()` 패턴 — 에러를 catch로 삼킴
+**모든 API 라우트** (`quotes/route.ts`, `pricing/route.ts`, `intake/route.ts` 등)
+
+**문제:** 모든 인증 API에서 동일한 안티패턴이 사용됩니다:
+```typescript
+const user = await requireUser().catch(() => null);
+if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+```
+
+`requireUser()`가 예외를 던지도록 설계되었는데 이를 catch로 삼키면, 인증 실패와 서버 오류(DB 연결 실패 등)를 구분할 수 없습니다. DB 오류도 401로 응답하게 됩니다.
+
+**수정 방향:**
+```typescript
+try {
+  const user = await requireUser();
+  // ... 로직
+} catch (err) {
+  if (err instanceof AuthError) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+}
+```
+
+---
+
+## 🟠 중요 — 지침서 위반 또는 핵심 기능 누락
+
+### 9. API 경로 불일치 — `projects` vs `pages`
+**지침서 섹션 3 프로젝트 구조:**
+```
+/api/pages/[id]/draft/route.ts
+/api/pages/[id]/preview/route.ts
+/api/pages/[id]/publish/route.ts
+```
+
+**실제 코드 (builder 페이지 87행, 118행, 127행):**
+```typescript
+fetch(`/api/pages/${pageId}/draft`, { method: "PATCH" });
+fetch(`/api/pages/${pageId}/preview`, { method: "POST" });
+fetch(`/api/pages/${pageId}/publish`, { method: "POST" });
+```
+
+**문제:** 빌더는 `/api/pages/[id]/...`를 호출하지만, 업로드된 소스에는 이 라우트 파일들이 **존재하지 않습니다**. 완료 보고서에는 `/api/projects/[id]/autosave`, `/api/projects/[id]/preview` 등으로 구현했다고 되어 있어 **경로가 불일치**합니다.
+
+**결론:** 빌더의 핵심 저장/미리보기/배포 기능이 동작하지 않을 가능성이 높습니다.
+
+---
+
+### 10. 지침서의 Page 모델 vs 실제 구현의 Project 통합
+**지침서:** Page는 Project와 1:1 관계의 **별도 모델**이며, `slug`, `previewToken`, `contentKo/En/Cn`, `draftContent` 등을 가집니다.
+
+**실제 완료 보고서:** Project 모델에 `publicToken`, `draftContent`, `contentKo/En/Zh`를 직접 넣은 것으로 보입니다.
+
+**영향:** 지침서의 Prisma 스키마를 그대로 따르지 않으면 모든 API와 컴포넌트에서 데이터 접근 경로가 달라집니다.
+
+---
+
+### 11. 테마 시스템 — 지침서와 구조 불일치
+**지침서의 ThemeConfig:**
+```typescript
+interface ThemeConfig {
+  colors: { primary, secondary, text, textLight, accent, background, backgroundAlt, border, buttonBg, buttonText };
+  fonts: { headingKo, headingEn, bodyKo, bodyEn };
+  backgroundStyle: "solid" | "texture" | "gradient";
+  buttonStyle: "rounded" | "sharp" | "pill";
+  animationTone: "subtle" | "moderate" | "elegant";
+}
+```
+
+**실제 완료 보고서의 ThemeConfig:**
+```typescript
+interface ThemeConfig {
+  bgColor: string; textColor: string; accentColor: string;
+  fontFamily: string; borderRadius: string;
+}
+```
+
+**문제:** 지침서의 7개 테마는 10색 컬러 팔레트 + 4개 폰트 + 배경 스타일 + 버튼 스타일 + 애니메이션 톤을 포함하는 상세한 구조입니다. 실제 구현은 이를 크게 단순화했습니다. 빌더 코드에서 `currentTheme.colors.accent`를 참조하므로, 지침서의 ThemeConfig 구조와 일치해야 합니다.
+
+---
+
+### 12. 섹션 드래그 순서 변경 미구현
+**지침서 Task 5-1:** "드래그로 순서 변경 (고정 섹션 제외)"
+
+**실제 코드:** 섹션 목록이 하드코딩되어 있고, 드래그 기능이 없습니다. `sectionOrder`와 `disabledSections`도 하드코딩:
+```typescript
+sectionOrder={["hero", "profile", "career", "portfolio", "strength", "contact", "footer"]}
+disabledSections={[]}
+```
+
+---
+
+### 13. 이미지 업로드 기능 부재
+**지침서 Task 5-1:** "이미지 업로드 영역 (드래그앤드롭)"
+
+**실제 빌더 코드:** Hero 섹션에 `heroImageId` 입력 필드가 없고, 이미지 업로드 UI가 전혀 구현되지 않았습니다. 포트폴리오 사진도 "사진은 자료 제출 또는 업로드를 통해 추가됩니다"라는 텍스트만 표시합니다.
+
+---
+
+### 14. Tiptap WYSIWYG 에디터 미사용
+**지침서 기술 스택:** "Editor: Tiptap (인라인 WYSIWYG)"
+**지침서 Task 5-1:** "Tiptap 에디터 (볼드, 이탤릭, 링크, 줄바꿈만 허용)"
+
+**실제 코드:** 모든 텍스트 입력에 일반 `<textarea>`와 `<input>`만 사용합니다.
+
+---
+
+### 15. Framer Motion 애니메이션 미사용
+**지침서 기술 스택:** "Animation: Framer Motion"
+**지침서 Task 5-2:** "Framer Motion 애니메이션 (animationTone에 따라 강도 조절)"
+
+**실제 코드:** Framer Motion import나 사용이 전혀 없습니다.
+
+---
+
+### 16. Zustand 상태 관리 미사용
+**지침서 기술 스택:** "State: Zustand"
+
+**실제 코드:** 빌더에서 `useState`만 사용하고, Zustand store가 없습니다. 복잡한 빌더 상태(draftContent, theme, sectionOrder 등)를 단일 컴포넌트의 useState로 관리하면 성능 문제와 상태 동기화 이슈가 발생합니다.
+
+---
+
+### 17. PRPageRenderer 컴포넌트 미포함
+**파일:** 빌더에서 import하지만 소스에 포함되지 않음
+
+```typescript
+import { PRPageRenderer } from "@/components/pr-page/PRPageRenderer";
+```
+
+**지침서 Task 5-2:** 7개 섹션 컴포넌트 + PRPageRenderer.tsx가 필요합니다.
+
+---
+
+### 18. DashboardSidebar 컴포넌트 미포함
+**파일:** layout.tsx에서 import하지만 소스에 포함되지 않음
+
+```typescript
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+```
+
+---
+
+### 19. 연락처 편집 — type/value 입력 부재
+**파일:** `builder/[projectId]/page.tsx` (279~301행)
+
+**문제:** 연락처 채널 편집 시 `label`만 입력 가능하고, `type` (email/kakao/instagram 등)과 `value` 입력 필드가 없습니다.
+
+**지침서 PageContent:**
+```typescript
+contact: {
+  channels: Array<{
+    type: "email" | "kakao" | "instagram" | ...;
+    value: string;
+    label: string;
+  }>;
+}
+```
+
+---
+
+### 20. `users/me` API — logAudit 미호출
+**파일:** `src/app/api/users/me/route.ts`
+
+**지침서 규칙 23:** "모든 핵심 변경은 AuditLog 기록"
+
+사용자 정보 변경 시 `logAudit()`가 호출되지 않습니다.
+
+---
+
+### 21. `users/me` API — 입력 검증 부재
+**파일:** `src/app/api/users/me/route.ts`
+
+**문제:** 요청 body를 검증 없이 그대로 Prisma update에 전달합니다. 악의적 사용자가 `role`, `commissionRate`, `status` 등 민감한 필드를 변경할 수 있습니다.
+
+```typescript
+const body = await request.json();
+await prisma.user.update({
+  where: { id: user.id },
+  data: {
+    name: body.name,      // 이것만 허용하면 OK이지만...
+    phone: body.phone,
+    company: body.company,
+  },
+});
+```
+
+현재는 3개 필드만 명시적으로 매핑하므로 즉각적 위험은 없지만, `body`를 spread하지 않는 것이 안전합니다. 다만 `body.name`이 undefined/null일 때의 처리가 없어 의도치 않게 null로 업데이트될 수 있습니다.
+
+---
+
+### 22. 견적 발송 시 Talent proxy 알림 규칙 미구현
+**지침서 규칙 L/35:** "Talent에게 이메일 알림 시 email이 없으면 담당 User에게 대리 알림. 메시지에 '방송인 [이름]에게 직접 전달해주세요' 포함"
+
+**실제 코드 (quotes/route.ts):** Talent.email이 있을 때만 알림을 보내고, 없을 때는 **아무것도 하지 않습니다.**
+
+---
+
+### 23. Admin 알림 페이지 — requireAdmin() 미호출
+**파일:** `src/app/admin/notifications/page.tsx`
+
+**문제:** `"use client"` 컴포넌트이므로 서버에서 `requireAdmin()`을 호출하지 않습니다. Admin layout에서 처리한다고 가정하지만, 소스에 admin/layout.tsx가 포함되어 있지 않아 확인 불가합니다.
+
+---
+
+### 24. RiskFlag — 30일 미확정 경고 자동 생성 미구현
+**지침서 Task 7-4:** "매일 1회 체크 (cron 또는 수동) → RiskFlag 생성"
+
+**실제 코드:** admin/monitoring에서 조회만 하고, RiskFlag를 실제로 생성하는 API나 cron job이 없습니다.
+
+---
+
+### 25. 상품 수정 API — 가격 변경 시 PricingPolicyVersion 생성 미구현
+**지침서 Task 6-1:** "가격 변경 시 새 PricingPolicyVersion 생성 + PricingChangeLog 기록"
+
+**실제 코드:** `/api/pricing/[id]` 라우트가 소스에 포함되어 있지 않습니다. 상품 생성만 가능하고 수정이 불가능합니다.
+
+---
+
+### 26. 견적 유효기간 만료 자동 처리 미구현
+**지침서 Task 6-3:** "유효기간 만료 시 자동 Expired (접근 시 확인)"
+
+**실제 코드:** 공개 Quote API에서 만료 체크는 토큰 검증 함수에 위임하지만, 실제 `requireQuoteToken()`의 구현이 소스에 없습니다. 또한 Quote 목록/상세에서 만료된 견적의 상태를 자동으로 EXPIRED로 변경하는 로직이 없습니다.
+
+---
+
+### 27. 수정 정책(RevisionPolicy) 관리 UI/API 미구현
+**지침서 Task 6-2:** "상품별로 User가 직접 설정"
+
+업로드된 소스에 RevisionPolicy CRUD API 또는 UI가 없습니다.
+
+---
+
+## 🟡 개선 권장
+
+### 28. 자동 저장 — 변경 감지 없이 항상 타이머 리셋
+**파일:** `builder/[projectId]/page.tsx` (96~103행)
+
+**문제:** `draftContent`가 변경될 때마다(최초 로딩 포함) 무조건 `setSaveState("unsaved")`를 호출하고 타이머를 리셋합니다. 초기 데이터 로딩 시에도 "미저장" 상태가 표시됩니다.
+
+---
+
+### 29. 자동 저장 — saveDraft 실패 시 재시도 없음
+**파일:** `builder/[projectId]/page.tsx` (84~93행)
+
+API 호출 실패 시 `"error"` 상태만 표시하고 재시도하지 않습니다. 네트워크 일시 장애 시 데이터가 유실될 수 있습니다.
+
+---
+
+### 30. DashboardHeader — 에러 무시
+**파일:** `src/components/layout/DashboardHeader.tsx` (13행)
+
+```typescript
+.catch(() => {});
+```
+
+API 호출 실패를 완전히 무시합니다.
+
+---
+
+### 31. Admin 페이지들 — 하드코딩된 `take: 100/50`
+**파일:** 모든 admin 페이지
+
+```typescript
+const projects = await prisma.project.findMany({ take: 100 });
+```
+
+페이지네이션이 구현되지 않아, 데이터가 100건을 초과하면 나머지를 볼 수 없습니다.
+
+---
+
+### 32. 빌더 — 테마/accentColor 변경이 서버에 저장되지 않음
+
+테마와 Accent Color를 변경해도 `draftContent`만 자동 저장되고, Page의 `theme`과 `accentColor` 필드는 업데이트되지 않습니다.
+
+---
+
+### 33. 빌더 — "버전 저장" 기능 미구현
+**지침서 Task 5-1:** '"버전 저장" 버튼 → PageVersion 생성'
+
+빌더 상단에 "저장", "미리보기 생성", "배포" 버튼만 있고 "버전 저장" 버튼이 없습니다.
+
+---
+
+### 34. 빌더 — 반응형 대응 미흡
+**지침서 Task 3-1:** "하단 탭바 (모바일 767px 이하, 핵심 5개만)"
+
+빌더의 3패널 레이아웃이 모바일에서 사용 불가능합니다. 좌측 208px + 우측 288px = 최소 496px + 중앙 프리뷰 영역이 필요합니다.
+
+---
+
+### 35. fetchNotifications — useEffect 경고
+**파일:** `src/app/dashboard/notifications/page.tsx` (29행)
+
+```typescript
+useEffect(() => {
+  fetchNotifications();
+}, []);
+```
+
+`fetchNotifications`가 의존성 배열에 포함되지 않아 ESLint 경고가 발생할 수 있습니다. `useCallback`으로 감싸거나 의존성에 추가해야 합니다.
+
+---
+
+### 36. 공통 에러 처리 부재
+모든 클라이언트 컴포넌트에서 API 호출 에러를 각자 다른 방식으로 처리합니다. 중앙화된 에러 핸들러나 toast 시스템이 없습니다.
+
+---
+
+### 37. Admin 공지 — Promise.all로 대량 알림 발송
+**파일:** `src/app/api/admin/notify/route.ts` (31~33행)
+
+```typescript
+await Promise.all(
+  users.map(u => sendNotification({ ... }))
+);
+```
+
+사용자가 수백 명이면 동시에 수백 개의 DB/이메일 요청이 발생합니다. 배치 처리 또는 큐를 사용해야 합니다.
+
+---
+
+### 38. `require*` 함수들의 소스 코드 미포함
+`src/lib/auth.ts` (`getCurrentDbUser`, `requireUser`, `requireAdmin`)
+`src/lib/prisma.ts`
+`src/lib/audit.ts` (`logAudit`, `logTimeline`)
+`src/lib/notify.ts` (`sendNotification`)
+`src/lib/tokens.ts` (`requireReviewToken`, `requireQuoteToken`, `requireDeliveredToken`)
+`src/themes/index.ts` 등
+
+이 핵심 유틸리티 파일들이 소스에 포함되지 않아 내부 동작을 검증할 수 없습니다. 이 파일들의 구현에 따라 위의 많은 이슈가 해결될 수도, 악화될 수도 있습니다.
+
+---
+
+### 39. 누락된 주요 파일 목록
+
+지침서에서 요구하지만 소스에 포함되지 않은 **주요 파일**:
+
+| 카테고리 | 누락 파일 |
+|----------|----------|
+| 핵심 라이브러리 | `src/lib/auth.ts`, `src/lib/prisma.ts`, `src/lib/audit.ts`, `src/lib/notify.ts`, `src/lib/tokens.ts`, `src/lib/mail.ts`, `src/lib/image.ts`, `src/lib/qr.ts`, `src/lib/pdf.ts` |
+| 인증/미들웨어 | `middleware.ts`, `src/app/login/page.tsx`, `src/app/layout.tsx` |
+| 대시보드 | `src/app/dashboard/page.tsx` (홈), `src/app/dashboard/talents/*`, `src/app/dashboard/projects/*`, `src/app/dashboard/orders/*`, `src/app/dashboard/settlements/*`, `src/app/dashboard/settings/*`, `src/app/dashboard/onboarding/*` |
+| 공개 페이지 | `src/app/p/[slug]/page.tsx`, `src/app/preview/[token]/page.tsx`, `src/app/submit/[token]/page.tsx`, `src/app/review/[token]/page.tsx`, `src/app/quote/[token]/page.tsx`, `src/app/delivered/[token]/page.tsx` |
+| Admin | `src/app/admin/layout.tsx`, `src/app/admin/page.tsx`, `src/app/admin/users/*`, `src/app/admin/audit/*` |
+| 컴포넌트 | `src/components/pr-page/PRPageRenderer.tsx`, 7개 섹션 컴포넌트, `src/components/layout/DashboardSidebar.tsx`, `src/components/ui/*` |
+| 테마 | `src/themes/` 전체 (7개 파일 + index.ts) |
+| API 라우트 | `/api/pages/*`, `/api/talents/*`, `/api/projects/[id]/*`, `/api/orders/*`, `/api/settlements/*`, `/api/upload/*`, `/api/qr/*`, `/api/auth/*` |
+| i18n | `src/i18n/config.ts`, `src/i18n/request.ts`, `messages/*.json` |
+| 스키마 | `prisma/schema.prisma`, `prisma/seed.ts` |
+| 설정 | `next.config.ts`, `tailwind.config.ts`, `package.json`, `.env.local` |
+
+> 참고: 업로드된 소스(src.zip)는 "이번 세션에서 신규 생성/수정된 파일"만 포함하고 있어, 전체 프로젝트의 일부분입니다.
+
+---
+
+### 40. 지침서 규칙 준수 상태 체크리스트
+
+| 규칙 | 상태 | 비고 |
+|------|------|------|
+| 규칙 A: SERVICE_ROLE_KEY 서버 전용 | ⚠️ | 쿠키 주입 이슈 (이슈 #1) |
+| 규칙 B: 클라이언트 ANON_KEY만 | ✅ | 확인됨 |
+| 규칙 C: Prisma User.role 기준 권한 | ✅ | Admin 페이지에서 requireAdmin() 사용 |
+| 규칙 D: MVP 오프라인 결제만 | ✅ | PG 코드 없음 |
+| 규칙 E: 외부 영상 PageContent.portfolio.videos | ✅ | 빌더에서 URL 입력 구현 |
+| 규칙 F: 연락처 source of truth = contact.channels | ⚠️ | 편집 UI 불완전 (이슈 #19) |
+| 규칙 G: URL 실제 세그먼트 기준 | ✅ | |
+| 규칙 H: 내부/공개 API 인증 분리 | ⚠️ | delivered API 미분리 (이슈 #6) |
+| 규칙 I: Preview/Published는 contentKo/En/Cn 소스 | ✅ | 빌더의 draftContent/preview 분리 |
+| 규칙 J: locale은 쿠키 기반 | ❓ | i18n 소스 미포함 |
+| 규칙 K: Resend 이메일 | ❓ | mail.ts 미포함 |
+| 규칙 L: Talent proxy 알림 | ❌ | 미구현 (이슈 #22) |
+
+---
+
+## 우선순위별 수정 권장 순서
+
+### 1단계: 즉시 (보안/동작 불가)
+1. `createServiceClient()` 쿠키 제거 (#1)
+2. `hashIp()` SHA-256으로 교체 (#2)
+3. Delivered API 토큰 검증 추가 (#6)
+4. 견적 발송 PATCH form → fetch 변경 (#7)
+5. 견적 알림 대상 수정 (User→Talent) (#5)
+6. 빌더 API 경로 `/api/pages/*` 일치 확인 (#9)
+
+### 2단계: 단기 (핵심 기능 완성)
+7. 이미지 업로드 기능 구현 (#13)
+8. 연락처 type/value 편집 추가 (#19)
+9. Talent proxy 알림 구현 (#22)
+10. `generateOrderNumber()` 순차 채번 (#4)
+11. `cn()` 함수에 clsx 실사용 (#3)
+12. `requireUser()` 에러 처리 개선 (#8)
+13. 테마 변경 저장 기능 (#32)
+
+### 3단계: 중기 (지침서 완전 준수)
+14. Tiptap 에디터 도입 (#14)
+15. Framer Motion 애니메이션 (#15)
+16. Zustand 상태 관리 (#16)
+17. 섹션 드래그 순서 변경 (#12)
+18. 버전 저장 기능 (#33)
+19. 수정 정책 관리 (#27)
+20. 페이지네이션 (#31)

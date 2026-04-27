@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=Archivo+Black&family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Serif:wght@400;700&family=Work+Sans:wght@300;400;500;600;700&family=Epilogue:wght@400;700;800;900&family=Manrope:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Nanum+Pen+Script&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+@import url('https://webfontworld.github.io/gmarket/GmarketSans.css');
+@import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2205@1.0/ChosunCentenary.woff2');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", serif;
+}
+
+@layer base {
+  :root {
+    --cf-bg: #ffffff;
+    --cf-text: #000000;
+    --cf-accent: #000000;
+    --cf-secondary: #666666;
+    --cf-card: #f9fafb;
+    --cf-border: #e5e7eb;
+  }
+  
+  body {
+    @apply font-sans text-black bg-white;
+  }
+}
+
+@layer components {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

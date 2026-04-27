@@ -1,0 +1,80 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Castfolio",
+  "colors": {
+    "primary": "#2563EB",
+    "light": "#3B82F6",
+    "dark": "#1D4ED8"
+  },
+  "logo": {
+    "light": "/images/logo-light.svg",
+    "dark": "/images/logo-dark.svg",
+    "href": "/"
+  },
+  "favicon": "/images/favicon.ico",
+  "navbar": {
+    "links": [
+      {
+        "label": "데모 보기",
+        "href": "https://castfolio.app/demo"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "무료로 시작하기",
+      "href": "https://castfolio.app/login"
+    }
+  },
+  "footer": {
+    "socials": {
+      "website": "https://castfolio.app"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "홈",
+        "groups": [
+          {
+            "group": "시작하기",
+            "pages": ["index", "quickstart"]
+          },
+          {
+            "group": "기능 안내",
+            "pages": [
+              "features/overview",
+              "features/page-builder",
+              "features/themes",
+              "features/settlement"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "가이드",
+        "groups": [
+          {
+            "group": "워크플로우",
+            "pages": ["guide/workflow", "guide/submit-form", "guide/review"]
+          }
+        ]
+      },
+      {
+        "tab": "요금제",
+        "groups": [
+          {
+            "group": "요금 안내",
+            "pages": ["pricing", "faq"]
+          }
+        ]
+      }
+    ]
+  },
+  "appearance": {
+    "default": "light"
+  },
+  "seo": {
+    "indexHiddenPages": false
+  }
+}

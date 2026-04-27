@@ -1,0 +1,58 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "confirm": "Confirm",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "submit": "Submit",
+    "send": "Send",
+    "preview": "Preview",
+    "publish": "Publish",
+    "draft": "Draft",
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "pr": {
+    "hero": {
+      "cta_portfolio": "View Portfolio",
+      "cta_contact": "Contact"
+    },
+    "profile": { "title": "Profile" },
+    "career": { "title": "Career" },
+    "portfolio": { "title": "Portfolio", "videos": "Videos", "photos": "Photos" },
+    "strength": { "title": "Strengths" },
+    "contact": { "title": "Contact" },
+    "footer": { "powered": "Powered by Castfolio" },
+    "preview_banner": "This is a preview page. Not yet published.",
+    "language": "Language"
+  },
+  "intake": {
+    "title": "Submit Materials",
+    "expired": "This link has expired",
+    "complete": "Your submission is complete. Thank you!"
+  },
+  "quote": {
+    "expired": "This quote has expired. Please contact your agent.",
+    "payment_guide": "Payment: Please contact the agent below to proceed.",
+    "contact_agent": "Contact Agent",
+    "inquire": "Inquire"
+  },
+  "delivered": {
+    "congratulations": "Congratulations! Your PR page is ready.",
+    "view_page": "View PR Page",
+    "download_qr": "Download QR Code",
+    "revision_policy": "Revision Policy"
+  }
+}

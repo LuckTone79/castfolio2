@@ -1,0 +1,663 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════
+// 계정/권한
+// ═══════════════════════════════════════
+
+enum UserRole {
+  MASTER_ADMIN
+  USER
+}
+
+enum UserType {
+  INDIVIDUAL
+  SOLE_PROPRIETOR
+  CORPORATION
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+model User {
+  id                String             @id @default(uuid())
+  email             String             @unique
+  name              String
+  role              UserRole           @default(USER)
+  userType          UserType?
+  company           String?
+  phone             String?
+  commissionRate    Decimal            @default(0.15)
+  status            AccountStatus      @default(ACTIVE)
+  supabaseUid       String             @unique
+
+  brandLogoUrl      String?
+  brandColor        String?
+
+  talents           Talent[]
+  projects          Project[]
+  productPackages   ProductPackage[]
+  quotes            Quote[]
+  orders            Order[]
+  settlements       SettlementBatch[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]         @relation("AuditActor")
+  adminNotes        AdminNote[]
+  pricingLogs       PricingChangeLog[]
+  commissionLedgers CommissionLedger[]
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+// ═══════════════════════════════════════
+// 핵심 비즈니스
+// ═══════════════════════════════════════
+
+enum TalentStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+model Talent {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+
+  nameKo      String
+  nameEn      String
+  nameCn      String?
+  email       String?
+  phone       String?
+  kakaoId     String?
+  position    String
+  status      TalentStatus @default(ACTIVE)
+
+  projects    Project[]
+  intakeForms IntakeForm[]
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+enum ProjectStatus {
+  NEW
+  COLLECTING_MATERIALS
+  DRAFTING
+  UNDER_REVIEW
+  READY_FOR_DELIVERY
+  DELIVERED
+  CLOSED
+  DISPUTED
+}
+
+enum IntakeMode {
+  SELF_SUBMISSION
+  OPERATOR_ENTRY
+  HYBRID
+}
+
+enum SourceChannel {
+  KAKAO
+  EMAIL
+  PHONE
+  OFFLINE
+  UPLOAD_LINK
+  MIXED
+}
+
+enum VerificationStatus {
+  NOT_REQUESTED
+  REQUESTED
+  APPROVED
+  REVISION_REQUESTED
+}
+
+enum DataEnteredBy {
+  TALENT
+  USER
+  BOTH
+}
+
+model Project {
+  id                     String             @id @default(uuid())
+  userId                 String
+  user                   User               @relation(fields: [userId], references: [id])
+  talentId               String
+  talent                 Talent             @relation(fields: [talentId], references: [id])
+
+  name                   String
+  purpose                String?
+  status                 ProjectStatus      @default(NEW)
+
+  intakeMode             IntakeMode         @default(SELF_SUBMISSION)
+  sourceChannel          SourceChannel?
+  dataEnteredBy          DataEnteredBy?
+  verificationStatus     VerificationStatus @default(NOT_REQUESTED)
+  verifiedAt             DateTime?
+
+  page                   Page?
+  pageVersions           PageVersion[]
+  intakeForms            IntakeForm[]
+  quotes                 Quote[]
+  orders                 Order[]
+  timeline               ProjectTimeline[]
+  mediaAssets            MediaAsset[]
+
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+}
+
+enum PageStatus {
+  DRAFT
+  PREVIEW
+  PUBLISHED
+  INACTIVE
+}
+
+model Page {
+  id              String     @id @default(uuid())
+  projectId       String     @unique
+  project         Project    @relation(fields: [projectId], references: [id])
+
+  slug            String     @unique
+  previewToken    String     @unique @default(uuid())
+  theme           String
+  accentColor     String?
+  status          PageStatus @default(DRAFT)
+
+  // 콘텐츠: 확정된 렌더링용 데이터 (Preview/Published에서 사용)
+  contentKo       Json       @default("{}")
+  contentEn       Json       @default("{}")
+  contentCn       Json       @default("{}")
+
+  // Draft: 편집 중 임시 데이터 (자동 저장용, 3개 locale 통합)
+  draftContent    Json?
+
+  // 섹션 설정
+  sectionOrder    String[]   @default(["hero","profile","career","portfolio","strength","contact","footer"])
+  disabledSections String[]  @default([])
+
+  noindex         Boolean    @default(true)
+  ogImageUrl      String?
+  showPhone       Boolean    @default(false)
+  emailBotProtect Boolean    @default(true)
+
+  viewsCount      Int        @default(0)
+  publishedAt     DateTime?
+
+  pageViews       PageView[]
+  qrAssets        QRAsset[]
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model PageVersion {
+  id           String   @id @default(uuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id])
+
+  versionName  String
+  draftSnapshot Json
+  theme        String
+  accentColor  String?
+  sectionOrder String[]
+  savedBy      String
+  reason       String?
+
+  createdAt    DateTime @default(now())
+}
+
+// ═══════════════════════════════════════
+// 미디어
+// ═══════════════════════════════════════
+
+enum MediaType {
+  HERO_PHOTO
+  PROFILE_PHOTO
+  PORTFOLIO_PHOTO
+  AUDIO_SAMPLE
+  OTHER
+}
+
+model MediaAsset {
+  id           String    @id @default(uuid())
+  projectId    String
+  project      Project   @relation(fields: [projectId], references: [id])
+
+  type         MediaType
+  originalUrl  String
+  optimizedUrl String?
+  thumbnailUrl String?
+  fileName     String
+  fileSize     Int
+  mimeType     String
+  width        Int?
+  height       Int?
+  uploadedBy   String
+
+  createdAt    DateTime  @default(now())
+}
+
+// ═══════════════════════════════════════
+// 자료 수집
+// ═══════════════════════════════════════
+
+model IntakeForm {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  talentId    String
+  talent      Talent   @relation(fields: [talentId], references: [id])
+
+  token       String   @unique @default(uuid())
+  expiresAt   DateTime?
+  customFields Json?
+
+  submissions IntakeSubmission[]
+
+  createdAt   DateTime @default(now())
+}
+
+enum SubmissionStatus {
+  PENDING
+  PARTIAL
+  COMPLETE
+}
+
+model IntakeSubmission {
+  id          String           @id @default(uuid())
+  formId      String
+  form        IntakeForm       @relation(fields: [formId], references: [id])
+
+  data        Json
+  submittedBy String
+  source      SourceChannel?
+  status      SubmissionStatus @default(PENDING)
+
+  createdAt   DateTime         @default(now())
+}
+
+// ═══════════════════════════════════════
+// 상품/가격
+// ═══════════════════════════════════════
+
+model ProductPackage {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  name        String
+  description String?
+  isTemplate  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+
+  pricingVersions PricingPolicyVersion[]
+  revisionPolicy  RevisionPolicy?
+  quoteLineItems  QuoteLineItem[]
+  pricingLogs     PricingChangeLog[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PricingPolicyVersion {
+  id              String         @id @default(uuid())
+  packageId       String
+  package         ProductPackage @relation(fields: [packageId], references: [id])
+
+  versionNumber   Int
+  basePrice       Decimal
+  promoPrice      Decimal?
+  promoStartAt    DateTime?
+  promoEndAt      DateTime?
+  isActive        Boolean        @default(true)
+
+  options         Json?
+  changeSummary   String?
+
+  createdAt       DateTime       @default(now())
+}
+
+model RevisionPolicy {
+  id                  String         @id @default(uuid())
+  packageId           String         @unique
+  package             ProductPackage @relation(fields: [packageId], references: [id])
+
+  freeRevisions       Int            @default(0)
+  extraRevisionFee    Decimal        @default(0)
+  revisionWindowDays  Int            @default(14)
+  freeScope           Json?
+  paidScope           Json?
+  excludedScope       Json?
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
+
+model PricingChangeLog {
+  id          String         @id @default(uuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id])
+  packageId   String
+  package     ProductPackage @relation(fields: [packageId], references: [id])
+
+  field       String
+  oldValue    String
+  newValue    String
+  reason      String?
+
+  createdAt   DateTime       @default(now())
+}
+
+// ═══════════════════════════════════════
+// 상업/정산
+// ═══════════════════════════════════════
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  EXPIRED
+  SUPERSEDED
+  ACCEPTED
+  REJECTED
+}
+
+model Quote {
+  id          String      @id @default(uuid())
+  projectId   String
+  project     Project     @relation(fields: [projectId], references: [id])
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+
+  token       String      @unique @default(uuid())
+  status      QuoteStatus @default(DRAFT)
+  totalAmount Decimal
+  validUntil  DateTime
+  message     String?
+  pricingSnapshot Json
+
+  lineItems   QuoteLineItem[]
+  order       Order?
+
+  sentAt      DateTime?
+  createdAt   DateTime    @default(now())
+}
+
+model QuoteLineItem {
+  id          String         @id @default(uuid())
+  quoteId     String
+  quote       Quote          @relation(fields: [quoteId], references: [id])
+  packageId   String
+  package     ProductPackage @relation(fields: [packageId], references: [id])
+
+  description String
+  amount      Decimal
+  quantity    Int            @default(1)
+}
+
+enum OrderStatus {
+  DRAFT
+  PAYMENT_PENDING
+  PAID
+  DELIVERED
+  SETTLED
+  CANCELLED
+  DISPUTED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  ONLINE_CARD
+  ONLINE_KAKAO
+  ONLINE_NAVER
+  ONLINE_TRANSFER
+  OFFLINE_CASH
+  OFFLINE_TRANSFER
+  OFFLINE_OTHER
+}
+
+model Order {
+  id                  String        @id @default(uuid())
+  quoteId             String?       @unique
+  quote               Quote?        @relation(fields: [quoteId], references: [id])
+  projectId           String
+  project             Project       @relation(fields: [projectId], references: [id])
+  userId              String
+  user                User          @relation(fields: [userId], references: [id])
+
+  orderNumber         String        @unique
+  status              OrderStatus   @default(DRAFT)
+  totalAmount         Decimal
+  commissionRate      Decimal
+  commissionAmount    Decimal
+  userAmount          Decimal
+
+  paymentMethod       PaymentMethod?
+  paymentProofUrl     String?
+  paidAt              DateTime?
+
+  pricingSnapshot     Json
+  revisionSnapshot    Json?
+
+  lineItems           OrderLineItem[]
+  payments            PaymentRecord[]
+  refunds             RefundRecord[]
+  commissionLedger    CommissionLedger[]
+
+  deliveredAt         DateTime?
+  settledAt           DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+model OrderLineItem {
+  id          String  @id @default(uuid())
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id])
+
+  description String
+  amount      Decimal
+  quantity    Int     @default(1)
+  type        String
+}
+
+model PaymentRecord {
+  id          String        @id @default(uuid())
+  orderId     String
+  order       Order         @relation(fields: [orderId], references: [id])
+
+  amount      Decimal
+  method      PaymentMethod
+  pgTxId      String?
+  status      String
+  proofUrl    String?
+
+  createdAt   DateTime      @default(now())
+}
+
+model RefundRecord {
+  id                 String   @id @default(uuid())
+  orderId            String
+  order              Order    @relation(fields: [orderId], references: [id])
+
+  amount             Decimal
+  reason             String
+  refundedCommission Decimal
+  status             String
+  processedBy        String?
+
+  createdAt          DateTime @default(now())
+}
+
+model CommissionLedger {
+  id               String           @id @default(uuid())
+  orderId          String
+  order            Order            @relation(fields: [orderId], references: [id])
+  userId           String
+  user             User             @relation(fields: [userId], references: [id])
+  settlementId     String?
+  settlement       SettlementBatch? @relation(fields: [settlementId], references: [id])
+
+  orderAmount      Decimal
+  commissionRate   Decimal
+  commissionAmount Decimal
+  userAmount       Decimal
+  type             String
+
+  createdAt        DateTime         @default(now())
+}
+
+enum SettlementStatus {
+  PENDING
+  COMPLETED
+  OVERDUE
+}
+
+model SettlementBatch {
+  id              String            @id @default(uuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
+
+  periodStart     DateTime
+  periodEnd       DateTime
+  totalSales      Decimal
+  totalCommission Decimal
+  totalUserAmount Decimal
+  status          SettlementStatus  @default(PENDING)
+  minimumMet      Boolean           @default(true)
+
+  ledgerEntries   CommissionLedger[]
+
+  completedAt     DateTime?
+  createdAt       DateTime          @default(now())
+}
+
+// ═══════════════════════════════════════
+// 알림
+// ═══════════════════════════════════════
+
+enum NotificationChannel {
+  DASHBOARD
+  EMAIL
+}
+
+model Notification {
+  id        String              @id @default(uuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id])
+
+  channel   NotificationChannel
+  type      String
+  title     String
+  body      String
+  link      String?
+  isRead    Boolean             @default(false)
+  metadata  Json?
+
+  createdAt DateTime            @default(now())
+}
+
+model NotificationTemplate {
+  id        String   @id @default(uuid())
+  type      String   @unique
+  titleKo   String
+  titleEn   String
+  titleCn   String?
+  bodyKo    String
+  bodyEn    String
+  bodyCn    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ═══════════════════════════════════════
+// 운영/감사
+// ═══════════════════════════════════════
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  actorId      String
+  actor        User     @relation("AuditActor", fields: [actorId], references: [id])
+  actorRole    String
+  action       String
+  targetType   String
+  targetId     String
+  before       Json?
+  after        Json?
+  reason       String?
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+}
+
+model ProjectTimeline {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  event       String
+  description String
+  actorId     String?
+  actorName   String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+}
+
+model AdminNote {
+  id          String   @id @default(uuid())
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+  targetType  String
+  targetId    String
+  note        String
+  isInternal  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model RiskFlag {
+  id          String    @id @default(uuid())
+  targetType  String
+  targetId    String
+  reason      String
+  severity    String
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  createdAt   DateTime  @default(now())
+}
+
+model PageView {
+  id        String   @id @default(uuid())
+  pageId    String
+  page      Page     @relation(fields: [pageId], references: [id])
+  ipHash    String
+  userAgent String?
+  referrer  String?
+  country   String?
+  viewedAt  DateTime @default(now())
+
+  @@index([pageId, ipHash, viewedAt])
+}
+
+model QRAsset {
+  id          String   @id @default(uuid())
+  pageId      String   @unique
+  page        Page     @relation(fields: [pageId], references: [id])
+  pngUrl      String?
+  svgUrl      String?
+  pdfUrl      String?
+  showPhoto   Boolean  @default(false)
+  nameDisplay String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
