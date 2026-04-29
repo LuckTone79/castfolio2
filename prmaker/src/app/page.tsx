@@ -20,8 +20,8 @@ const features = [
         <path d="M14 2v6h5M16 13H8M16 17H8M10 9H8" />
       </svg>
     ),
-    title: "자료 수집",
-    desc: "방송인이 직접 제출하거나 담당자가 대행 입력",
+    title: "방송인 고객 관리",
+    desc: "고객별 자료 제출 상태, 제작 단계, 판매 진행을 한 화면에서 관리",
     color: "#7C5CFC",
   },
   {
@@ -31,8 +31,8 @@ const features = [
         <path d="M3 9h18M9 21V9" />
       </svg>
     ),
-    title: "PR 페이지 제작",
-    desc: "7가지 전문 테마로 10분 만에 완성",
+    title: "PR 홈페이지 빌더",
+    desc: "7가지 전문 테마로 방송인 고객에게 납품할 결과물을 빠르게 제작",
     color: "#06B6D4",
   },
   {
@@ -42,8 +42,8 @@ const features = [
         <circle cx="12" cy="12" r="3" />
       </svg>
     ),
-    title: "미리보기 검토",
-    desc: "토큰 기반 검토 링크로 방송인과 소통",
+    title: "검토 링크 전달",
+    desc: "완성 전 페이지를 보내 수정 요청과 최종 승인을 받을 수 있습니다",
     color: "#10B981",
   },
   {
@@ -54,8 +54,8 @@ const features = [
         <circle cx="16" cy="14" r="1" fill="currentColor" stroke="none" />
       </svg>
     ),
-    title: "견적 & 결제",
-    desc: "자동 견적서 발송 및 결제 안내",
+    title: "판매 확정 관리",
+    desc: "실제 판매금액 기준으로 수수료와 정산 금액을 확인합니다",
     color: "#F59E0B",
   },
   {
@@ -65,8 +65,8 @@ const features = [
         <path d="M3 9h18M9 21V9M12 6v1M16 6v1" />
       </svg>
     ),
-    title: "QR 납품",
-    desc: "고해상도 QR 코드 + PDF 명함 자동 생성",
+    title: "공개 URL & QR 납품",
+    desc: "최종 공개 URL과 QR 카드로 방송사·PD·에이전시에 바로 공유",
     color: "#EC4899",
   },
   {
@@ -76,27 +76,27 @@ const features = [
         <polyline points="16 7 22 7 22 13" />
       </svg>
     ),
-    title: "월 정산",
-    desc: "15% 수수료, 매월 1일 자동 정산",
+    title: "정산 관리",
+    desc: "판매 확정 건 기준으로 파트너 수익과 플랫폼 수수료를 집계",
     color: "#8B5CF6",
   },
 ];
 
 const steps = [
-  { num: "01", title: "방송인 등록", desc: "이름, 포지션, 연락처 입력" },
-  { num: "02", title: "자료 수집", desc: "제출 링크 발송 또는 직접 입력" },
-  { num: "03", title: "PR 페이지 제작", desc: "테마 선택 후 빌더로 편집" },
-  { num: "04", title: "검토 & 결제", desc: "미리보기 확인 후 견적 발송" },
-  { num: "05", title: "배포 & 납품", desc: "공개 링크 + QR 코드 전달" },
-  { num: "06", title: "월 정산", desc: "수익 85% 익월 1일 정산" },
+  { num: "01", title: "방송인 고객 등록", desc: "이름, 포지션, 연락처를 등록합니다" },
+  { num: "02", title: "자료 요청 링크 발송", desc: "로그인 없는 제출 링크를 고객에게 전달합니다" },
+  { num: "03", title: "자료 자동 수집", desc: "사진, 소개, 경력, 영상 자료를 한 번에 받습니다" },
+  { num: "04", title: "Builder 반영", desc: "제출 자료를 버튼 한 번으로 PR 페이지 초안에 반영합니다" },
+  { num: "05", title: "검토 · 납품", desc: "검토 링크 전달 후 공개 URL과 QR로 납품합니다" },
+  { num: "06", title: "판매 확정 · 정산", desc: "판매 확정 건만 15% 수수료가 계산됩니다" },
 ];
 
 const faqs = [
-  { q: "방송인이 직접 사용하는 서비스인가요?", a: "아닙니다. Castfolio는 방송인 PR 페이지를 제작·납품하는 에이전트(제작 파트너)를 위한 B2B SaaS입니다." },
-  { q: "테마는 몇 가지인가요?", a: "7가지 전문 테마(앵커 클린, 프레스티지 블랙, 럭스 마블, 프레시 스카이, 소프트 블러시, 내추럴 그린, 웜 코랄)를 제공합니다." },
-  { q: "결제는 어떻게 이루어지나요?", a: "현재 MVP에서는 오프라인 결제를 지원합니다. 담당자가 직접 결제를 안내하고 확인합니다." },
-  { q: "수수료는 얼마인가요?", a: "기본 수수료는 15%입니다. 우수 파트너에게는 할인 혜택이 제공됩니다." },
-  { q: "다국어 지원이 되나요?", a: "한국어/영어/중국어 3개 언어를 지원합니다. 공개 PR 페이지에서 언어 전환이 가능합니다." },
+  { q: "Castfolio는 방송인이 직접 사용하는 서비스인가요?", a: "아닙니다. Castfolio는 방송인 PR 홈페이지를 제작·판매하는 파트너를 위한 B2B SaaS입니다. 방송인 고객은 자료 제출 링크와 검토 링크만 이용합니다." },
+  { q: "파트너가 판매 가격을 직접 정할 수 있나요?", a: "네. 파트너가 고객에게 제안하는 제작 가격은 자유롭게 설정할 수 있고, 판매 확정 금액 기준으로 수수료가 계산됩니다." },
+  { q: "방송인 고객도 회원가입이 필요한가요?", a: "아닙니다. 방송인 고객은 로그인 없이 자료 제출 링크와 검토 링크를 통해 필요한 정보만 입력하면 됩니다." },
+  { q: "수수료는 언제 발생하나요?", a: "홈페이지를 만들거나 편집하는 것만으로는 수수료가 발생하지 않습니다. 파트너가 판매 확정을 입력한 시점에만 15% 플랫폼 수수료가 계산됩니다." },
+  { q: "완성된 홈페이지는 어떻게 납품하나요?", a: "최종 공개 URL과 QR 카드로 납품할 수 있으며, 방송인 고객은 이를 방송사 PD나 에이전시에 바로 공유할 수 있습니다." },
 ];
 
 export default function LandingPage() {
@@ -185,23 +185,23 @@ export default function LandingPage() {
               className="w-1.5 h-1.5 rounded-full"
               style={{ background: "#7C5CFC", boxShadow: "0 0 6px #7C5CFC" }}
             />
-            방송인 PR 페이지 빌더 · B2B SaaS
+            파트너용 방송인 PR 홈페이지 빌더
           </div>
 
           <h1
             className="font-bold leading-tight mb-6"
             style={{ fontSize: "clamp(2.2rem, 5vw, 3.8rem)", color: "var(--text-primary)" }}
           >
-            방송인 PR 페이지를<br />
-            <span className="text-gradient-violet">10분 만에 완성</span>
+            방송인 PR 홈페이지 제작을<br />
+            <span className="text-gradient-violet">수익화하는 파트너용 빌더</span>
           </h1>
 
           <p
             className="text-base leading-relaxed mb-10 mx-auto"
             style={{ maxWidth: 520, color: "var(--text-secondary)" }}
           >
-            아나운서, 쇼호스트, MC, 리포터를 위한 전문 PR 페이지.<br />
-            자료 수집부터 납품, 정산까지 원스톱으로 처리하세요.
+            Castfolio는 아나운서, 쇼호스트, MC, 리포터 고객에게<br />
+            전문 PR 홈페이지를 제작·판매하는 파트너를 위한 B2B SaaS입니다.
           </p>
 
           <div className="flex flex-wrap gap-3 justify-center">
@@ -209,7 +209,7 @@ export default function LandingPage() {
               href="/demo"
               className="btn-ghost px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2"
             >
-              데모 보기
+              샘플 PR 페이지 보기
               <ArrowRight />
             </Link>
             <Link
@@ -217,7 +217,7 @@ export default function LandingPage() {
               className="btn-primary px-7 py-3 rounded-xl text-sm flex items-center gap-2"
               style={{ background: "var(--accent)" }}
             >
-              무료로 시작하기
+              파트너로 시작하기
               <ArrowRight />
             </Link>
           </div>
@@ -226,9 +226,9 @@ export default function LandingPage() {
           <div className="flex items-center justify-center gap-6 mt-12 flex-wrap">
             {[
               "7가지 전문 테마",
-              "3개 언어 지원 (한·영·중)",
-              "QR · PDF 자동 생성",
-              "월 정산 85%",
+              "로그인 없는 자료 제출 링크",
+              "판매 확정 시에만 15%",
+              "파트너 수익 85%",
             ].map(badge => (
               <div key={badge} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--text-muted)" }}>
                 <span style={{ color: "var(--accent-emerald)" }}>
@@ -341,10 +341,10 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-10">
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "#7C5CFC" }}>
-              수수료 구조
+              파트너 수익 구조
             </p>
             <h2 className="font-bold text-2xl md:text-3xl" style={{ color: "var(--text-primary)" }}>
-              성과 기반, 월정액 없음
+              판매 확정 시에만 수수료 발생
             </h2>
           </div>
 
@@ -378,14 +378,14 @@ export default function LandingPage() {
               플랫폼 수수료
             </p>
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              나머지 <strong style={{ color: "var(--text-secondary)" }}>85%</strong>는 파트너 수익 · 월 1회 정산 · 최소 ₩10,000
+              판매 확정 금액의 <strong style={{ color: "var(--text-secondary)" }}>85%</strong>는 파트너 수익이며, 플랫폼 수수료는 15%입니다.
             </p>
 
             <div className="flex justify-center gap-8 mt-8 pt-8" style={{ borderTop: "1px solid rgba(124,92,252,0.2)" }}>
               {[
                 { label: "별도 월정액", value: "없음" },
-                { label: "정산 주기", value: "월 1회" },
-                { label: "최소 금액", value: "₩10,000" },
+                { label: "수수료 기준", value: "판매 확정" },
+                { label: "파트너 수익", value: "85%" },
               ].map(item => (
                 <div key={item.label} className="text-center">
                   <p className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>{item.value}</p>
@@ -444,14 +444,14 @@ export default function LandingPage() {
             지금 바로 시작하세요
           </h2>
           <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.75)" }}>
-            방송인 PR 페이지 제작을 10분 안에 완성하는 경험, 직접 해보세요.
+            방송인 고객에게 판매할 고급 PR 홈페이지를 더 빠르게 제작하고 납품해보세요.
           </p>
           <Link
             href="/login"
             className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-sm transition-all"
             style={{ background: "white", color: "#4A36B8" }}
           >
-            무료로 시작하기
+            파트너로 시작하기
             <ArrowRight />
           </Link>
         </div>

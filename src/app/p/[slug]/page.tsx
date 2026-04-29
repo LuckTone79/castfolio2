@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { NotFoundPage } from "@/components/common/not-found-page";
 import { PRPageRenderer } from "@/components/page/pr-page-renderer";
 import { prisma } from "@/lib/prisma";
 import type { PageContent } from "@/types/page-content";
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 
   if (!page) {
-    return { title: "페이지를 찾을 수 없습니다" };
+    return { title: "페이지를 찾을 수 없습니다." };
   }
 
   const talent = page.project.talent;
@@ -43,19 +43,25 @@ export default async function PRPublicPage({ params }: Props) {
   });
 
   if (!page) {
-    notFound();
+    return (
+      <NotFoundPage
+        title="페이지를 찾을 수 없습니다."
+        description="주소가 잘못되었거나 아직 공개되지 않은 페이지입니다."
+      />
+    );
   }
 
-  prisma.page
+  void prisma.page
     .update({ where: { id: page.id }, data: { viewsCount: { increment: 1 } } })
     .catch(() => {});
 
   const content = (page.contentKo || page.draftContent) as unknown as PageContent;
   if (!content) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-950 text-sm text-gray-500">
-        콘텐츠를 불러올 수 없습니다.
-      </div>
+      <NotFoundPage
+        title="페이지를 찾을 수 없습니다."
+        description="주소가 잘못되었거나 아직 공개되지 않은 페이지입니다."
+      />
     );
   }
 

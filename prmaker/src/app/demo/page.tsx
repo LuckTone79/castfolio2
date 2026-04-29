@@ -36,8 +36,8 @@ export default function DemoPage() {
           >
             THEMES
           </span>
-          <h1 className="font-bold text-3xl mb-3" style={{ color: "var(--text-primary)" }}>테마 갤러리</h1>
-          <p style={{ color: "var(--text-muted)" }}>7가지 전문 테마 중 방송인의 스타일에 맞는 테마를 선택하세요.</p>
+          <h1 className="font-bold text-3xl mb-3" style={{ color: "var(--text-primary)" }}>고객에게 제안할 수 있는 PR 홈페이지 샘플</h1>
+          <p style={{ color: "var(--text-muted)" }}>방송인 고객의 이미지와 포지션에 맞춰 제안할 수 있는 7가지 전문 테마입니다.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -108,7 +108,7 @@ export default function DemoPage() {
                   {theme.descriptionKo}
                 </p>
                 <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
-                  추천: {theme.recommendedFor}
+                  추천 고객: {theme.recommendedFor}
                 </p>
 
                 <Link
@@ -116,7 +116,7 @@ export default function DemoPage() {
                   className="btn-primary block w-full py-2 rounded-xl text-xs text-center"
                   style={{ background: "var(--accent)" }}
                 >
-                  데모 보기
+                  샘플 보기
                 </Link>
               </div>
             </div>

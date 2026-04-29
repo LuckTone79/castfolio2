@@ -1,20 +1,37 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { User } from "@prisma/client";
 
-export async function getCurrentSessionUser() {
+export const getCurrentSessionUser = cache(async () => {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
-}
 
-export async function getCurrentDbUser(): Promise<User | null> {
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error) {
+      console.error("[auth] getUser failed:", error.message);
+      return null;
+    }
+
+    return user;
+  } catch (error) {
+    console.error("[auth] unexpected getUser failure:", error);
+    return null;
+  }
+});
+
+export const getCurrentDbUser = cache(async (): Promise<User | null> => {
   const sessionUser = await getCurrentSessionUser();
   if (!sessionUser) return null;
+
   return prisma.user.findUnique({
     where: { supabaseUid: sessionUser.id },
   });
-}
+});
 
 export async function requireUser(): Promise<User> {
   const user = await getCurrentDbUser();

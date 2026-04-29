@@ -1,53 +1,47 @@
-"use client";
-
-import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
-import { Button, Badge } from "@/components/ui";
-import { Banknote, Play } from "lucide-react";
+import { requireAdminProfile } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { formatCurrency, formatDate } from "@/lib/utils";
 
-export default function SettlementsPage() {
-  const [running, setRunning] = useState(false);
-  const [result, setResult] = useState("");
+export default async function AdminSettlementsPage() {
+  await requireAdminProfile();
 
-  const runSettlement = async () => {
-    setRunning(true);
-    setResult("");
-    try {
-      const res = await fetch("/api/settlements/run", { method: "POST" });
-      const data = await res.json();
-      if (res.ok) {
-        setResult(`정산 완료: ${data.batchesCreated || 0}건의 배치가 생성되었습니다.`);
-      } else {
-        setResult(`오류: ${data.error || "정산 실행 실패"}`);
-      }
-    } catch {
-      setResult("네트워크 오류");
-    }
-    setRunning(false);
-  };
+  const batches = await prisma.settlementBatch.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 50,
+    include: { user: true },
+  });
 
   return (
     <>
       <PageHeader
-        title="정산 관리"
-        description="월간 정산 배치를 관리합니다"
-        actions={
-          <Button onClick={runSettlement} loading={running}>
-            <Play size={14} /> 정산 실행
-          </Button>
-        }
+        title="전체 정산 관리"
+        description="파트너별 정산 배치와 플랫폼 수수료, 파트너 정산금 현황을 확인하는 공간입니다."
       />
 
-      {result && (
-        <div className={`rounded-lg px-4 py-3 mb-6 text-sm ${result.startsWith("오류") ? "bg-red-900/20 text-red-400 border border-red-800" : "bg-emerald-900/20 text-emerald-400 border border-emerald-800"}`}>
-          {result}
-        </div>
-      )}
-
-      <div className="rounded-xl border border-gray-800 bg-gray-900 p-12 text-center text-gray-500 text-sm">
-        <Banknote size={32} className="mx-auto mb-4 text-gray-600" />
-        정산 배치 목록은 API 연동 후 표시됩니다.<br />
-        정산 실행 버튼을 클릭하면 전월 미정산 커미션을 집계합니다.
+      <div className="rounded-2xl border border-gray-800 bg-gray-900">
+        {batches.length === 0 ? (
+          <div className="px-6 py-12 text-center text-sm text-gray-500">정산 배치가 아직 생성되지 않았습니다.</div>
+        ) : (
+          <div className="divide-y divide-gray-800">
+            {batches.map((batch) => (
+              <div key={batch.id} className="grid gap-3 px-6 py-5 lg:grid-cols-[1.2fr_1fr_1fr_0.8fr] lg:items-center">
+                <div>
+                  <p className="text-sm font-semibold text-white">{batch.user.name}</p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {formatDate(batch.periodStart)} ~ {formatDate(batch.periodEnd)}
+                  </p>
+                </div>
+                <p className="text-sm text-gray-300">{formatCurrency(batch.totalSales.toString())}</p>
+                <p className="text-sm text-gray-400">{formatCurrency(batch.totalCommission.toString())}</p>
+                <div className="text-left lg:text-right">
+                  <p className="text-sm text-gray-300">{batch.status}</p>
+                  <p className="mt-1 text-xs text-gray-500">{formatDate(batch.createdAt)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

@@ -4,31 +4,31 @@ const sections = [
   {
     badge: "WHO",
     title: "누구를 위한 서비스인가요?",
-    content: "Castfolio는 방송인 PR 페이지를 제작·납품하는 에이전트(제작 파트너)를 위한 플랫폼입니다. 방송인 코치, 브랜딩 전문가, 에이전시 등이 주요 고객입니다.",
+    content: "Castfolio는 방송인 PR 홈페이지를 제작·판매하는 파트너를 위한 운영 도구입니다. 방송인 고객은 로그인 없이 자료 제출과 검토만 진행합니다.",
   },
   {
     badge: "INTAKE",
-    title: "자료 수집 3가지 모드",
+    title: "자료 요청 링크 보내기",
     items: [
-      { mode: "직접 제출 (Self Submission)", desc: "방송인에게 제출 링크를 보내면 방송인이 직접 자료를 입력합니다." },
-      { mode: "대행 입력 (Operator Entry)", desc: "카카오톡, 이메일, 전화 등으로 받은 자료를 담당자가 직접 입력합니다." },
-      { mode: "혼합 (Hybrid)", desc: "일부는 방송인이, 일부는 담당자가 입력하는 유연한 방식입니다." },
+      { mode: "방송인 고객 등록", desc: "고객명과 포지션을 등록한 뒤 프로젝트를 연결합니다." },
+      { mode: "자료 제출 링크 발송", desc: "링크 하나만 보내면 방송인 고객이 로그인 없이 사진, 소개, 경력, 영상 자료를 제출할 수 있습니다." },
+      { mode: "제출 자료 확인", desc: "dashboard/intake에서 제출 현황을 보고 Builder 초안으로 바로 불러올 수 있습니다." },
     ],
   },
   {
     badge: "BUILD",
-    title: "PR 페이지 제작",
-    content: "7가지 전문 테마 중 하나를 선택하고 빌더에서 콘텐츠를 편집합니다. 한국어/영어/중국어 3개 언어로 작성할 수 있습니다.",
+    title: "PR 홈페이지 제작",
+    content: "7가지 전문 테마 중 하나를 선택하고 빌더에서 콘텐츠를 편집합니다. 제출 자료를 초안에 반영해 복붙 시간을 줄일 수 있습니다.",
   },
   {
     badge: "PRICE",
-    title: "가격 및 수수료",
-    content: "상품 가격은 파트너가 자유롭게 설정합니다. Castfolio는 결제 금액의 15%만 수수료로 가져갑니다. 별도의 월정액이나 고정 비용은 없습니다.",
+    title: "판매 확정과 수수료",
+    content: "상품 가격은 파트너가 자유롭게 설정합니다. 홈페이지 생성 자체에는 비용이 없고, 판매 확정 금액 기준으로만 15% 플랫폼 수수료가 계산됩니다.",
   },
   {
     badge: "PAY",
     title: "정산",
-    content: "매월 1일 전월 매출분을 정산합니다. 최소 정산 금액은 10,000원이며, 미달 시 다음 달로 이월됩니다.",
+    content: "파트너 수익은 판매 확정 금액의 85%입니다. 정산 정책은 운영 설정에 따라 달라질 수 있으며, dashboard에서 확인할 수 있습니다.",
   },
 ];
 
@@ -67,8 +67,8 @@ export default function GuidePage() {
           >
             GUIDE
           </span>
-          <h1 className="font-bold text-3xl mb-3" style={{ color: "var(--text-primary)" }}>기능 가이드</h1>
-          <p style={{ color: "var(--text-muted)" }}>Castfolio를 활용하는 방법을 안내드립니다.</p>
+          <h1 className="font-bold text-3xl mb-3" style={{ color: "var(--text-primary)" }}>파트너 운영 가이드</h1>
+          <p style={{ color: "var(--text-muted)" }}>방송인 고객 등록부터 자료 수집, 제작, 납품까지 전체 흐름을 안내합니다.</p>
         </div>
 
         {/* Sections */}
@@ -122,14 +122,14 @@ export default function GuidePage() {
           className="mt-12 rounded-2xl p-8 text-center fade-in-6"
           style={{ background: "linear-gradient(135deg, rgba(124,92,252,0.12) 0%, rgba(90,63,216,0.08) 100%)", border: "1px solid rgba(124,92,252,0.2)" }}
         >
-          <p className="font-bold text-lg mb-2" style={{ color: "var(--text-primary)" }}>지금 바로 시작하세요</p>
-          <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>별도 월정액 없이 성과 기반으로만 비용이 발생합니다.</p>
+          <p className="font-bold text-lg mb-2" style={{ color: "var(--text-primary)" }}>지금 바로 파트너 운영을 시작하세요</p>
+          <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>자료 요청부터 판매 확정까지 한 흐름으로 관리할 수 있습니다.</p>
           <Link
             href="/login"
             className="btn-primary px-6 py-2.5 rounded-xl text-sm"
             style={{ background: "var(--accent)" }}
           >
-            무료로 시작하기
+            파트너로 시작하기
           </Link>
         </div>
       </div>

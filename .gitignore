@@ -15,6 +15,10 @@ build/
 .DS_Store
 *.pem
 .env*.local
+.env.production
+.env.production.*
+.env.prmaker.*
+.env.castfolio.*
 
 # Debug logs
 npm-debug.log*

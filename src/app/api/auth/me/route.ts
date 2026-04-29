@@ -27,9 +27,12 @@ export async function GET() {
   return NextResponse.json({
     id: dbUser.id,
     email: dbUser.email,
-    name: dbUser.name,
-    role: dbUser.role,
+    displayName: dbUser.name,
+    role: dbUser.role === "MASTER_ADMIN" ? "admin" : "agent",
     userType: dbUser.userType,
-    status: dbUser.status,
+    status: "active",
+    commissionRate: Number(dbUser.commissionRate),
+    createdAt: dbUser.createdAt.toISOString(),
+    updatedAt: dbUser.updatedAt.toISOString(),
   });
 }

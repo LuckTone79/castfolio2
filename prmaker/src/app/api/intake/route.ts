@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
+import { logAudit, logTimeline } from "@/lib/audit";
+import { buildIntakeUrl, createIntakeToken, hasMeaningfulContent } from "@/lib/intake";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logAudit, logTimeline } from "@/lib/audit";
+import type { IntakePayload, IntakeSubmissionRecord } from "@/types/intake";
+import type { PageContent } from "@/types/page-content";
+
+function getExistingContent(page: { draftContent: unknown; contentKo: unknown } | null): PageContent | null {
+  if (!page) return null;
+  const draft = page.draftContent as { ko?: PageContent } | null;
+  if (draft?.ko) return draft.ko;
+  return page.contentKo as PageContent | null;
+}
 
 export async function GET(request: Request) {
   let user: Awaited<ReturnType<typeof requireUser>>;
@@ -19,14 +29,40 @@ export async function GET(request: Request) {
   const forms = await prisma.intakeForm.findMany({
     where,
     include: {
-      talent: { select: { nameKo: true } },
-      project: { select: { id: true, name: true } },
+      talent: { select: { id: true, nameKo: true, position: true } },
+      project: { select: { id: true, name: true, page: { select: { draftContent: true, contentKo: true } } } },
       submissions: { orderBy: { createdAt: "desc" }, take: 1 },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json({ forms });
+  const records: IntakeSubmissionRecord[] = forms.map((form) => {
+    const latestSubmission = form.submissions[0];
+    const payload = (latestSubmission?.data ?? null) as IntakePayload | null;
+    const importedAt = payload?.meta?.importedAt ?? null;
+    const submittedAt = payload?.meta?.submittedAt ?? latestSubmission?.createdAt.toISOString() ?? null;
+    const existingContent = getExistingContent(form.project.page);
+
+    return {
+      id: form.id,
+      formId: form.id,
+      projectId: form.project.id,
+      talentId: form.talent.id,
+      talentName: form.talent.nameKo,
+      projectName: form.project.name,
+      position: form.talent.position || "",
+      token: form.token,
+      workflowStatus: importedAt ? "imported" : latestSubmission ? "submitted" : "requested",
+      submittedAt,
+      importedAt,
+      latestSubmissionId: latestSubmission?.id ?? null,
+      latestPayload: payload,
+      intakeUrl: buildIntakeUrl(form.token),
+      hasExistingContent: existingContent ? hasMeaningfulContent(existingContent) : false,
+    };
+  });
+
+  return NextResponse.json({ forms: records });
 }
 
 export async function POST(request: Request) {
@@ -50,6 +86,7 @@ export async function POST(request: Request) {
     data: {
       projectId,
       talentId: project.talentId,
+      token: createIntakeToken(),
       expiresAt: expiresAt ? new Date(expiresAt) : undefined,
     },
   });

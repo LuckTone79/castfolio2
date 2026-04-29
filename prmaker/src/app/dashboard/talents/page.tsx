@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/auth";
+import { IntakeLinkButton } from "@/components/dashboard/IntakeLinkButton";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -117,6 +118,7 @@ export default async function TalentsPage() {
                       >
                         상세
                       </Link>
+                      <IntakeLinkButton talentId={t.id} />
                       <Link
                         href={`/dashboard/projects/new?talentId=${t.id}`}
                         className="text-xs font-medium"

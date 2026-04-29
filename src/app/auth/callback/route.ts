@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -49,6 +50,43 @@ export async function GET(request: NextRequest) {
     loginUrl.searchParams.set("error", "oauth_callback_failed");
     loginUrl.searchParams.set("redirect", safeNext);
     return NextResponse.redirect(loginUrl);
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user?.email) {
+    const displayName =
+      typeof user.user_metadata?.full_name === "string"
+        ? user.user_metadata.full_name
+        : typeof user.user_metadata?.name === "string"
+          ? user.user_metadata.name
+          : user.email.split("@")[0];
+
+    const dbUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ supabaseUid: user.id }, { email: user.email }],
+      },
+    });
+
+    if (dbUser) {
+      await prisma.user.update({
+        where: { id: dbUser.id },
+        data: {
+          supabaseUid: user.id,
+          name: dbUser.name || displayName,
+        },
+      });
+    } else {
+      await prisma.user.create({
+        data: {
+          email: user.email,
+          name: displayName,
+          supabaseUid: user.id,
+        },
+      });
+    }
   }
 
   return response;

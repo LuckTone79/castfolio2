@@ -2,129 +2,183 @@ import Link from "next/link";
 import {
   ArrowRight,
   BadgeCheck,
+  Banknote,
+  CheckCircle2,
+  FileInput,
   Globe,
-  Layers3,
-  MonitorSmartphone,
-  Rocket,
+  LayoutTemplate,
+  Link2,
+  QrCode,
   ShieldCheck,
   Sparkles,
   Users,
 } from "lucide-react";
 
-const FEATURE_CARDS = [
+const OPERATING_STRUCTURE = [
   {
-    icon: MonitorSmartphone,
-    title: "압도적인 첫인상",
+    title: "CastFolio 운영자",
     description:
-      "방송/행사/기업 소개에 바로 사용할 수 있는 전문형 PR 랜딩으로 첫 화면에서 신뢰를 만듭니다.",
+      "플랫폼을 제공하고, 파트너 계정·수수료·정산·전체 페이지 운영 기준을 관리합니다.",
   },
   {
-    icon: Layers3,
-    title: "전문 테마 시스템",
+    title: "제작 파트너",
     description:
-      "직무 성격에 맞는 테마를 선택하고 빌더에서 바로 편집해 완성도 높은 결과물을 빠르게 만듭니다.",
+      "방송인 고객에게 PR 홈페이지 제작 서비스를 판매하고, 자료 수집부터 납품까지 업무를 운영합니다.",
   },
   {
-    icon: Globe,
-    title: "즉시 배포 + 도메인 연결",
+    title: "방송인 고객",
     description:
-      "배포 링크와 커스텀 도메인을 바로 연결해 공유부터 운영까지 한 흐름으로 처리합니다.",
+      "완성된 PR 홈페이지를 검토하고, 방송사·PD·에이전시 제출용으로 활용할 최종 결과물을 받습니다.",
   },
 ];
 
-const THEME_CARDS = [
+const PARTNER_BENEFITS = [
   {
-    name: "DIVA THEME",
-    highlights: ["풀스크린 비주얼 임팩트", "트렌디한 그라데이션 포인트", "다이내믹한 스크롤 애니메이션"],
+    icon: Users,
+    title: "방송인 고객 관리",
+    description:
+      "고객별 프로필, 자료 제출 여부, 제작 단계, 판매 확정 상태를 한 화면에서 관리합니다.",
   },
   {
-    name: "OFFICE THEME",
-    highlights: ["그리드 기반의 정갈한 레이아웃", "프리미엄 골드/블랙 컬러 무드", "텍스트 중심의 가독성 극대화"],
+    icon: FileInput,
+    title: "자료 수집 링크",
+    description:
+      "방송인 고객에게 로그인 없는 전용 링크를 보내 사진, 경력, 소개, 영상 자료를 빠르게 수집합니다.",
   },
   {
-    name: "ARTISTIC THEME",
-    highlights: ["유니크한 오버랩 요소", "비정형 아트 레이아웃", "모던한 타이포그래피 시스템"],
+    icon: LayoutTemplate,
+    title: "PR 홈페이지 빌더",
+    description:
+      "7가지 고급 테마를 기반으로 고객 이미지에 맞는 결과물을 제작하고 납품 품질을 표준화합니다.",
   },
   {
-    name: "MINIMAL THEME",
-    highlights: ["세련된 정보 집중형 구성", "브랜드 메시지 전달력 강화", "반응형 최적화"],
+    icon: Link2,
+    title: "검토 링크 전달",
+    description:
+      "완성 전 페이지를 고객에게 보내 수정 요청을 받고, 최종 승인 전까지 검토 흐름을 관리합니다.",
+  },
+  {
+    icon: QrCode,
+    title: "공개 URL 및 QR 납품",
+    description:
+      "최종 공개 링크와 QR 카드로 방송국 PD, 에이전시, 행사 담당자에게 바로 공유할 수 있게 합니다.",
+  },
+  {
+    icon: Banknote,
+    title: "판매 확정 및 정산",
+    description:
+      "실제 판매금액을 기준으로 파트너 수익과 플랫폼 수수료를 자동 계산해 정산 흐름을 명확하게 정리합니다.",
   },
 ];
 
-const PROCESS_STEPS = [
-  { title: "방송인 등록", description: "대상 방송인/팀을 등록하고 프로젝트를 생성합니다." },
-  { title: "자료 수집", description: "링크로 자료를 수집하고 필요한 항목을 정리합니다." },
-  { title: "빌더 편집", description: "테마/섹션/콘텐츠를 실시간으로 편집해 완성도를 높입니다." },
-  { title: "검수 및 배포", description: "최종 검수 후 즉시 배포하고 공유 링크를 전달합니다." },
+const SAMPLE_THEMES = [
+  {
+    name: "Elegant White",
+    audience: "신뢰감과 깔끔함이 중요한 아나운서, 리포터 고객에게 적합",
+  },
+  {
+    name: "Classic Black",
+    audience: "카리스마와 고급스러운 이미지를 강조해야 하는 MC, 쇼호스트 고객에게 적합",
+  },
+  {
+    name: "Soft Pink",
+    audience: "친근하고 부드러운 이미지를 원하는 라이프스타일 쇼호스트 고객에게 적합",
+  },
+  {
+    name: "Sky Blue",
+    audience: "밝고 활동적인 이미지를 강조하는 리포터, 행사 MC 고객에게 적합",
+  },
+];
+
+const WORKFLOW = [
+  "방송인 고객 등록",
+  "자료 요청 링크 발송",
+  "제출 자료 확인 후 빌더 불러오기",
+  "PR 홈페이지 제작",
+  "검토 링크 전달 및 수정 반영",
+  "최종 공개 URL·QR 납품",
+  "판매 확정 입력",
+  "파트너 정산 내역 관리",
 ];
 
 const FAQ_ITEMS = [
   {
-    q: "홈페이지 제작 기간은 얼마나 걸리나요?",
-    a: "자료가 준비되어 있으면 평균 10분 내외로 기본 페이지를 완성하고 바로 배포할 수 있습니다.",
+    question: "CastFolio는 방송인이 직접 사용하는 서비스인가요?",
+    answer:
+      "아닙니다. CastFolio는 방송인 PR 홈페이지를 제작·판매하는 파트너를 위한 B2B SaaS입니다. 방송인 고객은 파트너가 보낸 자료 제출 링크, 검토 링크, 최종 공개 페이지를 통해 이용합니다.",
   },
   {
-    q: "수정은 몇 번까지 가능한가요?",
-    a: "요금제 정책에 따라 다르지만 기본적으로 빌더에서 반복 수정이 가능하며 변경 이력 관리도 지원합니다.",
+    question: "파트너가 판매 가격을 직접 정할 수 있나요?",
+    answer:
+      "네. 파트너가 방송인 고객에게 제안하는 제작 가격은 자유롭게 설정할 수 있습니다. CastFolio는 판매 확정 금액을 기준으로 플랫폼 수수료를 계산합니다.",
   },
   {
-    q: "로그인 후 어떤 기능을 사용할 수 있나요?",
-    a: "사용자/관리자 대시보드, 방송인 관리, 가격 플랜, 주문/정산, 감사 로그까지 전체 운영 기능을 사용할 수 있습니다.",
+    question: "방송인 고객도 회원가입이 필요한가요?",
+    answer:
+      "아닙니다. 방송인 고객은 로그인 없이 자료 제출 링크와 검토 링크를 통해 필요한 정보를 입력하고 완성된 페이지를 확인합니다.",
+  },
+  {
+    question: "수수료는 언제 발생하나요?",
+    answer:
+      "홈페이지를 생성하거나 편집하는 것만으로는 수수료가 발생하지 않습니다. 파트너가 판매 확정을 입력한 시점에만 수수료가 계산됩니다.",
+  },
+  {
+    question: "기본 수수료 구조는 어떻게 되나요?",
+    answer:
+      "기본 구조는 파트너 수익 85%, CastFolio 플랫폼 수수료 15%입니다. 파트너별 수수료율은 운영 정책에 따라 조정될 수 있습니다.",
+  },
+  {
+    question: "완성된 홈페이지는 어떻게 납품하나요?",
+    answer:
+      "최종 공개 URL과 QR 카드로 납품할 수 있습니다. 방송인 고객은 그 링크를 방송사 PD, 에이전시, 행사 담당자에게 바로 공유할 수 있습니다.",
   },
 ];
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#f4f5f7] text-slate-900">
-      <header className="sticky top-0 z-50 border-b border-black/5 bg-[#f4f5f7]/95 backdrop-blur">
+    <div className="min-h-screen bg-[#f6f4ee] text-slate-950">
+      <header className="sticky top-0 z-50 border-b border-black/5 bg-[#f6f4ee]/90 backdrop-blur-xl">
         <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black text-xl font-bold text-white">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-lg font-black text-white">
               C
             </div>
-            <p className="text-3xl font-black tracking-tight">CastFolio</p>
-          </div>
+            <div>
+              <p className="text-lg font-black tracking-tight">CastFolio</p>
+              <p className="text-xs font-medium text-slate-500">Partner PR Delivery SaaS</p>
+            </div>
+          </Link>
 
-          <div className="hidden items-center gap-8 lg:flex">
-            <a href="#features" className="text-sm font-semibold text-slate-600 hover:text-slate-900">
-              기능
+          <nav className="hidden items-center gap-7 lg:flex">
+            <a href="#structure" className="text-sm font-semibold text-slate-600 transition hover:text-slate-950">
+              운영 구조
             </a>
-            <a href="#themes" className="text-sm font-semibold text-slate-600 hover:text-slate-900">
-              테마
+            <a href="#benefits" className="text-sm font-semibold text-slate-600 transition hover:text-slate-950">
+              파트너 기능
             </a>
-            <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-slate-900">
-              제작 과정
+            <a href="#workflow" className="text-sm font-semibold text-slate-600 transition hover:text-slate-950">
+              업무 흐름
             </a>
-            <a href="#faq" className="text-sm font-semibold text-slate-600 hover:text-slate-900">
+            <a href="#pricing" className="text-sm font-semibold text-slate-600 transition hover:text-slate-950">
+              수수료
+            </a>
+            <a href="#faq" className="text-sm font-semibold text-slate-600 transition hover:text-slate-950">
               FAQ
             </a>
-          </div>
+          </nav>
 
           <div className="flex items-center gap-2">
-            <div className="hidden rounded-2xl border border-black/10 bg-white/70 p-1.5 sm:flex">
-              {["한", "日", "中", "VN", "EN"].map((lang, idx) => (
-                <button
-                  key={lang}
-                  type="button"
-                  className={`rounded-xl px-3 py-1.5 text-xs font-semibold ${
-                    idx === 0 ? "bg-black text-white" : "text-slate-500"
-                  }`}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
             <Link
-              href="/login"
-              className="inline-flex h-12 items-center gap-2 rounded-2xl bg-black px-5 text-sm font-bold text-white transition hover:bg-slate-800"
+              href="/guide"
+              className="hidden rounded-2xl border border-black/10 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-white sm:inline-flex"
             >
-              에이전트 로그인
+              운영 가이드
             </Link>
             <Link
-              href="/login?redirect=/admin"
-              className="hidden h-12 items-center rounded-2xl border border-black/15 px-4 text-sm font-semibold text-slate-700 transition hover:bg-white sm:inline-flex"
+              href="/login"
+              className="inline-flex items-center rounded-2xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
             >
-              관리자
+              파트너로 시작하기
             </Link>
           </div>
         </div>
@@ -132,142 +186,262 @@ export default function LandingPage() {
 
       <main>
         <section className="px-4 pb-20 pt-16 sm:px-6 sm:pt-24">
-          <div className="mx-auto max-w-6xl text-center">
-            <div className="mx-auto mb-8 inline-flex items-center gap-2 rounded-full bg-[#625fff1a] px-4 py-2 text-sm font-semibold text-[#5048ea]">
-              <Sparkles className="h-4 w-4" />
-              방송인을 위한 AI 기반 PR 빌더
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#d7d0ff] px-4 py-2 text-sm font-semibold text-[#4338ca]">
+                <Sparkles className="h-4 w-4" />
+                방송인 PR 홈페이지 제작 대행 파트너용 B2B SaaS
+              </div>
+
+              <h1 className="mt-6 text-balance text-5xl font-black leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
+                방송인 PR 홈페이지 제작을
+                <br />
+                수익화하는 파트너용 빌더
+              </h1>
+
+              <p className="mt-6 max-w-3xl text-pretty text-lg leading-8 text-slate-600 sm:text-xl">
+                CastFolio는 아나운서, 쇼호스트, MC, 리포터 고객에게 전문 PR 홈페이지를 제작·판매하는
+                파트너를 위한 플랫폼입니다. 고객 자료 수집부터 제작, 검토 링크 전달, 최종 납품, 판매
+                확정, 수수료 정산까지 하나의 흐름으로 관리하세요.
+              </p>
+
+              <div className="mt-10 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-slate-800"
+                >
+                  파트너로 시작하기
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/demo"
+                  className="inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-white px-6 py-3.5 text-sm font-bold text-slate-900 transition hover:bg-slate-50"
+                >
+                  샘플 PR 페이지 보기
+                </Link>
+              </div>
+
+              <div className="mt-10 flex flex-wrap gap-3 text-sm">
+                <span className="rounded-2xl border border-black/10 bg-white px-4 py-2 font-semibold text-slate-700">
+                  월정액 없이 시작
+                </span>
+                <span className="rounded-2xl border border-black/10 bg-white px-4 py-2 font-semibold text-slate-700">
+                  판매 확정 시에만 수수료 발생
+                </span>
+                <span className="rounded-2xl border border-black/10 bg-white px-4 py-2 font-semibold text-slate-700">
+                  파트너 수익 85%
+                </span>
+              </div>
             </div>
 
-            <h1 className="text-balance text-5xl font-black leading-tight tracking-tight sm:text-7xl">
-              완벽한 PR 페이지를
-              <br />
-              <span className="text-[#5b57ff]">만드세요.</span>
-            </h1>
+            <div className="rounded-[32px] border border-black/10 bg-white p-6 shadow-[0_24px_90px_rgba(15,23,42,0.08)]">
+              <div className="rounded-[28px] bg-slate-950 p-6 text-white">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-white/60">Partner workflow</p>
+                <div className="mt-6 space-y-4">
+                  {[
+                    "방송인 고객 등록",
+                    "자료 제출 링크 발송",
+                    "PR 홈페이지 제작",
+                    "검토 링크 전달",
+                    "최종 납품 및 판매 확정",
+                  ].map((item) => (
+                    <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                      <CheckCircle2 className="h-5 w-5 text-[#b6ffb0]" />
+                      <span className="text-sm font-medium">{item}</span>
+                    </div>
+                  ))}
+                </div>
 
-            <p className="mx-auto mt-8 max-w-3xl text-pretty text-xl leading-relaxed text-slate-600">
-              방송인 지망생부터 현업 전문가까지, 포트폴리오·소개·문의 동선을 하나로 묶은 전문 PR 홈페이지를
-              빠르게 구축하세요.
-            </p>
-
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-              <Link
-                href="/create"
-                className="inline-flex items-center gap-2 rounded-2xl bg-black px-6 py-3.5 text-sm font-bold text-white transition hover:bg-slate-800"
-              >
-                지금 바로 시작하기 <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/demo"
-                className="inline-flex items-center gap-2 rounded-2xl border border-black/15 bg-white px-6 py-3.5 text-sm font-bold text-slate-800 transition hover:bg-slate-50"
-              >
-                실제 구조 미리보기
-              </Link>
-            </div>
-
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3 text-sm">
-              <span className="rounded-2xl border border-black/10 bg-white px-4 py-2 font-semibold text-slate-700">
-                500+ 명의 전문가가 선택
-              </span>
-              <span className="rounded-2xl border border-black/10 bg-white px-4 py-2 font-semibold text-slate-700">
-                7개 이상의 전문 테마
-              </span>
-              <span className="rounded-2xl border border-black/10 bg-white px-4 py-2 font-semibold text-slate-700">
-                즉시 배포 가능
-              </span>
+                <div className="mt-6 rounded-2xl bg-[#4338ca] px-5 py-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">Revenue split</p>
+                  <div className="mt-3 flex items-end justify-between gap-4">
+                    <div>
+                      <p className="text-3xl font-black">85%</p>
+                      <p className="text-sm text-white/75">파트너 수익</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-black">15%</p>
+                      <p className="text-sm text-white/75">플랫폼 수수료</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="features" className="border-t border-black/5 px-4 py-20 sm:px-6">
-          <div className="mx-auto max-w-6xl">
-            <div className="mb-10 text-center">
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#5b57ff]">Why CastFolio</p>
-              <h2 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">왜 CastFolio인가요?</h2>
+        <section id="structure" className="border-t border-black/5 px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-7xl">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#4338ca]">Operating Model</p>
+              <h2 className="mt-3 text-balance text-4xl font-black tracking-tight sm:text-5xl">
+                CastFolio는 이렇게 운영됩니다
+              </h2>
+              <p className="mt-4 text-lg leading-8 text-slate-600">
+                이 서비스의 직접 고객은 방송인이 아니라 제작 파트너입니다. 방송인 고객은 파트너가 만든
+                결과물을 검토하고 활용하는 최종 고객입니다.
+              </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
-              {FEATURE_CARDS.map((item) => (
+            <div className="mt-12 grid gap-6 lg:grid-cols-3">
+              {OPERATING_STRUCTURE.map((item, index) => (
                 <article
                   key={item.title}
-                  className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.04)]"
+                  className="rounded-[28px] border border-black/10 bg-white p-7 shadow-[0_18px_50px_rgba(15,23,42,0.06)]"
                 >
-                  <div className="mb-4 inline-flex rounded-2xl bg-[#625fff1a] p-3 text-[#5b57ff]">
+                  <div className="inline-flex rounded-2xl bg-slate-950 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-white">
+                    Step {index + 1}
+                  </div>
+                  <h3 className="mt-5 text-2xl font-black">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">{item.description}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-8 rounded-[28px] border border-dashed border-black/15 bg-[#efe9db] px-6 py-6 text-center text-sm font-semibold text-slate-700 sm:text-base">
+              CastFolio 운영자 → 제작 파트너 → 방송인 고객 → 방송사·PD·에이전시 제출
+            </div>
+          </div>
+        </section>
+
+        <section id="benefits" className="border-t border-black/5 px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-12 max-w-3xl">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#4338ca]">Partner Benefits</p>
+              <h2 className="mt-3 text-balance text-4xl font-black tracking-tight sm:text-5xl">
+                파트너 업무 흐름에 맞춰 기능을 정리했습니다
+              </h2>
+              <p className="mt-4 text-lg leading-8 text-slate-600">
+                방송인 직접 사용 서비스처럼 보이지 않도록, 기능 설명도 모두 파트너의 실제 운영 기준으로
+                재정렬했습니다.
+              </p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {PARTNER_BENEFITS.map((item) => (
+                <article
+                  key={item.title}
+                  className="rounded-[28px] border border-black/10 bg-white p-7 shadow-[0_18px_50px_rgba(15,23,42,0.06)]"
+                >
+                  <div className="inline-flex rounded-2xl bg-[#e2dcff] p-3 text-[#4338ca]">
                     <item.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-xl font-extrabold">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                  <h3 className="mt-5 text-2xl font-black">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">{item.description}</p>
                 </article>
               ))}
             </div>
           </div>
         </section>
 
-        <section id="themes" className="border-t border-black/5 px-4 py-20 sm:px-6">
-          <div className="mx-auto max-w-6xl">
-            <div className="mb-10 text-center">
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#5b57ff]">Theme System</p>
-              <h2 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">전문성을 극대화하는 4가지 테마</h2>
+        <section className="border-t border-black/5 px-4 py-20 sm:px-6">
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+            <div className="rounded-[30px] bg-slate-950 p-8 text-white">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-white/60">Sample outcomes</p>
+              <h2 className="mt-4 text-4xl font-black tracking-tight">고객에게 제안할 수 있는 PR 홈페이지 샘플</h2>
+              <p className="mt-4 text-base leading-7 text-white/70">
+                방송인 고객의 이미지와 포지션에 맞춰 납품할 수 있는 샘플 결과물입니다. 테마 선택도
+                방송인이 아니라 파트너의 제안 도구로 보이도록 정리했습니다.
+              </p>
+              <Link
+                href="/demo"
+                className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-slate-100"
+              >
+                샘플 갤러리 전체 보기
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-              {THEME_CARDS.map((theme) => (
-                <article
-                  key={theme.name}
-                  className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.04)]"
-                >
-                  <h3 className="text-xl font-black text-[#5b57ff]">{theme.name}</h3>
-                  <ul className="mt-4 space-y-2">
-                    {theme.highlights.map((highlight) => (
-                      <li key={highlight} className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                        <BadgeCheck className="h-4 w-4 text-[#5b57ff]" />
-                        {highlight}
-                      </li>
-                    ))}
-                  </ul>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {SAMPLE_THEMES.map((theme) => (
+                <article key={theme.name} className="rounded-[28px] border border-black/10 bg-white p-6">
+                  <p className="text-sm font-black uppercase tracking-[0.2em] text-[#4338ca]">{theme.name}</p>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">{theme.audience}</p>
+                  <div className="mt-5 flex items-center gap-2 text-sm font-semibold text-slate-900">
+                    <BadgeCheck className="h-4 w-4 text-[#4338ca]" />
+                    파트너 제안용 샘플
+                  </div>
                 </article>
               ))}
             </div>
           </div>
         </section>
 
-        <section id="process" className="border-t border-black/5 px-4 py-20 sm:px-6">
-          <div className="mx-auto max-w-6xl">
-            <div className="mb-10 text-center">
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#5b57ff]">Workflow</p>
-              <h2 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">완료까지 한 흐름으로</h2>
+        <section id="workflow" className="border-t border-black/5 px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 max-w-3xl">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#4338ca]">Workflow</p>
+              <h2 className="mt-3 text-balance text-4xl font-black tracking-tight sm:text-5xl">
+                실제 업무 흐름도 파트너 기준으로 고정합니다
+              </h2>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              {PROCESS_STEPS.map((step, index) => (
-                <article
-                  key={step.title}
-                  className="flex gap-4 rounded-3xl border border-black/10 bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.04)]"
-                >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black text-sm font-black text-white">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {WORKFLOW.map((step, index) => (
+                <article key={step} className="rounded-[26px] border border-black/10 bg-white p-6">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-sm font-black text-white">
                     {index + 1}
                   </div>
-                  <div>
-                    <h3 className="text-lg font-extrabold">{step.title}</h3>
-                    <p className="mt-1 text-sm text-slate-600">{step.description}</p>
-                  </div>
+                  <p className="mt-5 text-lg font-extrabold">{step}</p>
                 </article>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="pricing" className="border-t border-black/5 px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-7xl rounded-[34px] bg-[#1f1d2b] px-8 py-12 text-white shadow-[0_30px_90px_rgba(15,23,42,0.18)] sm:px-12">
+            <div className="grid gap-10 lg:grid-cols-[1fr_0.8fr] lg:items-end">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#c5beff]">Revenue Policy</p>
+                <h2 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">파트너 수익 85%</h2>
+                <p className="mt-5 max-w-3xl text-base leading-8 text-white/72">
+                  홈페이지 생성 자체에는 수수료가 발생하지 않습니다. 방송인 고객에게 최종 납품한 뒤,
+                  파트너가 판매 확정을 입력한 건에 대해서만 플랫폼 수수료가 계산됩니다.
+                </p>
+                <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-sm font-semibold text-white/70">파트너 수익</p>
+                    <p className="mt-2 text-2xl font-black">85%</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-sm font-semibold text-white/70">플랫폼 수수료</p>
+                    <p className="mt-2 text-2xl font-black">15%</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-sm font-semibold text-white/70">시작 비용</p>
+                    <p className="mt-2 text-2xl font-black">월정액 없음</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-[28px] border border-white/10 bg-white/5 p-6">
+                <div className="flex items-center gap-3 text-[#c5beff]">
+                  <Globe className="h-5 w-5" />
+                  <p className="text-sm font-bold uppercase tracking-[0.2em]">Settlement note</p>
+                </div>
+                <ul className="mt-5 space-y-3 text-sm leading-7 text-white/75">
+                  <li>월정액 없이 시작하고, 실제 판매가 확정된 건만 수수료를 정산합니다.</li>
+                  <li>판매금액, 증빙, 메모를 기준으로 파트너 정산 흐름을 관리할 수 있습니다.</li>
+                  <li>정산 정책은 운영 설정에 따라 변경될 수 있습니다.</li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>
 
         <section id="faq" className="border-t border-black/5 px-4 py-20 sm:px-6">
-          <div className="mx-auto max-w-4xl">
-            <div className="mb-10 text-center">
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#5b57ff]">Support</p>
-              <h2 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">자주 묻는 질문</h2>
+          <div className="mx-auto max-w-5xl">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#4338ca]">FAQ</p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">파트너 관점에서 자주 묻는 질문</h2>
             </div>
 
-            <div className="space-y-3">
+            <div className="mt-10 space-y-3">
               {FAQ_ITEMS.map((item) => (
-                <details key={item.q} className="rounded-2xl border border-black/10 bg-white p-5">
-                  <summary className="cursor-pointer list-none text-base font-extrabold">{item.q}</summary>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.a}</p>
+                <details key={item.question} className="rounded-[24px] border border-black/10 bg-white p-6">
+                  <summary className="cursor-pointer list-none text-lg font-extrabold">{item.question}</summary>
+                  <p className="mt-4 text-sm leading-7 text-slate-600">{item.answer}</p>
                 </details>
               ))}
             </div>
@@ -275,31 +449,29 @@ export default function LandingPage() {
         </section>
 
         <section className="border-t border-black/5 px-4 py-20 sm:px-6">
-          <div className="mx-auto max-w-5xl rounded-[32px] bg-black px-8 py-14 text-center text-white sm:px-14">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-white/70">Launch Ready</p>
-            <h2 className="mt-4 text-balance text-4xl font-black leading-tight sm:text-5xl">
-              당신의 가치를
+          <div className="mx-auto max-w-6xl rounded-[34px] bg-white px-8 py-14 text-center shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:px-12">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#4338ca]">Start as a partner</p>
+            <h2 className="mt-4 text-balance text-4xl font-black tracking-tight sm:text-5xl">
+              방송인 고객에게 더 빠르고 더 고급스럽게
               <br />
-              새롭게 정의하세요.
+              PR 홈페이지를 납품하세요
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-pretty text-base text-white/70">
-              PR 페이지 제작부터 운영 대시보드, 결제/정산 흐름까지 한 번에 연결해 팀의 생산성과 완성도를 동시에
-              높입니다.
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-slate-600">
+              CastFolio는 방송인이 직접 가입하는 서비스가 아니라, 제작 파트너가 결과물을 판매하고
+              운영하는 플랫폼입니다. 필요한 간판을 이제 정확한 방향으로 걸어두었습니다.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <Link
-                href="/create"
-                className="inline-flex items-center gap-2 rounded-2xl bg-[#5b57ff] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#4d49eb]"
+                href="/login"
+                className="inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-slate-800"
               >
-                <Rocket className="h-4 w-4" />
-                제작 시작
+                파트너로 시작하기
               </Link>
               <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/10"
+                href="/guide"
+                className="inline-flex items-center gap-2 rounded-2xl border border-black/10 px-6 py-3.5 text-sm font-bold text-slate-900 transition hover:bg-slate-50"
               >
-                <Users className="h-4 w-4" />
-                대시보드 이동
+                파트너 운영 가이드 보기
               </Link>
             </div>
           </div>
@@ -318,4 +490,3 @@ export default function LandingPage() {
     </div>
   );
 }
-

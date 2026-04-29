@@ -1,14 +1,18 @@
 export interface PageContent {
   hero: {
+    nameKo?: string;
+    nameEn?: string;
     tagline: string;
     position: string;
     heroImageId: string;
+    photoUrl?: string;
     ctaPrimary: { label: string; action: "portfolio" | "contact" };
     ctaSecondary: { label: string; action: "portfolio" | "contact" };
   };
   profile: {
     intro: string;
     profileImageId: string;
+    profilePhotoUrl?: string;
     infoItems: Array<{ label: string; value: string }>;
     strengths: Array<{ icon: string; label: string }>;
   };
