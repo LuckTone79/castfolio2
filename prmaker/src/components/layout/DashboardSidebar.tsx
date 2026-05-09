@@ -190,7 +190,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ user }) => {
           <span>로그아웃</span>
         </button>
         <p className="text-center mt-1" style={{ fontSize: "0.6rem", color: "var(--text-muted)", opacity: 0.5 }}>
-          v1.2.0
+          v1.3.0
         </p>
       </div>
     </aside>

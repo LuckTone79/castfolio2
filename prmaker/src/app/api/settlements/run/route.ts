@@ -41,7 +41,7 @@ export async function POST() {
         totalSales,
         totalCommission,
         totalUserAmount,
-        status: minimumMet ? "PENDING" : "PENDING",
+        status: minimumMet ? "PENDING" : "CARRIED_OVER",
         minimumMet,
       },
     });

@@ -15,6 +15,14 @@ const EMPTY_CONTENT: PageContent = {
   contact: { channels: [] },
 };
 
+interface MediaAssetSummary {
+  id: string;
+  type: string;
+  optimizedUrl: string | null;
+  thumbnailUrl: string | null;
+  originalUrl: string;
+}
+
 interface ProjectData {
   id: string;
   page: {
@@ -28,6 +36,7 @@ interface ProjectData {
     disabledSections: string[];
   } | null;
   talent: { nameKo: string; nameEn: string };
+  mediaAssets: MediaAssetSummary[];
 }
 
 type SaveState = "saved" | "saving" | "unsaved" | "error";
@@ -50,6 +59,8 @@ export default function BuilderPage() {
   const [saveState, setSaveState] = useState<SaveState>("saved");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [publishError, setPublishError] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
 
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>();
   const isInitialLoad = useRef(true);
@@ -59,6 +70,15 @@ export default function BuilderPage() {
       .then(r => r.json())
       .then(async (data: ProjectData) => {
         setProjectData(data);
+
+        // Build imageUrls map from existing media assets
+        if (data.mediaAssets?.length) {
+          const urlMap: Record<string, string> = {};
+          for (const asset of data.mediaAssets) {
+            urlMap[asset.id] = asset.optimizedUrl || asset.originalUrl;
+          }
+          setImageUrls(urlMap);
+        }
 
         if (!data.page) {
           // Create page if it doesn't exist
@@ -135,6 +155,28 @@ export default function BuilderPage() {
       setPublishError(data.errors || [data.error]);
     } else {
       window.open(`/p/${data.slug}`, "_blank");
+    }
+  };
+
+  const uploadImage = async (file: File, mediaType: "HERO_PHOTO" | "PROFILE_PHOTO" | "PORTFOLIO_PHOTO", fieldKey: string) => {
+    setUploadingField(fieldKey);
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("projectId", projectId);
+    fd.append("mediaType", mediaType);
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || "업로드 실패");
+        return null;
+      }
+      const asset: MediaAssetSummary = await res.json();
+      const url = asset.optimizedUrl || asset.originalUrl;
+      setImageUrls(prev => ({ ...prev, [asset.id]: url }));
+      return asset;
+    } finally {
+      setUploadingField(null);
     }
   };
 
@@ -241,6 +283,9 @@ export default function BuilderPage() {
               disabledSections={[]}
               watermark={true}
               locale={activeLocale}
+              heroImageUrl={currentContent.hero.heroImageId ? imageUrls[currentContent.hero.heroImageId] : undefined}
+              profileImageUrl={currentContent.profile.profileImageId ? imageUrls[currentContent.profile.profileImageId] : undefined}
+              photoUrls={imageUrls}
             />
           </div>
         </div>
@@ -254,6 +299,51 @@ export default function BuilderPage() {
         <div className="flex-1 overflow-y-auto p-4 space-y-4 text-sm">
           {activeSection === "hero" && (
             <>
+              {/* Hero Image Upload */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  대표 사진 <span className="text-red-500">*필수</span>
+                </label>
+                {currentContent.hero.heroImageId && imageUrls[currentContent.hero.heroImageId] ? (
+                  <div className="relative">
+                    <img
+                      src={imageUrls[currentContent.hero.heroImageId]}
+                      alt="대표 사진"
+                      className="w-full h-32 object-cover rounded-lg border"
+                    />
+                    <button
+                      onClick={() => updateSection("hero", { heroImageId: "" })}
+                      className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded hover:bg-red-600"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                ) : (
+                  <label className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${uploadingField === "hero" ? "border-blue-300 bg-blue-50" : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"}`}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingField === "hero"}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const asset = await uploadImage(file, "HERO_PHOTO", "hero");
+                        if (asset) updateSection("hero", { heroImageId: asset.id });
+                      }}
+                    />
+                    {uploadingField === "hero" ? (
+                      <span className="text-xs text-blue-500">업로드 중...</span>
+                    ) : (
+                      <>
+                        <span className="text-2xl mb-1">🖼️</span>
+                        <span className="text-xs text-gray-500">클릭하여 대표 사진 업로드</span>
+                        <span className="text-xs text-gray-400 mt-0.5">JPG/PNG/WEBP, 최대 10MB</span>
+                      </>
+                    )}
+                  </label>
+                )}
+              </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">포지션</label>
                 <input value={currentContent.hero.position}
@@ -271,6 +361,48 @@ export default function BuilderPage() {
           )}
           {activeSection === "profile" && (
             <>
+              {/* Profile Image Upload */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">프로필 사진</label>
+                {currentContent.profile.profileImageId && imageUrls[currentContent.profile.profileImageId] ? (
+                  <div className="relative">
+                    <img
+                      src={imageUrls[currentContent.profile.profileImageId]}
+                      alt="프로필 사진"
+                      className="w-20 h-20 object-cover rounded-full border mx-auto block"
+                    />
+                    <button
+                      onClick={() => updateSection("profile", { profileImageId: "" })}
+                      className="block mx-auto mt-1 text-xs text-red-500 hover:underline"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                ) : (
+                  <label className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${uploadingField === "profile" ? "border-blue-300 bg-blue-50" : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"}`}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingField === "profile"}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const asset = await uploadImage(file, "PROFILE_PHOTO", "profile");
+                        if (asset) updateSection("profile", { profileImageId: asset.id });
+                      }}
+                    />
+                    {uploadingField === "profile" ? (
+                      <span className="text-xs text-blue-500">업로드 중...</span>
+                    ) : (
+                      <>
+                        <span className="text-2xl mb-1">👤</span>
+                        <span className="text-xs text-gray-500">프로필 사진 업로드</span>
+                      </>
+                    )}
+                  </label>
+                )}
+              </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">자기소개 ({currentContent.profile.intro.length}/500)</label>
                 <textarea value={currentContent.profile.intro} rows={6}
@@ -480,10 +612,56 @@ export default function BuilderPage() {
                 ))}
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-600 block mb-1">포트폴리오 사진 ID</label>
-                <p className="text-xs text-gray-400">사진은 자료 제출 또는 업로드를 통해 추가됩니다.</p>
-                {currentContent.portfolio.photos.length > 0 && (
-                  <p className="text-xs text-gray-600 mt-1">{currentContent.portfolio.photos.length}장 등록됨</p>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-medium text-gray-600">포트폴리오 사진</label>
+                  <label className={`text-xs cursor-pointer px-2 py-1 rounded border transition-colors ${uploadingField === "photo" ? "text-gray-400 border-gray-200" : "text-blue-600 border-blue-200 hover:bg-blue-50"}`}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      disabled={uploadingField === "photo"}
+                      onChange={async (e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (!files.length) return;
+                        for (const file of files) {
+                          const asset = await uploadImage(file, "PORTFOLIO_PHOTO", "photo");
+                          if (asset) {
+                            updateSection("portfolio", {
+                              photos: [...currentContent.portfolio.photos, asset.id],
+                            });
+                          }
+                        }
+                      }}
+                    />
+                    {uploadingField === "photo" ? "업로드 중..." : "+ 사진 추가"}
+                  </label>
+                </div>
+                {currentContent.portfolio.photos.length === 0 ? (
+                  <p className="text-xs text-gray-400 text-center py-3">사진이 없습니다.</p>
+                ) : (
+                  <div className="grid grid-cols-3 gap-1">
+                    {currentContent.portfolio.photos.map((photoId, i) => (
+                      <div key={i} className="relative group">
+                        {imageUrls[photoId] ? (
+                          <img src={imageUrls[photoId]} alt={`사진 ${i + 1}`} className="w-full h-16 object-cover rounded border" />
+                        ) : (
+                          <div className="w-full h-16 bg-gray-100 rounded border flex items-center justify-center">
+                            <span className="text-xs text-gray-400">#{i + 1}</span>
+                          </div>
+                        )}
+                        <button
+                          onClick={() => {
+                            const photos = currentContent.portfolio.photos.filter((_, idx) => idx !== i);
+                            updateSection("portfolio", { photos });
+                          }}
+                          className="absolute top-0.5 right-0.5 bg-red-500 text-white text-xs w-4 h-4 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>

@@ -12,6 +12,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     include: {
       talent: true,
       page: true,
+      mediaAssets: { select: { id: true, type: true, optimizedUrl: true, thumbnailUrl: true, originalUrl: true } },
       intakeForms: { include: { submissions: { orderBy: { createdAt: "desc" }, take: 1 } } },
       quotes: { orderBy: { createdAt: "desc" }, take: 3 },
       orders: { orderBy: { createdAt: "desc" }, take: 3 },

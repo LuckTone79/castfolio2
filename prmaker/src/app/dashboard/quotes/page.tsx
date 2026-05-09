@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
+import { ConfirmPaymentButton } from "@/components/dashboard/ConfirmPaymentButton";
 
 const PlusIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -18,16 +19,35 @@ const quoteStatusConfig: Record<string, { label: string; cls: string }> = {
   SUPERSEDED: { label: "대체됨", cls: "badge-gray" },
 };
 
+const orderStatusConfig: Record<string, { label: string; cls: string }> = {
+  PAYMENT_PENDING: { label: "결제 대기", cls: "badge-amber" },
+  PAID:            { label: "결제 완료", cls: "badge-emerald" },
+  IN_PROGRESS:     { label: "제작 중",  cls: "badge-blue" },
+  DELIVERED:       { label: "납품 완료", cls: "badge-emerald" },
+  CANCELLED:       { label: "취소",     cls: "badge-red" },
+  REFUNDED:        { label: "환불",     cls: "badge-gray" },
+};
+
 export default async function QuotesPage() {
   const user = await requireUser();
-  const quotes = await prisma.quote.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-    include: {
-      project: { include: { talent: { select: { nameKo: true } } } },
-    },
-    take: 50,
-  });
+  const [quotes, pendingOrders] = await Promise.all([
+    prisma.quote.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      include: {
+        project: { include: { talent: { select: { nameKo: true } } } },
+      },
+      take: 50,
+    }),
+    prisma.order.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      include: {
+        project: { include: { talent: { select: { nameKo: true } } } },
+      },
+      take: 30,
+    }),
+  ]);
 
   return (
     <div className="space-y-5 fade-in">
@@ -45,6 +65,82 @@ export default async function QuotesPage() {
         </Link>
       </div>
 
+      {/* Orders section — payment confirmation */}
+      {pendingOrders.length > 0 && (
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}
+        >
+          <div className="px-5 py-3 border-b flex items-center gap-2" style={{ borderColor: "var(--border-subtle)" }}>
+            <span className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>주문 관리</span>
+            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(251,191,36,0.15)", color: "#F59E0B" }}>
+              결제 대기 {pendingOrders.filter(o => o.status === "PAYMENT_PENDING").length}건
+            </span>
+          </div>
+          <table className="w-full table-dark">
+            <thead>
+              <tr>
+                {["방송인", "주문번호", "금액", "상태", "주문일", "액션"].map(h => (
+                  <th key={h}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {pendingOrders.map(o => {
+                const s = orderStatusConfig[o.status] ?? { label: o.status, cls: "badge-gray" };
+                return (
+                  <tr key={o.id}>
+                    <td>
+                      <p className="font-medium text-sm" style={{ color: "var(--text-primary)" }}>
+                        {o.project.talent.nameKo}
+                      </p>
+                    </td>
+                    <td>
+                      <span className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>
+                        {o.orderNumber}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="font-semibold text-sm text-gradient-amber">
+                        {formatCurrency(Number(o.totalAmount))}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.cls}`}>
+                        {s.label}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                        {new Date(o.createdAt).toLocaleDateString("ko-KR")}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/dashboard/projects/${o.projectId}`}
+                          className="text-xs font-medium"
+                          style={{ color: "#A78BFA" }}
+                        >
+                          프로젝트
+                        </Link>
+                        {o.status === "PAYMENT_PENDING" && (
+                          <ConfirmPaymentButton
+                            orderId={o.id}
+                            orderNumber={o.orderNumber}
+                          />
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Quotes section */}
       <div
         className="rounded-2xl overflow-hidden"
         style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}
