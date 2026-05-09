@@ -3,6 +3,8 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logAudit, logTimeline } from "@/lib/audit";
 import { sendNotification, notifyTalent } from "@/lib/notify";
+import { sendEmail } from "@/lib/mail";
+import { deliveryCompleteTemplate } from "@/lib/email-templates";
 import { generateQRPng, generateQRSvg } from "@/lib/qr";
 import { generateQRCardPdf } from "@/lib/pdf";
 import { createServiceClient } from "@/lib/supabase/server";
@@ -90,7 +92,23 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
 
   await sendNotification({ userId: user.id, type: "delivery_complete", title: "PR 페이지 배포 완료", body: `${talent.nameKo}의 PR 페이지가 배포되었습니다.`, link: `/dashboard/projects/${page.projectId}` });
 
-  await notifyTalent({ talentId: talent.id, type: "delivery_complete", title: "PR 페이지가 완성되었습니다!", body: `${talent.nameKo}님의 PR 페이지가 공개되었습니다. 링크: ${pageUrl}` });
+  // Send rich delivery email directly to talent if they have an email
+  if (talent.email) {
+    const { subject, html } = deliveryCompleteTemplate({
+      talentName: talent.nameKo,
+      pageUrl,
+      partnerName: user.name || "담당 제작자",
+    });
+    await sendEmail({ to: talent.email, subject, html });
+  } else {
+    // Proxy via partner email using rich template
+    const { subject, html } = deliveryCompleteTemplate({
+      talentName: talent.nameKo,
+      pageUrl,
+      partnerName: user.name || "담당 제작자",
+    });
+    await sendEmail({ to: user.email, subject: `[전달 요청] ${subject}`, html });
+  }
 
   return NextResponse.json({ ok: true, slug: page.slug, status: updated.status, qrPngUrl: pngUrl });
 }

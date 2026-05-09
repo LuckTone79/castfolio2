@@ -3,6 +3,7 @@ import { requireReviewToken } from "@/lib/tokens";
 import { prisma } from "@/lib/prisma";
 import { logTimeline } from "@/lib/audit";
 import { sendNotification } from "@/lib/notify";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function GET(_: Request, { params }: { params: { token: string } }) {
   try {
@@ -27,6 +28,12 @@ export async function GET(_: Request, { params }: { params: { token: string } })
 }
 
 export async function POST(request: Request, { params }: { params: { token: string } }) {
+  // Rate limit: 10 requests per token per hour
+  const rl = rateLimit(`review:${params.token}:${getClientIp(request)}`, 10, 3_600_000);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "너무 많은 요청입니다. 잠시 후 다시 시도해주세요." }, { status: 429 });
+  }
+
   try {
     const form = await requireReviewToken(params.token);
     const body = await request.json();

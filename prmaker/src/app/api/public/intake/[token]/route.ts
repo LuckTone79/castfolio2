@@ -1,6 +1,7 @@
 import { logTimeline } from "@/lib/audit";
 import { normalizeIntakePayload, payloadToPageContent } from "@/lib/intake";
 import { sendNotification } from "@/lib/notify";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -31,6 +32,12 @@ export async function GET(_: Request, { params }: { params: { token: string } })
 }
 
 export async function POST(request: Request, { params }: { params: { token: string } }) {
+  // Rate limit: 5 submissions per token per 10 minutes
+  const rl = rateLimit(`intake:${params.token}:${getClientIp(request)}`, 5, 600_000);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "너무 많은 요청입니다. 잠시 후 다시 시도해주세요." }, { status: 429 });
+  }
+
   try {
     const form = await requireIntakeToken(params.token);
     const body = (await request.json()) as IntakePayload;

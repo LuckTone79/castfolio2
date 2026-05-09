@@ -103,18 +103,33 @@ export default function BuilderPage() {
       });
   }, [projectId]);
 
-  const saveDraft = useCallback(async (content: DraftContent) => {
+  // Retry-capable save: attempts up to 3 times with 2s backoff
+  const saveDraft = useCallback(async (content: DraftContent, attempt = 1) => {
     if (!pageId) return;
     setSaveState("saving");
-    const res = await fetch(`/api/pages/${pageId}/draft`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ draftContent: content, theme, accentColor }),
-    });
-    setSaveState(res.ok ? "saved" : "error");
+    try {
+      const res = await fetch(`/api/pages/${pageId}/draft`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ draftContent: content, theme, accentColor }),
+      });
+      if (res.ok) {
+        setSaveState("saved");
+      } else if (attempt < 3) {
+        setTimeout(() => saveDraft(content, attempt + 1), 2000 * attempt);
+      } else {
+        setSaveState("error");
+      }
+    } catch {
+      if (attempt < 3) {
+        setTimeout(() => saveDraft(content, attempt + 1), 2000 * attempt);
+      } else {
+        setSaveState("error");
+      }
+    }
   }, [pageId, theme, accentColor]);
 
-  // Auto-save every 30 seconds (초기 로딩 시 미저장 상태 표시 방지)
+  // Auto-save with 5s debounce (초기 로딩 시 미저장 상태 표시 방지)
   useEffect(() => {
     if (isInitialLoad.current) {
       isInitialLoad.current = false;
@@ -124,9 +139,21 @@ export default function BuilderPage() {
     setSaveState("unsaved");
     autoSaveTimer.current = setTimeout(() => {
       saveDraft(draftContent);
-    }, 30000);
+    }, 5000);
     return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
   }, [draftContent, saveDraft]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (saveState === "unsaved" || saveState === "saving") {
+        e.preventDefault();
+        e.returnValue = "저장되지 않은 변경 사항이 있습니다. 페이지를 떠나시겠습니까?";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [saveState]);
 
   const updateSection = (section: keyof PageContent, data: Partial<PageContent[keyof PageContent]>) => {
     setDraftContent(prev => ({

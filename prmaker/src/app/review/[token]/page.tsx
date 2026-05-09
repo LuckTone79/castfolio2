@@ -4,6 +4,17 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PRPageRenderer } from "@/components/pr-page/PRPageRenderer";
 import { getTheme } from "@/themes";
+import { PageContent, DraftContent } from "@/types/page-content";
+
+// Returns true when obj is the multi-locale { ko, en, zh } structure.
+// Flat legacy PageContent has "hero" at the root, not a nested locale key.
+function isDraftContent(obj: Record<string, unknown>): obj is DraftContent & Record<string, unknown> {
+  return (
+    typeof obj.ko === "object" &&
+    obj.ko !== null &&
+    "hero" in (obj.ko as Record<string, unknown>)
+  );
+}
 
 interface ReviewData {
   submission: Record<string, string>;
@@ -146,9 +157,11 @@ export default function ReviewPage() {
       {/* PR Page Preview Tab */}
       {activeTab === "preview" && hasPage && (() => {
         const pageData = data.page!;
-        const draftContent = pageData.draftContent as Record<string, unknown>;
+        const draftRaw = pageData.draftContent as Record<string, unknown>;
         const locale = "ko";
-        const content = (draftContent[locale] || draftContent) as Parameters<typeof PRPageRenderer>[0]["content"];
+        const content: PageContent = isDraftContent(draftRaw)
+          ? draftRaw.ko
+          : (draftRaw as unknown as PageContent);
         const theme = getTheme(pageData.theme || "anchor-clean");
         const sectionOrder = pageData.sectionOrder?.length
           ? pageData.sectionOrder

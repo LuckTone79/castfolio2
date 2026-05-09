@@ -3,6 +3,8 @@ import { logAudit, logTimeline } from "@/lib/audit";
 import { buildIntakeUrl, createIntakeToken, hasMeaningfulContent } from "@/lib/intake";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendEmail } from "@/lib/mail";
+import { intakeRequestTemplate } from "@/lib/email-templates";
 import type { IntakePayload, IntakeSubmissionRecord } from "@/types/intake";
 import type { PageContent } from "@/types/page-content";
 
@@ -94,5 +96,17 @@ export async function POST(request: Request) {
   await logAudit({ actorId: user.id, actorRole: user.role, action: "CREATE_INTAKE_FORM", targetType: "IntakeForm", targetId: form.id, after: { projectId } });
   await logTimeline({ projectId, event: "INTAKE_LINK_CREATED", description: "자료 제출 링크가 생성되었습니다", actorId: user.id, actorName: user.name });
 
-  return NextResponse.json(form, { status: 201 });
+  // Send intake link email to talent if they have a direct email
+  const intakeUrl = buildIntakeUrl(form.token);
+  if (project.talent.email) {
+    const { subject, html } = intakeRequestTemplate({
+      talentName: project.talent.nameKo,
+      partnerName: user.name || "담당 제작자",
+      intakeUrl,
+      expiresAt: form.expiresAt,
+    });
+    await sendEmail({ to: project.talent.email, subject, html });
+  }
+
+  return NextResponse.json({ ...form, intakeUrl }, { status: 201 });
 }

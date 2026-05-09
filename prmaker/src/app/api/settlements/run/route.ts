@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendEmail } from "@/lib/mail";
+import { settlementNoticeTemplate } from "@/lib/email-templates";
 
 export async function POST() {
   await requireAdmin().catch(() => null);
@@ -25,6 +27,17 @@ export async function POST() {
     if (!byUser[entry.userId]) byUser[entry.userId] = [];
     byUser[entry.userId].push(entry);
   }
+
+  // Pre-fetch users for email notifications
+  const userIds = Object.keys(byUser);
+  const users = await prisma.user.findMany({
+    where: { id: { in: userIds } },
+    select: { id: true, name: true, email: true },
+  });
+  const userMap = Object.fromEntries(users.map(u => [u.id, u]));
+
+  const periodLabel = `${periodStart.getFullYear()}년 ${periodStart.getMonth() + 1}월`;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://castfolio.wideget.net";
 
   const batches = [];
   for (const [userId, entries] of Object.entries(byUser)) {
@@ -51,6 +64,22 @@ export async function POST() {
       where: { id: { in: entries.map(e => e.id) } },
       data: { settlementId: batch.id },
     });
+
+    // Send settlement notice email to partner (only if minimum met)
+    if (minimumMet && userMap[userId]?.email) {
+      const { subject, html } = settlementNoticeTemplate({
+        partnerName: userMap[userId].name || "파트너",
+        periodLabel,
+        totalAmount: totalSales,
+        commissionAmount: totalCommission,
+        settlementAmount: totalUserAmount,
+        orderCount: entries.length,
+        dashboardUrl: `${appUrl}/dashboard/settlements`,
+      });
+      await sendEmail({ to: userMap[userId].email, subject, html }).catch(err =>
+        console.error(`[settlement] email failed for user ${userId}:`, err)
+      );
+    }
 
     batches.push(batch);
   }
