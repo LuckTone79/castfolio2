@@ -20,12 +20,14 @@ const quoteStatusConfig: Record<string, { label: string; cls: string }> = {
 };
 
 const orderStatusConfig: Record<string, { label: string; cls: string }> = {
+  DRAFT:           { label: "초안",      cls: "badge-gray" },
   PAYMENT_PENDING: { label: "결제 대기", cls: "badge-amber" },
   PAID:            { label: "결제 완료", cls: "badge-emerald" },
-  IN_PROGRESS:     { label: "제작 중",  cls: "badge-blue" },
   DELIVERED:       { label: "납품 완료", cls: "badge-emerald" },
-  CANCELLED:       { label: "취소",     cls: "badge-red" },
-  REFUNDED:        { label: "환불",     cls: "badge-gray" },
+  SETTLED:         { label: "정산 완료", cls: "badge-violet" },
+  CANCELLED:       { label: "취소",      cls: "badge-red" },
+  DISPUTED:        { label: "이슈",      cls: "badge-red" },
+  REFUNDED:        { label: "환불",      cls: "badge-gray" },
 };
 
 export default async function QuotesPage() {

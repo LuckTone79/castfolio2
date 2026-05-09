@@ -45,6 +45,14 @@ const IconReceipt = () => (
   </svg>
 );
 
+const IconClipboard = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+    <rect x="9" y="3" width="6" height="4" rx="1" />
+    <path d="M9 12h6M9 16h4" />
+  </svg>
+);
+
 const IconWallet = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" />
@@ -81,6 +89,7 @@ const MENU_ITEMS = [
   { href: "/dashboard/projects", label: "제작 프로젝트", Icon: IconFolder },
   { href: "/dashboard/pricing", label: "상품 / 가격", Icon: IconTag },
   { href: "/dashboard/quotes", label: "판매 관리", Icon: IconReceipt },
+  { href: "/dashboard/orders", label: "주문 관리", Icon: IconClipboard },
   { href: "/dashboard/settlements", label: "정산 내역", Icon: IconWallet },
   { href: "/dashboard/help", label: "파트너 가이드", Icon: IconHelp },
   { href: "/dashboard/settings", label: "설정", Icon: IconSettings },
@@ -190,7 +199,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ user }) => {
           <span>로그아웃</span>
         </button>
         <p className="text-center mt-1" style={{ fontSize: "0.6rem", color: "var(--text-muted)", opacity: 0.5 }}>
-          v1.3.0
+          v1.4.0
         </p>
       </div>
     </aside>

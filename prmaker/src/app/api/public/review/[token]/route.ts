@@ -8,7 +8,19 @@ export async function GET(_: Request, { params }: { params: { token: string } })
   try {
     const form = await requireReviewToken(params.token);
     const submission = form.submissions[0];
-    return NextResponse.json({ submission: submission?.data, status: form.project.verificationStatus });
+
+    // Fetch page data for PR preview
+    const page = await prisma.page.findFirst({
+      where: { projectId: form.projectId },
+      select: { draftContent: true, theme: true, accentColor: true, sectionOrder: true, disabledSections: true },
+    });
+
+    return NextResponse.json({
+      submission: submission?.data,
+      status: form.project.verificationStatus,
+      talent: { nameKo: form.talent.nameKo, nameEn: form.talent.nameEn },
+      page: page ?? null,
+    });
   } catch {
     return NextResponse.json({ error: "INVALID" }, { status: 404 });
   }

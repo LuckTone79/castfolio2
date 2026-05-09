@@ -57,6 +57,7 @@ export default function BuilderPage() {
   const [activeSection, setActiveSection] = useState<ActiveSection>("hero");
   const [draftContent, setDraftContent] = useState<DraftContent>({ ko: { ...EMPTY_CONTENT }, en: { ...EMPTY_CONTENT }, zh: { ...EMPTY_CONTENT } });
   const [saveState, setSaveState] = useState<SaveState>("saved");
+  const [mobileTab, setMobileTab] = useState<"edit" | "preview">("edit");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [publishError, setPublishError] = useState<string[]>([]);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
@@ -196,9 +197,28 @@ export default function BuilderPage() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
+      {/* Mobile tab bar */}
+      <div className="md:hidden flex items-center bg-white border-b px-3 py-2 gap-1">
+        <button
+          onClick={() => setMobileTab("edit")}
+          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-colors ${mobileTab === "edit" ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"}`}
+        >
+          편집
+        </button>
+        <button
+          onClick={() => setMobileTab("preview")}
+          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-colors ${mobileTab === "preview" ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"}`}
+        >
+          미리보기
+        </button>
+        <button onClick={() => saveDraft(draftContent)} className="px-3 py-2 text-xs border rounded-lg hover:bg-gray-50">저장</button>
+        <button onClick={handlePublish} className="px-3 py-2 text-xs bg-green-600 text-white rounded-lg font-medium">배포</button>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
       {/* Left Panel - Sections */}
-      <div className="w-52 bg-white border-r flex flex-col shrink-0">
+      <div className={`w-52 bg-white border-r flex flex-col shrink-0 ${mobileTab === "edit" ? "flex" : "hidden"} md:flex`}>
         <div className="px-4 py-3 border-b">
           <Link href={`/dashboard/projects/${projectId}`} className="text-xs text-gray-500 hover:text-gray-700">← 프로젝트로</Link>
           <p className="font-semibold text-sm mt-1">{projectData?.talent.nameKo}</p>
@@ -228,7 +248,7 @@ export default function BuilderPage() {
       </div>
 
       {/* Center - Preview */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className={`flex-1 flex flex-col overflow-hidden ${mobileTab === "preview" ? "flex" : "hidden"} md:flex`}>
         {/* Top bar */}
         <div className="bg-white border-b px-4 py-2 flex items-center gap-3">
           <select value={theme} onChange={e => setTheme(e.target.value)}
@@ -292,7 +312,7 @@ export default function BuilderPage() {
       </div>
 
       {/* Right Panel - Editor */}
-      <div className="w-72 bg-white border-l flex flex-col shrink-0">
+      <div className={`w-full md:w-72 bg-white border-l flex flex-col shrink-0 ${mobileTab === "edit" ? "flex" : "hidden"} md:flex`}>
         <div className="px-4 py-3 border-b">
           <p className="font-semibold text-sm">{SECTIONS.find(s => s.key === activeSection)?.label} 편집</p>
         </div>
@@ -740,6 +760,7 @@ export default function BuilderPage() {
           )}
         </div>
       </div>
+      </div> {/* closes flex flex-1 overflow-hidden */}
     </div>
   );
 }

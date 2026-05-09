@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireQuoteToken } from "@/lib/tokens";
 import { formatCurrency } from "@/lib/utils";
+import { QuoteActionButtons } from "@/components/quote/QuoteActionButtons";
 
 interface Props { params: { token: string } }
 
@@ -89,31 +90,41 @@ export default async function QuotePage({ params }: Props) {
           )}
         </div>
 
-        {/* Payment instructions */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h2 className="font-semibold text-blue-900 mb-2">💳 결제 방법</h2>
-          <p className="text-sm text-blue-800 mb-4">
-            아래 담당자에게 연락하여 결제를 진행해주세요.
-          </p>
-          <div className="space-y-2">
+        {/* Accept / Reject actions (SENT status only) */}
+        <QuoteActionButtons
+          token={params.token}
+          quoteStatus={quote.status}
+          talentName={talent.nameKo}
+          totalAmount={formatCurrency(Number(quote.totalAmount))}
+        />
+
+        {/* Payment instructions (shown for SENT/ACCEPTED) */}
+        {(quote.status === "SENT" || quote.status === "ACCEPTED") && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+            <h2 className="font-semibold text-blue-900 mb-2">💳 결제 문의</h2>
+            <p className="text-sm text-blue-800 mb-4">
+              견적 수락 후 아래 담당자에게 연락하여 결제를 진행해주세요.
+            </p>
+            <div className="space-y-2">
+              {user.email && (
+                <a href={`mailto:${user.email}`} className="flex items-center gap-2 text-sm text-blue-700 hover:underline">
+                  <span>✉️</span> {user.email}
+                </a>
+              )}
+              {user.phone && (
+                <a href={`tel:${user.phone}`} className="flex items-center gap-2 text-sm text-blue-700 hover:underline">
+                  <span>📞</span> {user.phone}
+                </a>
+              )}
+            </div>
             {user.email && (
-              <a href={`mailto:${user.email}`} className="flex items-center gap-2 text-sm text-blue-700 hover:underline">
-                <span>✉️</span> {user.email}
-              </a>
-            )}
-            {user.phone && (
-              <a href={`tel:${user.phone}`} className="flex items-center gap-2 text-sm text-blue-700 hover:underline">
-                <span>📞</span> {user.phone}
+              <a href={`mailto:${user.email}?subject=${encodeURIComponent(`[견적] ${talent.nameKo} PR 페이지 결제 문의`)}`}
+                className="mt-4 block w-full py-2.5 bg-blue-600 text-white text-center rounded-lg font-medium hover:bg-blue-700 text-sm">
+                문의하기
               </a>
             )}
           </div>
-          {user.email && (
-            <a href={`mailto:${user.email}?subject=${encodeURIComponent(`[견적] ${talent.nameKo} PR 페이지 결제 문의`)}`}
-              className="mt-4 block w-full py-2.5 bg-blue-600 text-white text-center rounded-lg font-medium hover:bg-blue-700 text-sm">
-              문의하기
-            </a>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
