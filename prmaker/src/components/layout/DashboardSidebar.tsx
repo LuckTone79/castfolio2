@@ -61,6 +61,15 @@ const IconWallet = () => (
   </svg>
 );
 
+const IconChart = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="20" x2="18" y2="10" />
+    <line x1="12" y1="20" x2="12" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="14" />
+    <line x1="2" y1="20" x2="22" y2="20" />
+  </svg>
+);
+
 const IconHelp = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" />
@@ -91,6 +100,7 @@ const MENU_ITEMS = [
   { href: "/dashboard/quotes", label: "판매 관리", Icon: IconReceipt },
   { href: "/dashboard/orders", label: "주문 관리", Icon: IconClipboard },
   { href: "/dashboard/settlements", label: "정산 내역", Icon: IconWallet },
+  { href: "/dashboard/analytics", label: "방문 분석", Icon: IconChart },
   { href: "/dashboard/help", label: "파트너 가이드", Icon: IconHelp },
   { href: "/dashboard/settings", label: "설정", Icon: IconSettings },
 ];
@@ -198,8 +208,12 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ user }) => {
           <IconLogout />
           <span>로그아웃</span>
         </button>
+        <div className="flex justify-center gap-3 mt-1">
+          <Link href="/terms" className="text-center" style={{ fontSize: "0.6rem", color: "var(--text-muted)", opacity: 0.5 }}>이용약관</Link>
+          <Link href="/privacy" className="text-center" style={{ fontSize: "0.6rem", color: "var(--text-muted)", opacity: 0.5 }}>개인정보처리방침</Link>
+        </div>
         <p className="text-center mt-1" style={{ fontSize: "0.6rem", color: "var(--text-muted)", opacity: 0.5 }}>
-          v1.5.0
+          v1.6.0
         </p>
       </div>
     </aside>

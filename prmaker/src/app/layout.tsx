@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://castfolio.wideget.net";
+
 export const metadata: Metadata = {
   title: "Castfolio — 방송인 PR 페이지 빌더",
   description: "방송인 PR 페이지를 10분 만에 제작, 납품, 정산하는 수직형 SaaS",
+  metadataBase: new URL(APP_URL),
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

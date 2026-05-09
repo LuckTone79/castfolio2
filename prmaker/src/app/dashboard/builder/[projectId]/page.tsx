@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, DragEvent } from "react";
 import { useParams } from "next/navigation";
 import { ALL_THEMES, getTheme } from "@/themes";
 import { PRPageRenderer } from "@/components/pr-page/PRPageRenderer";
@@ -62,6 +62,9 @@ export default function BuilderPage() {
   const [publishError, setPublishError] = useState<string[]>([]);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
   const [uploadingField, setUploadingField] = useState<string | null>(null);
+  const [sectionOrder, setSectionOrder] = useState<string[]>(["hero", "profile", "career", "portfolio", "strength", "contact"]);
+  const dragItem = useRef<string | null>(null);
+  const dragOverItem = useRef<string | null>(null);
 
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>();
   const isInitialLoad = useRef(true);
@@ -98,6 +101,9 @@ export default function BuilderPage() {
           if (data.page.draftContent) {
             setDraftContent(data.page.draftContent as DraftContent);
           }
+          if (data.page.sectionOrder?.length) {
+            setSectionOrder(data.page.sectionOrder);
+          }
         }
         setLoading(false);
       });
@@ -111,7 +117,7 @@ export default function BuilderPage() {
       const res = await fetch(`/api/pages/${pageId}/draft`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ draftContent: content, theme, accentColor }),
+        body: JSON.stringify({ draftContent: content, theme, accentColor, sectionOrder }),
       });
       if (res.ok) {
         setSaveState("saved");
@@ -142,6 +148,32 @@ export default function BuilderPage() {
     }, 5000);
     return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
   }, [draftContent, saveDraft]);
+
+  // Drag-and-drop section reorder (hero fixed first, contact fixed last)
+  const handleDragStart = (e: DragEvent<HTMLButtonElement>, key: string) => {
+    dragItem.current = key;
+    e.dataTransfer.effectAllowed = "move";
+  };
+  const handleDragEnter = (key: string) => { dragOverItem.current = key; };
+  const handleDragEnd = () => {
+    if (!dragItem.current || !dragOverItem.current || dragItem.current === dragOverItem.current) {
+      dragItem.current = null; dragOverItem.current = null; return;
+    }
+    const FIXED = ["hero", "contact"];
+    if (FIXED.includes(dragItem.current) || FIXED.includes(dragOverItem.current)) return;
+
+    setSectionOrder(prev => {
+      const next = [...prev];
+      const from = next.indexOf(dragItem.current!);
+      const to = next.indexOf(dragOverItem.current!);
+      if (from === -1 || to === -1) return prev;
+      next.splice(from, 1);
+      next.splice(to, 0, dragItem.current!);
+      return next;
+    });
+    dragItem.current = null;
+    dragOverItem.current = null;
+  };
 
   // Warn before leaving with unsaved changes
   useEffect(() => {
@@ -251,18 +283,30 @@ export default function BuilderPage() {
           <p className="font-semibold text-sm mt-1">{projectData?.talent.nameKo}</p>
         </div>
         <div className="flex-1 p-2 overflow-y-auto">
-          <p className="text-xs font-medium text-gray-400 uppercase px-2 mb-2">섹션</p>
-          {SECTIONS.map(s => (
-            <button
-              key={s.key}
-              onClick={() => setActiveSection(s.key as ActiveSection)}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors ${activeSection === s.key ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50"}`}
-            >
-              <span>{s.icon}</span>
-              <span>{s.label}</span>
-              {s.fixed && <span className="ml-auto text-xs text-gray-300">고정</span>}
-            </button>
-          ))}
+          <p className="text-xs font-medium text-gray-400 uppercase px-2 mb-1">섹션</p>
+          <p className="text-[10px] text-gray-400 px-2 mb-2">드래그로 순서 변경</p>
+          {sectionOrder.map(key => {
+            const s = SECTIONS.find(s => s.key === key);
+            if (!s) return null;
+            const isFixed = !!s.fixed;
+            return (
+              <button
+                key={s.key}
+                draggable={!isFixed}
+                onDragStart={!isFixed ? (e) => handleDragStart(e, s.key) : undefined}
+                onDragEnter={() => handleDragEnter(s.key)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => e.preventDefault()}
+                onClick={() => setActiveSection(s.key as ActiveSection)}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors ${activeSection === s.key ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50"} ${!isFixed ? "cursor-grab active:cursor-grabbing" : ""}`}
+              >
+                {!isFixed && <span className="text-gray-300 text-[10px] mr-0.5">⠿</span>}
+                <span>{s.icon}</span>
+                <span>{s.label}</span>
+                {isFixed && <span className="ml-auto text-xs text-gray-300">고정</span>}
+              </button>
+            );
+          })}
         </div>
 
         {/* Save state */}
@@ -326,7 +370,7 @@ export default function BuilderPage() {
               accentColor={accentColor || undefined}
               talentName={talent?.nameKo || "방송인"}
               talentNameEn={talent?.nameEn}
-              sectionOrder={["hero", "profile", "career", "portfolio", "strength", "contact", "footer"]}
+              sectionOrder={[...sectionOrder, "footer"]}
               disabledSections={[]}
               watermark={true}
               locale={activeLocale}

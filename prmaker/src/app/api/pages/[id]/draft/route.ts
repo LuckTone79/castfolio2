@@ -13,11 +13,16 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   if (!page) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await request.json();
-  const { draftContent } = body;
+  const { draftContent, theme, accentColor, sectionOrder } = body;
 
   const updated = await prisma.page.update({
     where: { id: params.id },
-    data: { draftContent },
+    data: {
+      draftContent,
+      ...(theme && { theme }),
+      ...(accentColor !== undefined && { accentColor: accentColor || null }),
+      ...(Array.isArray(sectionOrder) && sectionOrder.length > 0 && { sectionOrder }),
+    },
   });
 
   return NextResponse.json({ ok: true, updatedAt: updated.updatedAt });
