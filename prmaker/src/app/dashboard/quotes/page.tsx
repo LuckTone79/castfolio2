@@ -33,15 +33,15 @@ export default async function QuotesPage() {
     <div className="space-y-5 fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-bold text-xl" style={{ color: "var(--text-primary)" }}>견적 / 주문</h1>
-          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>총 {quotes.length}건</p>
+          <h1 className="font-bold text-xl" style={{ color: "var(--text-primary)" }}>판매 메뉴</h1>
+          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>견적 발송, 주문 확인, 판매 확정 흐름을 관리합니다.</p>
         </div>
         <Link
           href="/dashboard/quotes/new"
           className="btn-primary flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm"
           style={{ background: "var(--accent)" }}
         >
-          <PlusIcon /> 견적 생성
+          <PlusIcon /> 판매 견적 생성
         </Link>
       </div>
 
@@ -60,14 +60,14 @@ export default async function QuotesPage() {
                 <path d="M14 2v6h5M16 13H8M16 17H8M10 9H8"/>
               </svg>
             </div>
-            <p className="font-semibold mb-1" style={{ color: "var(--text-primary)" }}>생성된 견적이 없습니다</p>
-            <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>프로젝트에 대한 견적서를 생성해보세요.</p>
+            <p className="font-semibold mb-1" style={{ color: "var(--text-primary)" }}>생성된 판매 견적이 없습니다</p>
+            <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>프로젝트에 대한 판매 제안서와 결제 안내 흐름을 시작해보세요.</p>
             <Link
               href="/dashboard/quotes/new"
               className="btn-primary inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm"
               style={{ background: "var(--accent)" }}
             >
-              <PlusIcon /> 견적 생성하기
+              <PlusIcon /> 첫 견적 생성
             </Link>
           </div>
         ) : (

@@ -9,4 +9,5 @@ export const freshSky: ThemeConfig = {
   colors: { primary: "#E8F4FD", secondary: "#D1ECFA", text: "#1A2E3B", textLight: "#5B7A8A", accent: "#4A90D9", background: "#F0F8FF", backgroundAlt: "#E8F4FD", border: "#B8D8F0", buttonBg: "#4A90D9", buttonText: "#FFFFFF" },
   fonts: { headingKo: "Pretendard", headingEn: "Montserrat", bodyKo: "Pretendard", bodyEn: "Inter" },
   backgroundStyle: "gradient", buttonStyle: "pill", animationTone: "moderate",
+  colorSchemeSlot: 4, maxWidth: "1280px", fontSizeBase: "15px",
 };

@@ -39,9 +39,9 @@ export default async function SettlementsPage() {
   return (
     <div className="space-y-6 fade-in">
       <div>
-        <h1 className="font-bold text-xl" style={{ color: "var(--text-primary)" }}>정산 내역</h1>
+        <h1 className="font-bold text-xl" style={{ color: "var(--text-primary)" }}>매출 및 정산</h1>
         <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-          {new Date().getFullYear()}년 {new Date().getMonth() + 1}월 기준
+          판매 확정 건을 기준으로 파트너 수익과 플랫폼 수수료 흐름을 확인합니다.
         </p>
       </div>
 

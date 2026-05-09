@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import { Mail, MessageCircle, Instagram, Youtube, Phone, Link as LinkIcon } from "lucide-react";
 import { ThemeConfig } from "@/types/theme";
 import { PageContent } from "@/types/page-content";
 
@@ -13,73 +14,83 @@ interface ContactSectionProps {
   sectionTitle?: string;
 }
 
-const CHANNEL_ICONS: Record<string, string> = {
-  email: "✉️",
-  kakao: "💬",
-  instagram: "📸",
-  youtube: "▶️",
-  tiktok: "🎵",
-  blog: "📝",
-  phone: "📞",
-  other: "🔗",
+const CHANNEL_ICON_COMPONENT: Record<PageContent["contact"]["channels"][number]["type"], React.ComponentType<{ className?: string }>> = {
+  email: Mail,
+  kakao: MessageCircle,
+  instagram: Instagram,
+  youtube: Youtube,
+  tiktok: LinkIcon,
+  blog: LinkIcon,
+  phone: Phone,
+  other: LinkIcon,
 };
 
 export const ContactSection: React.FC<ContactSectionProps> = ({
-  content, theme, showPhone, emailBotProtect, accentColor, sectionTitle = "연락처",
+  content,
+  showPhone,
+  emailBotProtect,
+  sectionTitle = "연락처",
 }) => {
-  const accent = accentColor || theme.colors.accent;
-
   const renderChannel = (channel: PageContent["contact"]["channels"][0]) => {
     if (channel.type === "phone" && !showPhone) return null;
-
-    const icon = CHANNEL_ICONS[channel.type] || "🔗";
+    const Icon = CHANNEL_ICON_COMPONENT[channel.type] || LinkIcon;
+    const href =
+      channel.type === "email" ? `mailto:${channel.value}` :
+      channel.type === "phone" ? `tel:${channel.value}` :
+      channel.value;
+    const isExternal = !["email", "phone"].includes(channel.type);
 
     if (channel.type === "email" && emailBotProtect) {
       return (
         <button
-          onClick={() => { window.location.href = `mailto:${channel.value}`; }}
-          className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors w-full text-left"
+          type="button"
+          onClick={() => { window.location.href = href; }}
+          className="flex items-center gap-3 p-4 rounded-xl transition-colors w-full text-left border"
+          style={{ borderColor: "var(--cs-border)", backgroundColor: "var(--cs-background)" }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--cs-background-alt)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "var(--cs-background)"; }}
         >
-          <span className="text-xl">{icon}</span>
-          <span className="text-sm font-medium">{channel.label || channel.value}</span>
+          <Icon className="w-4 h-4 shrink-0" />
+          <span className="text-sm font-medium break-all">{channel.label || channel.value}</span>
         </button>
       );
     }
 
     return (
       <a
-        href={channel.type === "email" ? `mailto:${channel.value}` : channel.type === "phone" ? `tel:${channel.value}` : channel.value}
-        target={["email", "phone"].includes(channel.type) ? undefined : "_blank"}
-        rel="noopener noreferrer"
-        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+        href={href}
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noopener noreferrer" : undefined}
+        className="flex items-center gap-3 p-4 rounded-xl transition-colors border"
+        style={{ borderColor: "var(--cs-border)", backgroundColor: "var(--cs-background)" }}
       >
-        <span className="text-xl">{icon}</span>
-        <span className="text-sm font-medium">{channel.label || channel.value}</span>
+        <Icon className="w-4 h-4 shrink-0" />
+        <span className="text-sm font-medium break-all">{channel.label || channel.value}</span>
       </a>
     );
   };
 
   return (
-    <section id="contact" style={{ backgroundColor: theme.colors.backgroundAlt, color: theme.colors.text }} className="py-20">
-      <div className="max-w-3xl mx-auto px-6 text-center">
+    <section id="contact" data-section="alt" className="py-[var(--layout-section-py)]">
+      <div className="max-w-3xl mx-auto px-[var(--layout-padding-x)] text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          style={{ fontFamily: theme.fonts.headingKo, color: accent }}
+          style={{ fontFamily: "var(--font-family-heading)", color: "var(--cs-accent)" }}
           className="text-3xl font-bold mb-12"
         >
           {sectionTitle}
         </motion.h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-md mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto">
           {content.channels.map((channel, i) => (
             <motion.div
-              key={i}
+              key={`${channel.type}-${channel.value}-${i}`}
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: i * 0.08 }}
             >
               {renderChannel(channel)}
             </motion.div>
@@ -89,3 +100,4 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     </section>
   );
 };
+

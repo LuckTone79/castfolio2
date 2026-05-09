@@ -9,4 +9,5 @@ export const naturalGreen: ThemeConfig = {
   colors: { primary: "#F0F7F0", secondary: "#E2EFE2", text: "#1A2E1A", textLight: "#5A7A5A", accent: "#4A8C4A", background: "#F5FAF5", backgroundAlt: "#EDF5ED", border: "#C5DCC5", buttonBg: "#2D5A2D", buttonText: "#FFFFFF" },
   fonts: { headingKo: "Pretendard", headingEn: "Montserrat", bodyKo: "SUIT", bodyEn: "Inter" },
   backgroundStyle: "solid", buttonStyle: "rounded", animationTone: "subtle",
+  colorSchemeSlot: 5, maxWidth: "1200px", fontSizeBase: "16px",
 };

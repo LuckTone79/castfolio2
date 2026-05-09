@@ -12,18 +12,17 @@ interface StrengthSectionProps {
 }
 
 export const StrengthSection: React.FC<StrengthSectionProps> = ({
-  content, theme, accentColor, sectionTitle = "강점",
+  content,
+  sectionTitle = "강점",
 }) => {
-  const accent = accentColor || theme.colors.accent;
-
   return (
-    <section id="strength" style={{ backgroundColor: theme.colors.background, color: theme.colors.text }} className="py-20">
-      <div className="max-w-5xl mx-auto px-6">
+    <section id="strength" data-section className="py-[var(--layout-section-py)]">
+      <div className="mx-auto px-[var(--layout-padding-x)]" style={{ maxWidth: "var(--layout-max-width)" }}>
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          style={{ fontFamily: theme.fonts.headingKo, color: accent }}
+          style={{ fontFamily: "var(--font-family-heading)", color: "var(--cs-accent)" }}
           className="text-3xl font-bold mb-12 text-center"
         >
           {sectionTitle}
@@ -37,12 +36,12 @@ export const StrengthSection: React.FC<StrengthSectionProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="p-6 rounded-xl border"
-              style={{ borderColor: theme.colors.border, backgroundColor: theme.colors.backgroundAlt }}
+              className="rounded-2xl border p-6"
+              style={{ borderColor: "var(--cs-border)", backgroundColor: "var(--cs-background)" }}
             >
               <div className="text-3xl mb-3">{card.icon}</div>
               <h3 className="font-semibold text-lg mb-2">{card.title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: theme.colors.textLight }}>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--cs-text-light)" }}>
                 {card.description}
               </p>
             </motion.div>
@@ -52,3 +51,4 @@ export const StrengthSection: React.FC<StrengthSectionProps> = ({
     </section>
   );
 };
+

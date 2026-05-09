@@ -1,4 +1,5 @@
 import type { User } from "@prisma/client";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,28 +30,28 @@ export interface UserAccess {
   canWrite: boolean;
 }
 
-export async function getCurrentSessionUser() {
+export const getCurrentSessionUser = cache(async () => {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   return user;
-}
+});
 
-export async function getCurrentDbUser(): Promise<User | null> {
+export const getCurrentDbUser = cache(async (): Promise<User | null> => {
   const sessionUser = await getCurrentSessionUser();
   if (!sessionUser) return null;
 
   return prisma.user.findUnique({
     where: { supabaseUid: sessionUser.id },
   });
-}
+});
 
-export async function getCurrentUserProfile(): Promise<UserProfile | null> {
+export const getCurrentUserProfile = cache(async (): Promise<UserProfile | null> => {
   const dbUser = await getCurrentDbUser();
   if (!dbUser || dbUser.status === "DELETED") return null;
   return normalizeDbUser(dbUser);
-}
+});
 
 export async function requireUser(): Promise<User> {
   const user = await getCurrentDbUser();

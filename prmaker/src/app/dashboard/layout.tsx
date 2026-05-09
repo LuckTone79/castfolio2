@@ -16,7 +16,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex h-screen" style={{ background: "var(--bg-base)" }}>
-      <DashboardSidebar user={{ name: user.name, email: user.email }} />
+      <DashboardSidebar user={{ name: user.name, email: user.email, userType: user.userType ?? undefined }} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardHeader />
         <main className="flex-1 overflow-y-auto p-6" style={{ background: "var(--bg-base)" }}>

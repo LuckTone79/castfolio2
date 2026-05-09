@@ -3,14 +3,36 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
-import { ChevronLeft, ChevronRight, Shield, Sparkles } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  FileInput,
+  LayoutDashboard,
+  ReceiptText,
+  Shield,
+  Sparkles,
+  SquarePen,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { APP_VERSION } from "@/lib/version";
+
+const NAV_ICONS = {
+  dashboard: LayoutDashboard,
+  users: Users,
+  intake: FileInput,
+  sales: ReceiptText,
+  settlements: Wallet,
+  builder: SquarePen,
+} as const;
+
+export type NavIconName = keyof typeof NAV_ICONS;
 
 export interface NavItem {
   href?: string;
   label: string;
-  icon: LucideIcon;
+  icon: NavIconName;
   exact?: boolean;
   badge?: string;
 }
@@ -40,6 +62,7 @@ export function SideNav({ items, brandLabel, brandTone }: SideNavProps) {
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
         {items.map((item) => {
+          const ItemIcon = NAV_ICONS[item.icon];
           const active = item.href
             ? item.exact
               ? pathname === item.href
@@ -48,7 +71,7 @@ export function SideNav({ items, brandLabel, brandTone }: SideNavProps) {
 
           const content = (
             <>
-              <item.icon size={18} className="shrink-0" />
+              <ItemIcon size={18} className="shrink-0" />
               {!collapsed && (
                 <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
                   <span className="truncate">{item.label}</span>
@@ -78,20 +101,29 @@ export function SideNav({ items, brandLabel, brandTone }: SideNavProps) {
           }
 
           return (
-            <Link key={item.href} href={item.href} className={className} title={collapsed ? item.label : undefined}>
+            <Link
+              key={item.href}
+              href={item.href}
+              prefetch
+              className={className}
+              title={collapsed ? item.label : undefined}
+            >
               {content}
             </Link>
           );
         })}
       </nav>
 
-      <button
-        onClick={() => setCollapsed((current) => !current)}
-        className="flex h-10 items-center justify-center border-t border-gray-800 text-gray-500 transition-colors hover:text-white"
-        aria-label={collapsed ? "메뉴 펼치기" : "메뉴 접기"}
-      >
-        {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-      </button>
+      <div className="border-t border-gray-800">
+        {!collapsed && <p className="px-4 pt-3 text-[11px] text-gray-500">v{APP_VERSION}</p>}
+        <button
+          onClick={() => setCollapsed((current) => !current)}
+          className="flex h-10 w-full items-center justify-center text-gray-500 transition-colors hover:text-white"
+          aria-label={collapsed ? "메뉴 펼치기" : "메뉴 접기"}
+        >
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
+      </div>
     </aside>
   );
 }

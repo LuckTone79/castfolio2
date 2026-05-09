@@ -13,17 +13,15 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
-  content, theme, heroImageUrl, talentName, accentColor,
+  content, heroImageUrl, talentName,
 }) => {
-  const accent = accentColor || theme.colors.accent;
-
   return (
     <section
       id="hero"
-      style={{ backgroundColor: theme.colors.background, color: theme.colors.text }}
+      data-section
       className="min-h-[60vh] flex items-center"
     >
-      <div className="max-w-6xl mx-auto px-6 py-20 w-full">
+      <div className="w-full mx-auto px-[var(--layout-padding-x)] py-[var(--layout-section-py)]" style={{ maxWidth: "var(--layout-max-width)" }}>
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Text */}
           <motion.div
@@ -32,38 +30,32 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <p style={{ color: accent }} className="text-sm font-semibold tracking-widest uppercase mb-2">
+            <p style={{ color: "var(--cs-accent)" }} className="text-sm font-semibold tracking-widest uppercase mb-2">
               {content.position}
             </p>
-            <h1 style={{ fontFamily: theme.fonts.headingKo }} className="text-4xl md:text-6xl font-bold mb-4">
+            <h1 style={{ fontFamily: "var(--font-family-heading)" }} className="text-4xl md:text-6xl font-bold mb-4">
               {talentName}
             </h1>
-            <p className="text-xl mb-8" style={{ color: theme.colors.textLight }}>
+            <p className="text-xl mb-8" style={{ color: "var(--cs-text-light)" }}>
               {content.tagline}
             </p>
             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
               <a
                 href={`#${content.ctaPrimary.action}`}
-                style={{ backgroundColor: theme.colors.buttonBg, color: theme.colors.buttonText }}
-                className={`px-6 py-3 font-semibold transition-opacity hover:opacity-90 ${
-                  theme.buttonStyle === "pill" ? "rounded-full" : theme.buttonStyle === "rounded" ? "rounded-lg" : "rounded"
-                }`}
+                className="cs-btn-primary px-6 py-3"
               >
                 {content.ctaPrimary.label}
               </a>
               <a
                 href={`#${content.ctaSecondary.action}`}
-                style={{ borderColor: theme.colors.border, color: theme.colors.text }}
-                className={`px-6 py-3 font-semibold border transition-colors hover:bg-gray-50 ${
-                  theme.buttonStyle === "pill" ? "rounded-full" : theme.buttonStyle === "rounded" ? "rounded-lg" : "rounded"
-                }`}
+                className="cs-btn-ghost px-6 py-3"
               >
                 {content.ctaSecondary.label}
               </a>
             </div>
           </motion.div>
 
-          {/* Photo */}
+          {/* Photo — 3:4 portrait ratio (sixshop imageRatio pattern) */}
           {heroImageUrl && (
             <motion.div
               className="flex-shrink-0"
@@ -74,7 +66,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <img
                 src={heroImageUrl}
                 alt={talentName}
-                className="w-72 h-96 md:w-80 md:h-[480px] object-cover rounded-2xl shadow-2xl"
+                className="img-ratio-34 w-72 md:w-80 rounded-2xl shadow-2xl"
                 loading="eager"
               />
             </motion.div>

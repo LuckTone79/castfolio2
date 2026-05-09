@@ -1,17 +1,17 @@
-import { FileInput, LayoutDashboard, ReceiptText, SquarePen, Users, Wallet } from "lucide-react";
 import { AccessDenied } from "@/components/common/access-denied";
 import { AuthRequired } from "@/components/common/auth-required";
 import { SuspendedAccount } from "@/components/common/suspended-account";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
+import type { NavItem } from "@/components/layout/side-nav";
 import { canAccessAgentApp, canWrite, getCurrentUserProfile } from "@/lib/auth";
 
-const buildAgentNav = (writeEnabled: boolean) => [
-  { href: "/app", label: "대시보드", icon: LayoutDashboard, exact: true },
-  { href: "/app/talents", label: "방송인 고객", icon: Users },
-  { href: "/app/intake", label: "자료 수집", icon: FileInput, badge: writeEnabled ? undefined : "read-only" },
-  { href: "/app/sales", label: "판매 관리", icon: ReceiptText, badge: writeEnabled ? undefined : "read-only" },
-  { href: "/app/settlements", label: "정산 내역", icon: Wallet },
-  { href: undefined, label: "PR 빌더는 고객 상세에서 진입", icon: SquarePen, badge: "info" },
+const buildAgentNav = (writeEnabled: boolean): NavItem[] => [
+  { href: "/app", label: "대시보드", icon: "dashboard", exact: true },
+  { href: "/app/talents", label: "방송인 고객", icon: "users" },
+  { href: "/app/intake", label: "자료 수집", icon: "intake", badge: writeEnabled ? undefined : "read-only" },
+  { href: "/app/sales", label: "매출 관리", icon: "sales", badge: writeEnabled ? undefined : "read-only" },
+  { href: "/app/settlements", label: "정산 내역", icon: "settlements" },
+  { href: undefined, label: "PR 빌더는 고객 상세에서 진입", icon: "builder", badge: "info" },
 ];
 
 export default async function AgentAppLayout({ children }: { children: React.ReactNode }) {

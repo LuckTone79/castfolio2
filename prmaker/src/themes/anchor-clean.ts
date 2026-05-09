@@ -9,4 +9,5 @@ export const anchorClean: ThemeConfig = {
   colors: { primary: "#FFFFFF", secondary: "#F5F5F5", text: "#1A1A1A", textLight: "#666666", accent: "#2563EB", background: "#FFFFFF", backgroundAlt: "#F8F9FA", border: "#E5E7EB", buttonBg: "#1A1A1A", buttonText: "#FFFFFF" },
   fonts: { headingKo: "Pretendard", headingEn: "Inter", bodyKo: "Pretendard", bodyEn: "Inter" },
   backgroundStyle: "solid", buttonStyle: "sharp", animationTone: "subtle",
+  colorSchemeSlot: 1, maxWidth: "1200px", fontSizeBase: "15px",
 };

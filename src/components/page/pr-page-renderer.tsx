@@ -87,20 +87,34 @@ export function PRPageRenderer({
     mediaAssets,
   };
 
+  const cssTokens = {
+    "--cs-accent": accent,
+    "--cs-accent-glow": `${accent}20`,
+    "--cs-background": theme.background,
+    "--cs-background-alt": theme.surface,
+    "--cs-text": theme.text,
+    "--cs-text-light": theme.textMuted,
+    "--cs-border": theme.border,
+    "--cs-button-bg": accent,
+    "--cs-button-text": theme.layout === "curated-atelier" ? "#ffffff" : theme.text,
+  } as React.CSSProperties;
+
   if (theme.layout === "curated-atelier") {
-    return <CuratedAtelierPage context={context} className={className} />;
+    return <CuratedAtelierPage context={context} cssTokens={cssTokens} className={className} />;
   }
 
-  return <ClassicThemePage context={context} themeColor={theme.color} className={className} />;
+  return <ClassicThemePage context={context} themeColor={theme.color} cssTokens={cssTokens} className={className} />;
 }
 
 function ClassicThemePage({
   context,
   themeColor,
+  cssTokens,
   className,
 }: {
   context: PageRenderContext;
   themeColor: string;
+  cssTokens: React.CSSProperties;
   className?: string;
 }) {
   const availableSections = new Set(context.orderedSections);
@@ -108,7 +122,7 @@ function ClassicThemePage({
   const secondaryHref = resolveCtaHref(context.content.hero.ctaSecondary?.action, availableSections);
 
   return (
-    <div className={cn("min-h-full text-white", className)} style={{ backgroundColor: "#030712" }}>
+    <div data-pr-page className={cn("min-h-full text-white", className)} style={{ backgroundColor: "var(--cs-background)", ...cssTokens }}>
       <section className="relative overflow-hidden">
         <div
           className="absolute inset-0"
@@ -266,9 +280,11 @@ function renderClassicSection(section: SectionKey, context: PageRenderContext) {
 
 function CuratedAtelierPage({
   context,
+  cssTokens,
   className,
 }: {
   context: PageRenderContext;
+  cssTokens: React.CSSProperties;
   className?: string;
 }) {
   const visibleNavSections = context.orderedSections.filter(
@@ -283,13 +299,14 @@ function CuratedAtelierPage({
 
   return (
     <div
-      className={cn("min-h-full text-[#1c1c19]", className)}
-      style={{ backgroundColor: "#fdf9f4" }}
+      data-pr-page
+      className={cn("min-h-full", className)}
+      style={{ color: "var(--cs-text)", backgroundColor: "var(--cs-background)", ...cssTokens }}
     >
       <div id="top" />
-      <nav className="sticky top-0 z-20 border-b border-[#dac1bf]/60 bg-[#fdf9f4]/85 backdrop-blur-xl">
+      <nav className="sticky top-0 z-20 backdrop-blur-xl" style={{ borderBottom: "1px solid color-mix(in srgb, var(--cs-border) 60%, transparent)", backgroundColor: "color-mix(in srgb, var(--cs-background) 85%, transparent)" }}>
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-5">
-          <span className="font-serif text-lg font-bold uppercase tracking-[0.35em]" style={{ color: context.accent }}>
+          <span className="font-serif text-lg font-bold uppercase tracking-[0.35em]" style={{ color: "var(--cs-accent)" }}>
             {context.nameEn || context.nameKo}
           </span>
           <div className="hidden items-center gap-6 md:flex">
@@ -297,15 +314,16 @@ function CuratedAtelierPage({
               <a
                 key={section}
                 href={`#${section}`}
-                className="text-sm font-medium text-[#745853] transition-transform duration-300 hover:scale-[1.02] hover:text-[#460609]"
+                className="text-sm font-medium transition-transform duration-300 hover:scale-[1.02]"
+                style={{ color: "var(--cs-text-light)" }}
               >
                 {getSectionLabel(section)}
               </a>
             ))}
             <a
               href="#contact"
-              className="rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-white transition-transform duration-300 hover:scale-[1.02]"
-              style={{ backgroundColor: context.accent }}
+              className="rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-[0.28em] transition-transform duration-300 hover:scale-[1.02]"
+              style={{ backgroundColor: "var(--cs-accent)", color: "var(--cs-button-text)" }}
             >
               Work With Me
             </a>
@@ -316,53 +334,54 @@ function CuratedAtelierPage({
       <main className="mx-auto max-w-3xl px-6 pb-24 pt-16">
         <section className="mb-24 text-center">
           <div className="relative mb-12 inline-block">
-            <div className="w-60 overflow-hidden rounded-xl bg-[#ebe8e3] shadow-[0_24px_70px_rgba(28,28,25,0.14)] md:w-64">
+            {/* Portrait — 3:4 ratio (sixshop imageRatio pattern) */}
+            <div className="w-60 overflow-hidden rounded-xl shadow-[0_24px_70px_rgba(28,28,25,0.14)] md:w-64" style={{ backgroundColor: "var(--cs-background-alt)" }}>
               <div className="-rotate-2 transform">
                 {context.heroImageUrl || context.profileImageUrl ? (
                   <img
                     src={context.heroImageUrl || context.profileImageUrl}
                     alt={`${context.nameKo} portrait`}
-                    className="h-80 w-full object-cover grayscale transition duration-700 hover:grayscale-0"
+                    className="img-ratio-34 w-full grayscale transition duration-700 hover:grayscale-0"
                   />
                 ) : (
-                  <div className="flex h-80 w-full items-center justify-center bg-[#ebe8e3] text-5xl font-serif font-bold uppercase text-[#460609]">
+                  <div className="img-ratio-34 flex w-full items-center justify-center text-5xl font-serif font-bold uppercase" style={{ backgroundColor: "var(--cs-background-alt)", color: "var(--cs-accent)" }}>
                     {getInitials(context.nameEn || context.nameKo)}
                   </div>
                 )}
               </div>
             </div>
             <div
-              className="absolute -bottom-5 -right-5 flex h-28 w-28 items-center justify-center rounded-full border bg-[#fdf9f4] p-4 text-center font-serif text-sm italic shadow-[0_18px_40px_rgba(70,6,9,0.1)]"
-              style={{ borderColor: `${context.accent}25`, color: context.accent }}
+              className="absolute -bottom-5 -right-5 flex h-28 w-28 items-center justify-center rounded-full border p-4 text-center font-serif text-sm italic shadow-[0_18px_40px_rgba(0,0,0,0.08)]"
+              style={{ borderColor: "var(--cs-accent-glow)", color: "var(--cs-accent)", backgroundColor: "var(--cs-background)" }}
             >
               Voice &amp; Presence
             </div>
           </div>
-          <h1 className="font-serif text-5xl font-extrabold uppercase tracking-tight text-[#460609] md:text-6xl">
+          <h1 className="font-serif text-5xl font-extrabold uppercase tracking-tight md:text-6xl" style={{ color: "var(--cs-accent)" }}>
             {context.nameEn || context.nameKo}
           </h1>
           {context.content.hero.position && (
-            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.32em] text-[#745853]">
+            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.32em]" style={{ color: "var(--cs-text-light)" }}>
               {context.content.hero.position}
             </p>
           )}
           {context.content.hero.tagline && (
-            <p className="mt-8 font-serif text-xl italic leading-9 text-[#554241]">
+            <p className="mt-8 font-serif text-xl italic leading-9" style={{ color: "var(--cs-text-light)" }}>
               &ldquo;{context.content.hero.tagline}&rdquo;
             </p>
           )}
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <a
               href={resolveCtaHref(context.content.hero.ctaPrimary?.action, new Set(context.orderedSections))}
-              className="rounded-full px-8 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-white transition-transform duration-300 hover:scale-[1.02]"
-              style={{ backgroundColor: context.accent }}
+              className="rounded-full px-8 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition-transform duration-300 hover:scale-[1.02]"
+              style={{ backgroundColor: "var(--cs-accent)", color: "var(--cs-button-text)" }}
             >
               {context.content.hero.ctaPrimary?.label || "Contact"}
             </a>
             <a
               href={resolveCtaHref(context.content.hero.ctaSecondary?.action, new Set(context.orderedSections))}
               className="rounded-full border px-8 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition-transform duration-300 hover:scale-[1.02]"
-              style={{ borderColor: "#dac1bf", color: context.accent }}
+              style={{ borderColor: "var(--cs-border)", color: "var(--cs-accent)" }}
             >
               {context.content.hero.ctaSecondary?.label || "Portfolio"}
             </a>
@@ -385,11 +404,11 @@ function CuratedAtelierPage({
                   {context.content.profile.infoItems.length > 0 && (
                     <div className="mt-8 grid gap-4 sm:grid-cols-3">
                       {context.content.profile.infoItems.map((item, index) => (
-                        <div key={`${item.label}-${index}`} className="rounded-xl bg-[#f7f3ee] px-5 py-4">
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#745853]">
+                        <div key={`${item.label}-${index}`} className="rounded-xl px-5 py-4" style={{ backgroundColor: "var(--cs-background-alt)" }}>
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--cs-text-light)" }}>
                             {item.label}
                           </p>
-                          <p className="mt-2 text-sm font-medium text-[#1c1c19]">{item.value}</p>
+                          <p className="mt-2 text-sm font-medium" style={{ color: "var(--cs-text)" }}>{item.value}</p>
                         </div>
                       ))}
                     </div>
@@ -399,7 +418,8 @@ function CuratedAtelierPage({
                       {context.content.profile.strengths.map((item, index) => (
                         <span
                           key={`${item.label}-${index}`}
-                          className="rounded-full bg-[#fed7d0] px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#795c57]"
+                          className="rounded-full px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.18em]"
+                          style={{ backgroundColor: "var(--cs-accent-glow)", color: "var(--cs-text-light)" }}
                         >
                           {item.icon ? `${item.icon} ` : ""}
                           {item.label}
@@ -416,13 +436,13 @@ function CuratedAtelierPage({
                   <SectionHeading title="경력" />
                   <div className="space-y-10">
                     {context.content.career.items.map((item, index) => (
-                      <div key={`${item.period}-${item.title}-${index}`} className="relative border-l pb-2 pl-8" style={{ borderColor: `${context.accent}22` }}>
-                        <div className="absolute -left-[7px] top-1 h-3 w-3 rounded-full" style={{ backgroundColor: index === 0 ? context.accent : "#887270" }} />
-                        <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#745853]">
+                      <div key={`${item.period}-${item.title}-${index}`} className="relative border-l pb-2 pl-8" style={{ borderColor: "var(--cs-accent-glow)" }}>
+                        <div className="absolute -left-[7px] top-1 h-3 w-3 rounded-full" style={{ backgroundColor: index === 0 ? "var(--cs-accent)" : "var(--cs-border)" }} />
+                        <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--cs-text-light)" }}>
                           {item.period}
                         </span>
-                        <h3 className="font-serif text-xl text-[#460609]">{item.title}</h3>
-                        {item.description && <p className="mt-2 text-sm leading-7 text-[#554241]">{item.description}</p>}
+                        <h3 className="font-serif text-xl" style={{ color: "var(--cs-accent)" }}>{item.title}</h3>
+                        {item.description && <p className="mt-2 text-sm leading-7" style={{ color: "var(--cs-text-light)" }}>{item.description}</p>}
                       </div>
                     ))}
                   </div>
@@ -439,12 +459,12 @@ function CuratedAtelierPage({
                     {context.content.strength.cards.map((card, index) => (
                       <div
                         key={`${card.title}-${index}`}
-                        className="rounded-xl border px-6 py-7 text-center transition-colors hover:border-[#460609]/20"
-                        style={{ borderColor: "#dac1bf33" }}
+                        className="rounded-xl border px-6 py-7 text-center transition-colors"
+                        style={{ borderColor: "var(--cs-border)" }}
                       >
-                        {card.icon && <div className="mb-4 text-3xl" style={{ color: context.accent }}>{card.icon}</div>}
-                        <h3 className="mb-3 font-serif text-xl text-[#460609]">{card.title}</h3>
-                        <p className="text-sm leading-7 text-[#554241]">{card.description}</p>
+                        {card.icon && <div className="mb-4 text-3xl" style={{ color: "var(--cs-accent)" }}>{card.icon}</div>}
+                        <h3 className="mb-3 font-serif text-xl" style={{ color: "var(--cs-accent)" }}>{card.title}</h3>
+                        <p className="text-sm leading-7" style={{ color: "var(--cs-text-light)" }}>{card.description}</p>
                       </div>
                     ))}
                   </div>
@@ -459,7 +479,7 @@ function CuratedAtelierPage({
                     {featuredContact ? (
                       <FeaturedContactCard channel={featuredContact} accent={context.accent} />
                     ) : (
-                      <div className="rounded-2xl bg-[#460609] p-8 text-white" />
+                      <div className="rounded-2xl p-8" style={{ backgroundColor: "var(--cs-accent)", color: "var(--cs-button-text)" }} />
                     )}
                     <div className="grid gap-4 sm:grid-cols-2">
                       {secondaryContacts.map((channel, index) => (
@@ -479,19 +499,17 @@ function CuratedAtelierPage({
         })}
       </main>
 
-      <footer className="border-t border-[#dac1bf]/50 px-6 py-12">
+      <footer className="border-t px-6 py-12" style={{ borderColor: "var(--cs-border)" }}>
         <div className="mx-auto flex max-w-4xl flex-col items-center gap-5 text-center">
-          <span className="font-serif text-xl text-[#460609]">{context.nameEn || context.nameKo}</span>
-          <div className="flex flex-wrap items-center justify-center gap-5 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#745853]">
+          <span className="font-serif text-xl" style={{ color: "var(--cs-accent)" }}>{context.nameEn || context.nameKo}</span>
+          <div className="flex flex-wrap items-center justify-center gap-5 text-[11px] font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--cs-text-light)" }}>
             <span>Privacy Policy</span>
             <span>Press Kit</span>
             <span>Inquiries</span>
           </div>
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-[#887270]">
-              Powered by Castfolio
-            </p>
-          </div>
+          <p className="text-[11px] uppercase tracking-[0.22em]" style={{ color: "var(--cs-border)" }}>
+            Powered by Castfolio
+          </p>
         </div>
       </footer>
     </div>

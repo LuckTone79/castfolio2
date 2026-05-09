@@ -9,4 +9,5 @@ export const prestigeBlack: ThemeConfig = {
   colors: { primary: "#0D0D0D", secondary: "#1A1A1A", text: "#F5F5F5", textLight: "#A0A0A0", accent: "#C9A84C", background: "#0D0D0D", backgroundAlt: "#141414", border: "#2A2A2A", buttonBg: "#C9A84C", buttonText: "#0D0D0D" },
   fonts: { headingKo: "Pretendard", headingEn: "Playfair Display", bodyKo: "Pretendard", bodyEn: "Inter" },
   backgroundStyle: "solid", buttonStyle: "sharp", animationTone: "elegant",
+  colorSchemeSlot: 2, maxWidth: "1080px", fontSizeBase: "15px",
 };

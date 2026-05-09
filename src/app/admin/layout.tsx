@@ -1,16 +1,16 @@
-import { FileStack, LayoutDashboard, ReceiptText, ShieldCheck, Users } from "lucide-react";
 import { AccessDenied } from "@/components/common/access-denied";
 import { AuthRequired } from "@/components/common/auth-required";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
+import type { NavItem } from "@/components/layout/side-nav";
 import { canAccessAdmin, getCurrentUserProfile } from "@/lib/auth";
 
-const ADMIN_NAV = [
-  { href: "/admin", label: "관리자 홈", icon: LayoutDashboard, exact: true },
-  { href: "/admin/users", label: "파트너 관리", icon: Users },
-  { href: "/admin/pages", label: "전체 페이지", icon: FileStack },
-  { href: "/admin/sales", label: "전체 판매", icon: ReceiptText },
-  { href: "/admin/settlements", label: "전체 정산", icon: ShieldCheck },
-  { href: "/admin/audit-logs", label: "감사 로그", icon: ShieldCheck },
+const ADMIN_NAV: NavItem[] = [
+  { href: "/admin", label: "관리자 홈", icon: "dashboard", exact: true },
+  { href: "/admin/users", label: "파트너 관리", icon: "users" },
+  { href: "/admin/pages", label: "전체 페이지", icon: "builder" },
+  { href: "/admin/sales", label: "전체 매출", icon: "sales" },
+  { href: "/admin/settlements", label: "전체 정산", icon: "settlements" },
+  { href: "/admin/audit-logs", label: "감사 로그", icon: "intake" },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

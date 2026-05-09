@@ -57,8 +57,8 @@ export default function SettingsPage() {
   return (
     <div className="max-w-xl space-y-5 fade-in">
       <div>
-        <h1 className="font-bold text-xl" style={{ color: "var(--text-primary)" }}>설정</h1>
-        <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>계정 정보를 관리하세요.</p>
+        <h1 className="font-bold text-xl" style={{ color: "var(--text-primary)" }}>결제 설정</h1>
+        <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>정산에 필요한 기본 계정 정보와 파트너 설정을 관리하세요.</p>
       </div>
 
       {/* Profile card */}
@@ -89,7 +89,7 @@ export default function SettingsPage() {
         </div>
 
         <h2 className="font-semibold text-sm mb-4" style={{ color: "var(--text-secondary)" }}>
-          프로필 수정
+          파트너 기본 정보
         </h2>
 
         <form onSubmit={handleSave} className="space-y-4">
@@ -166,7 +166,7 @@ export default function SettingsPage() {
         className="rounded-2xl p-5"
         style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}
       >
-        <h2 className="font-semibold text-sm mb-4" style={{ color: "var(--text-secondary)" }}>계정 정보</h2>
+        <h2 className="font-semibold text-sm mb-4" style={{ color: "var(--text-secondary)" }}>정산 기준 정보</h2>
         <div className="space-y-3">
           {[
             { label: "플랫폼 수수료", value: "15%" },

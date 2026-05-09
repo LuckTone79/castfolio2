@@ -9,4 +9,5 @@ export const softBlush: ThemeConfig = {
   colors: { primary: "#FFF0F5", secondary: "#FCE4EC", text: "#3D2C35", textLight: "#8E6B7A", accent: "#DB7093", background: "#FFFAFB", backgroundAlt: "#FFF0F5", border: "#F0D4DE", buttonBg: "#DB7093", buttonText: "#FFFFFF" },
   fonts: { headingKo: "Pretendard", headingEn: "Montserrat", bodyKo: "SUIT", bodyEn: "Inter" },
   backgroundStyle: "solid", buttonStyle: "pill", animationTone: "subtle",
+  colorSchemeSlot: 3, maxWidth: "1200px", fontSizeBase: "15px",
 };

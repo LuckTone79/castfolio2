@@ -102,7 +102,7 @@ export default function DemoThemePage({ params }: Props) {
           className="btn-primary px-3 py-1 rounded-lg text-xs"
           style={{ background: "var(--accent)" }}
         >
-          시작하기 →
+          파트너로 시작하기 →
         </Link>
       </div>
 

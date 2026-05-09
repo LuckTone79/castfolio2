@@ -34,9 +34,13 @@ function formatDate(value: string | null) {
   return new Date(value).toLocaleString("ko-KR");
 }
 
-export function IntakeSubmissionList() {
-  const [forms, setForms] = useState<IntakeSubmissionRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+interface IntakeSubmissionListProps {
+  initialForms: IntakeSubmissionRecord[];
+}
+
+export function IntakeSubmissionList({ initialForms }: IntakeSubmissionListProps) {
+  const [forms, setForms] = useState<IntakeSubmissionRecord[]>(initialForms);
+  const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<IntakeSubmissionRecord | null>(null);
@@ -61,8 +65,8 @@ export function IntakeSubmissionList() {
   };
 
   useEffect(() => {
-    void load();
-  }, []);
+    setForms(initialForms);
+  }, [initialForms]);
 
   const filtered = useMemo(() => {
     return forms.filter((form) => {

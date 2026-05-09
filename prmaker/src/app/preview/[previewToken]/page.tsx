@@ -43,7 +43,14 @@ export default async function PreviewPage({ params, searchParams }: Props) {
 
   const rawContent = (contentMap[locale] || page.contentKo) as Partial<PageContent>;
   const content: PageContent = {
-    hero: { tagline: "", position: "", heroImageId: "", ctaPrimary: { label: "포트폴리오 보기", action: "portfolio" }, ctaSecondary: { label: "연락하기", action: "contact" }, ...(rawContent.hero || {}) },
+    hero: {
+      tagline: "",
+      position: "",
+      heroImageId: "",
+      ctaPrimary: { label: "포트폴리오 보기", action: "portfolio" },
+      ctaSecondary: { label: "연락하기", action: "contact" },
+      ...(rawContent.hero || {}),
+    },
     profile: { intro: "", profileImageId: "", infoItems: [], strengths: [], ...(rawContent.profile || {}) },
     career: { items: [], ...(rawContent.career || {}) },
     portfolio: { videos: [], photos: [], audioSamples: [], ...(rawContent.portfolio || {}) },
@@ -63,9 +70,8 @@ export default async function PreviewPage({ params, searchParams }: Props) {
 
   return (
     <div>
-      {/* Preview banner */}
       <div className="sticky top-0 z-50 bg-yellow-400 text-yellow-900 text-sm text-center py-2 font-medium">
-        ⚠️ 이 페이지는 미리보기입니다. 정식 배포 전입니다.
+        미리보기 페이지입니다. 정식 공개 전 화면입니다.
       </div>
 
       <PRPageRenderer
@@ -86,3 +92,4 @@ export default async function PreviewPage({ params, searchParams }: Props) {
     </div>
   );
 }
+

@@ -5,6 +5,7 @@
 @tailwind utilities;
 
 :root {
+  /* ── Dashboard UI tokens ─────────────────────── */
   --bg-base: #070B14;
   --bg-surface: #0D1321;
   --bg-elevated: #131B2E;
@@ -27,6 +28,44 @@
 
   --background: var(--bg-base);
   --foreground: var(--text-primary);
+
+  /* ── Typography tokens ───────────────────────── */
+  --font-family-heading: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+  --font-family-body: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+  --font-size-base: 15px;
+
+  /* ── Spacing scale (fx = flexible) ──────────── */
+  --spacing-base: 8px;
+  --spacing-base-fx-xs:  calc(var(--spacing-base) * 0.5);  /* 4px  */
+  --spacing-base-fx-sm:  var(--spacing-base);               /* 8px  */
+  --spacing-base-fx-md:  calc(var(--spacing-base) * 2);     /* 16px */
+  --spacing-base-fx-lg:  calc(var(--spacing-base) * 3);     /* 24px */
+  --spacing-base-fx-xl:  calc(var(--spacing-base) * 4);     /* 32px */
+  --spacing-base-fx-2xl: calc(var(--spacing-base) * 6);     /* 48px */
+  --spacing-base-fx-3xl: calc(var(--spacing-base) * 8);     /* 64px */
+  --spacing-base-fx-4xl: calc(var(--spacing-base) * 12);    /* 96px */
+
+  /* ── Button border-radius tokens ─────────────── */
+  --button-rect-border-radius: 0px;
+  --button-round-rect-border-radius: 8px;
+  --button-capsule-border-radius: 9999px;
+  --button-primary-border-radius: var(--button-round-rect-border-radius);
+
+  /* ── PR-page color scheme slots (overridden per theme) ── */
+  --cs-accent: #7C5CFC;
+  --cs-accent-glow: rgba(124, 92, 252, 0.18);
+  --cs-background: #FFFFFF;
+  --cs-background-alt: #F8F9FA;
+  --cs-text: #1A1A1A;
+  --cs-text-light: #666666;
+  --cs-border: #E5E7EB;
+  --cs-button-bg: #1A1A1A;
+  --cs-button-text: #FFFFFF;
+
+  /* ── Layout ──────────────────────────────────── */
+  --layout-max-width: 1200px;
+  --layout-padding-x: 24px;
+  --layout-section-py: 80px;
 }
 
 * { box-sizing: border-box; }
@@ -190,4 +229,153 @@ body {
   @keyframes fadeIn  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
   @keyframes float   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
   @keyframes spin-slow { to { transform: rotate(360deg); } }
+}
+
+/* ── PR-page color scheme slots ───────────────────────────────────
+   Injected via data-color-scheme on the page root. Each scheme
+   overrides --cs-* tokens; sections reference only var(--cs-*).
+   ──────────────────────────────────────────────────────────────── */
+[data-color-scheme="1"] {
+  /* Anchor Clean — white minimal */
+  --cs-accent: #2563EB;
+  --cs-accent-glow: rgba(37, 99, 235, 0.15);
+  --cs-background: #FFFFFF;
+  --cs-background-alt: #F8F9FA;
+  --cs-text: #1A1A1A;
+  --cs-text-light: #555555;
+  --cs-border: #E5E7EB;
+  --cs-button-bg: #1A1A1A;
+  --cs-button-text: #FFFFFF;
+  --button-primary-border-radius: var(--button-rect-border-radius);
+}
+[data-color-scheme="2"] {
+  /* Prestige Black — dark luxury */
+  --cs-accent: #C9A84C;
+  --cs-accent-glow: rgba(201, 168, 76, 0.15);
+  --cs-background: #0A0A0A;
+  --cs-background-alt: #141414;
+  --cs-text: #F5F5F5;
+  --cs-text-light: #888888;
+  --cs-border: rgba(255, 255, 255, 0.08);
+  --cs-button-bg: #C9A84C;
+  --cs-button-text: #0A0A0A;
+  --button-primary-border-radius: var(--button-rect-border-radius);
+}
+[data-color-scheme="3"] {
+  /* Warm Coral — soft feminine */
+  --cs-accent: #E05C5C;
+  --cs-accent-glow: rgba(224, 92, 92, 0.15);
+  --cs-background: #FFFAF9;
+  --cs-background-alt: #FFF0EE;
+  --cs-text: #2D1B1B;
+  --cs-text-light: #8C6060;
+  --cs-border: #F5DEDE;
+  --cs-button-bg: #E05C5C;
+  --cs-button-text: #FFFFFF;
+  --button-primary-border-radius: var(--button-capsule-border-radius);
+}
+[data-color-scheme="4"] {
+  /* Fresh Sky — energetic blue */
+  --cs-accent: #0EA5E9;
+  --cs-accent-glow: rgba(14, 165, 233, 0.15);
+  --cs-background: #F0F9FF;
+  --cs-background-alt: #E0F2FE;
+  --cs-text: #0C2340;
+  --cs-text-light: #4B7A9E;
+  --cs-border: #BAE6FD;
+  --cs-button-bg: #0EA5E9;
+  --cs-button-text: #FFFFFF;
+  --button-primary-border-radius: var(--button-round-rect-border-radius);
+}
+[data-color-scheme="5"] {
+  /* Natural Green — calm organic */
+  --cs-accent: #3D8B5E;
+  --cs-accent-glow: rgba(61, 139, 94, 0.15);
+  --cs-background: #F6FBF7;
+  --cs-background-alt: #EBF5EE;
+  --cs-text: #1A2E1F;
+  --cs-text-light: #4D7A5C;
+  --cs-border: #C6E2CC;
+  --cs-button-bg: #3D8B5E;
+  --cs-button-text: #FFFFFF;
+  --button-primary-border-radius: var(--button-round-rect-border-radius);
+}
+
+/* ── PR-page section structural styles ────────────────────────── */
+[data-section] {
+  background-color: var(--cs-background);
+  color: var(--cs-text);
+}
+[data-section="alt"] {
+  background-color: var(--cs-background-alt);
+}
+
+/* ── PR-page scroll animations (stagger pattern from sixshop) ─── */
+.sr-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sr-item.sr-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.sr-item:nth-child(1) { transition-delay: 0.05s; }
+.sr-item:nth-child(2) { transition-delay: 0.10s; }
+.sr-item:nth-child(3) { transition-delay: 0.15s; }
+.sr-item:nth-child(4) { transition-delay: 0.20s; }
+.sr-item:nth-child(5) { transition-delay: 0.25s; }
+.sr-item:nth-child(6) { transition-delay: 0.30s; }
+
+/* ── PR-page image aspect ratio utilities ─────────────────────── */
+.img-ratio-34 { aspect-ratio: 3 / 4; object-fit: cover; }
+.img-ratio-11 { aspect-ratio: 1 / 1; object-fit: cover; }
+.img-ratio-169 { aspect-ratio: 16 / 9; object-fit: cover; }
+
+/* ── PR-page button using --cs-* tokens ───────────────────────── */
+.cs-btn-primary {
+  background-color: var(--cs-button-bg);
+  color: var(--cs-button-text);
+  border-radius: var(--button-primary-border-radius);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.cs-btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--cs-accent-glow);
+}
+.cs-btn-primary:active { transform: translateY(0); }
+
+.cs-btn-ghost {
+  background: transparent;
+  border: 1px solid var(--cs-border);
+  color: var(--cs-text);
+  border-radius: var(--button-primary-border-radius);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.cs-btn-ghost:hover {
+  background-color: var(--cs-background-alt);
+  border-color: var(--cs-accent);
+}
+
+/* ── Strength card (portfolio block pattern) ──────────────────── */
+.cs-card {
+  background-color: var(--cs-background-alt);
+  border: 1px solid var(--cs-border);
+  border-radius: var(--button-round-rect-border-radius);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.cs-card:hover {
+  border-color: var(--cs-accent);
+  box-shadow: 0 4px 24px var(--cs-accent-glow);
+  transform: translateY(-2px);
 }

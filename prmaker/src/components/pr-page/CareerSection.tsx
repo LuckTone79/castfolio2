@@ -12,18 +12,17 @@ interface CareerSectionProps {
 }
 
 export const CareerSection: React.FC<CareerSectionProps> = ({
-  content, theme, accentColor, sectionTitle = "경력",
+  content,
+  sectionTitle = "경력",
 }) => {
-  const accent = accentColor || theme.colors.accent;
-
   return (
-    <section id="career" style={{ backgroundColor: theme.colors.background, color: theme.colors.text }} className="py-20">
-      <div className="max-w-4xl mx-auto px-6">
+    <section id="career" data-section className="py-[var(--layout-section-py)]">
+      <div className="mx-auto px-[var(--layout-padding-x)]" style={{ maxWidth: "880px" }}>
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          style={{ fontFamily: theme.fonts.headingKo, color: accent }}
+          style={{ fontFamily: "var(--font-family-heading)", color: "var(--cs-accent)" }}
           className="text-3xl font-bold mb-12 text-center"
         >
           {sectionTitle}
@@ -37,19 +36,19 @@ export const CareerSection: React.FC<CareerSectionProps> = ({
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="flex gap-4"
+              className="grid grid-cols-[18px_1fr] gap-4"
             >
               <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full mt-1.5" style={{ backgroundColor: accent }} />
+                <div className="w-3 h-3 rounded-full mt-1.5" style={{ backgroundColor: "var(--cs-accent)" }} />
                 {i < content.items.length - 1 && (
-                  <div className="w-0.5 flex-1 mt-1" style={{ backgroundColor: theme.colors.border }} />
+                  <div className="w-0.5 flex-1 mt-1" style={{ backgroundColor: "var(--cs-border)" }} />
                 )}
               </div>
-              <div className="flex-1 pb-8">
-                <p className="text-sm mb-1" style={{ color: theme.colors.textLight }}>{item.period}</p>
+              <div className="rounded-2xl border p-5 md:p-6" style={{ borderColor: "var(--cs-border)", backgroundColor: "var(--cs-background)" }}>
+                <p className="text-sm mb-2" style={{ color: "var(--cs-text-light)" }}>{item.period}</p>
                 <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
                 {item.description && (
-                  <p className="text-sm leading-relaxed" style={{ color: theme.colors.textLight }}>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--cs-text-light)" }}>
                     {item.description}
                   </p>
                 )}
@@ -61,3 +60,4 @@ export const CareerSection: React.FC<CareerSectionProps> = ({
     </section>
   );
 };
+

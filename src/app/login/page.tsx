@@ -5,8 +5,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Input } from "@/components/ui";
+import { APP_VERSION } from "@/lib/version";
 
 type Mode = "login" | "signup" | "forgot";
+const DEFAULT_REDIRECT = "/app";
+
+function sanitizeRedirectPath(value: string | null, fallback: string) {
+  if (!value) return fallback;
+  if (!value.startsWith("/")) return fallback;
+  if (value.startsWith("//")) return fallback;
+  if (value.includes("\\")) return fallback;
+  return value;
+}
 
 export default function LoginPage() {
   return (
@@ -19,8 +29,9 @@ export default function LoginPage() {
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/app";
+  const redirect = sanitizeRedirectPath(searchParams.get("redirect"), DEFAULT_REDIRECT);
   const callbackError = searchParams.get("error");
+  const callbackMessage = searchParams.get("message");
 
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
@@ -35,7 +46,7 @@ function LoginContent() {
 
   const oauthErrorMessage = useMemo(() => {
     if (callbackError !== "oauth_callback_failed") return "";
-    return "Google 로그인 처리 중 오류가 발생했습니다. Supabase와 Google Cloud의 리디렉션 URL 설정을 다시 확인해주세요.";
+    return "Google 로그인 처리 중 오류가 발생했습니다. Supabase/Google OAuth 리디렉션 설정을 확인해주세요.";
   }, [callbackError]);
 
   const resetFeedback = () => {
@@ -49,11 +60,7 @@ function LoginContent() {
 
     const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
     if (loginError) {
-      setError(
-        loginError.message === "Invalid login credentials"
-          ? "이메일 또는 비밀번호가 올바르지 않습니다."
-          : loginError.message,
-      );
+      setError(loginError.message === "Invalid login credentials" ? "이메일 또는 비밀번호가 올바르지 않습니다." : loginError.message);
       setLoading(false);
       return;
     }
@@ -78,7 +85,7 @@ function LoginContent() {
       return;
     }
 
-    setMessage("인증 메일을 발송했습니다. 받은 편지함에서 확인해주세요.");
+    setMessage("인증 메일을 발송했습니다. 메일의 링크를 확인해주세요.");
     setLoading(false);
   };
 
@@ -104,23 +111,9 @@ function LoginContent() {
     setOauthLoading(true);
     resetFeedback();
 
-    const returnUrl = new URL(`${window.location.origin}/auth/callback`);
-    returnUrl.searchParams.set("next", redirect);
-
-    const { error: googleError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: returnUrl.toString(),
-        queryParams: {
-          prompt: "select_account",
-        },
-      },
-    });
-
-    if (googleError) {
-      setError(googleError.message);
-      setOauthLoading(false);
-    }
+    const oauthUrl = new URL("/auth/google", window.location.origin);
+    oauthUrl.searchParams.set("redirect", redirect);
+    window.location.assign(oauthUrl.toString());
   };
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -145,25 +138,18 @@ function LoginContent() {
             <Sparkles size={28} className="text-white" />
             <span className="text-2xl font-bold tracking-tight text-white">CastFolio</span>
           </div>
-          <p className="text-sm text-gray-500">제작 파트너와 관리자용 로그인</p>
+          <p className="text-sm text-gray-500">크리에이터 PR 운영 도구</p>
         </div>
 
         <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-xl">
           <h1 className="mb-1 text-center text-xl font-semibold text-white">
             {mode === "login" && "로그인"}
-            {mode === "signup" && "파트너 계정 만들기"}
+            {mode === "signup" && "회원가입"}
             {mode === "forgot" && "비밀번호 재설정"}
           </h1>
-          <p className="mb-6 text-center text-sm text-gray-400">
-            {mode === "login" && "파트너 대시보드 또는 관리자 화면으로 이동합니다."}
-            {mode === "signup" && "새 파트너 계정을 만들어 CastFolio를 시작하세요."}
-            {mode === "forgot" && "가입한 이메일을 입력하면 재설정 링크를 보내드립니다."}
-          </p>
 
           {message ? (
-            <div className="rounded-lg border border-emerald-800 bg-emerald-900/30 p-4 text-center text-sm text-emerald-400">
-              {message}
-            </div>
+            <div className="rounded-lg border border-emerald-800 bg-emerald-900/30 p-4 text-center text-sm text-emerald-400">{message}</div>
           ) : (
             <div className="space-y-4">
               {mode !== "forgot" && (
@@ -175,30 +161,15 @@ function LoginContent() {
                     onClick={handleGoogleLogin}
                     loading={oauthLoading}
                   >
-                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-[#4285F4] ring-1 ring-gray-300">
-                      G
-                    </span>
-                    {oauthLoading ? "Google로 이동 중..." : "Google로 계속하기"}
+                    Google로 계속하기
                   </Button>
-                  <div className="flex items-center gap-3">
-                    <div className="h-px flex-1 bg-gray-800" />
-                    <span className="text-xs text-gray-500">또는 이메일로 진행</span>
-                    <div className="h-px flex-1 bg-gray-800" />
-                  </div>
                 </>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="relative">
                   <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <Input
-                    type="email"
-                    placeholder="이메일"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    className="pl-9"
-                    required
-                  />
+                  <Input type="email" placeholder="이메일" value={email} onChange={(event) => setEmail(event.target.value)} className="pl-9" required />
                 </div>
 
                 {mode !== "forgot" && (
@@ -224,15 +195,13 @@ function LoginContent() {
                   </div>
                 )}
 
-                {(error || oauthErrorMessage) && (
-                  <p className="rounded-lg bg-red-900/20 px-3 py-2 text-sm text-red-400">
-                    {error || oauthErrorMessage}
-                  </p>
+                {(error || callbackMessage || oauthErrorMessage) && (
+                  <p className="rounded-lg bg-red-900/20 px-3 py-2 text-sm text-red-400">{error || callbackMessage || oauthErrorMessage}</p>
                 )}
 
                 <Button type="submit" className="w-full" loading={loading}>
                   {mode === "login" && "로그인"}
-                  {mode === "signup" && "계정 만들기"}
+                  {mode === "signup" && "회원가입"}
                   {mode === "forgot" && "재설정 메일 보내기"}
                 </Button>
               </form>
@@ -248,12 +217,11 @@ function LoginContent() {
                 <p className="mt-2 text-gray-500">
                   계정이 없으신가요?{" "}
                   <button onClick={() => changeMode("signup")} className="text-white hover:underline">
-                    파트너 계정 만들기
+                    회원가입
                   </button>
                 </p>
               </>
             )}
-
             {mode === "signup" && (
               <p className="text-gray-500">
                 이미 계정이 있으신가요?{" "}
@@ -262,7 +230,6 @@ function LoginContent() {
                 </button>
               </p>
             )}
-
             {mode === "forgot" && (
               <button onClick={() => changeMode("login")} className="text-gray-400 transition-colors hover:text-white">
                 로그인으로 돌아가기
@@ -271,7 +238,7 @@ function LoginContent() {
           </div>
         </div>
 
-        <p className="mt-6 text-center text-xs text-gray-600">© 2026 CastFolio. All rights reserved.</p>
+        <p className="mt-6 text-center text-xs text-gray-600">v{APP_VERSION} | © 2026 CastFolio. All rights reserved.</p>
       </div>
     </div>
   );

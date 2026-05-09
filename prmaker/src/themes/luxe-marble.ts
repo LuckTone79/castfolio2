@@ -9,4 +9,5 @@ export const luxeMarble: ThemeConfig = {
   colors: { primary: "#F5F0EC", secondary: "#EDE8E3", text: "#2C2420", textLight: "#8B7D6B", accent: "#C9B99A", background: "#F5F0EC", backgroundAlt: "#EDE8E3", border: "#D5CCBF", buttonBg: "#2C2420", buttonText: "#F5F0EC" },
   fonts: { headingKo: "Pretendard", headingEn: "Playfair Display", bodyKo: "SUIT", bodyEn: "Inter" },
   backgroundStyle: "texture", buttonStyle: "rounded", animationTone: "elegant",
+  colorSchemeSlot: 1, maxWidth: "1080px", fontSizeBase: "15px",
 };

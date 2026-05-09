@@ -4,11 +4,30 @@ import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
 import { prisma } from "@/lib/prisma";
 
+function sanitizeRedirectPath(value: string | null, fallback: string) {
+  if (!value) return fallback;
+  if (!value.startsWith("/")) return fallback;
+  if (value.startsWith("//")) return fallback;
+  if (value.includes("\\")) return fallback;
+  return value;
+}
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = requestUrl.searchParams.get("next") || "/dashboard";
-  const safeNext = next.startsWith("/") ? next : "/dashboard";
+  const safeNext = sanitizeRedirectPath(requestUrl.searchParams.get("next"), "/app");
+  const providerError = requestUrl.searchParams.get("error");
+  const providerErrorDescription = requestUrl.searchParams.get("error_description");
+
+  if (providerError) {
+    const loginUrl = new URL("/login", requestUrl.origin);
+    loginUrl.searchParams.set("error", "oauth_callback_failed");
+    loginUrl.searchParams.set("redirect", safeNext);
+    if (providerErrorDescription) {
+      loginUrl.searchParams.set("message", providerErrorDescription);
+    }
+    return NextResponse.redirect(loginUrl);
+  }
 
   if (!code) {
     // No code present — redirect to login with error
@@ -28,15 +47,14 @@ export async function GET(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          // Read all cookies from the incoming request (includes the PKCE code verifier)
-          return request.cookies.getAll();
+        get(name: string) {
+          return request.cookies.get(name)?.value;
         },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: CookieOptions }>) {
-          // Write session cookies directly onto the redirect response
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options ?? {});
-          });
+        set(name: string, value: string, options: CookieOptions) {
+          response.cookies.set(name, value, options);
+        },
+        remove(name: string, options: CookieOptions) {
+          response.cookies.set(name, "", { ...options, maxAge: 0 });
         },
       },
     }

@@ -8,5 +8,6 @@ export const warmCoral: ThemeConfig = {
   recommendedFor: "엔터테인먼트 MC, 라이브커머스",
   colors: { primary: "#FFF5EE", secondary: "#FFE8DC", text: "#2D1810", textLight: "#8B5E3C", accent: "#FF7F50", background: "#FFFAF7", backgroundAlt: "#FFF5EE", border: "#F0D5C4", buttonBg: "#FF7F50", buttonText: "#FFFFFF" },
   fonts: { headingKo: "Pretendard", headingEn: "Montserrat", bodyKo: "Pretendard", bodyEn: "Inter" },
-  backgroundStyle: "solid", buttonStyle: "rounded", animationTone: "moderate",
+  backgroundStyle: "solid", buttonStyle: "pill", animationTone: "moderate",
+  colorSchemeSlot: 3, maxWidth: "1200px", fontSizeBase: "15px",
 };

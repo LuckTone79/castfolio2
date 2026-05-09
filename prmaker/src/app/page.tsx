@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 
 const ArrowRight = () => (
@@ -6,125 +7,120 @@ const ArrowRight = () => (
     <path d="M5 12h14M12 5l7 7-7 7" />
   </svg>
 );
+
 const CheckIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
 
-const features = [
+const roles = [
   {
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14 2H6a2 2 0 00-2 2v16l2.5-1.5L9 20l2.5-1.5L14 20l2.5-1.5L19 20V8z" />
-        <path d="M14 2v6h5M16 13H8M16 17H8M10 9H8" />
-      </svg>
-    ),
+    title: "Castfolio 운영자",
+    body: "플랫폼을 제공하고 파트너 계정, 수수료, 정산, 전체 페이지 운영을 관리합니다.",
+    accent: "#7C5CFC",
+  },
+  {
+    title: "제작 파트너",
+    body: "방송인 고객에게 PR 홈페이지 제작 서비스를 판매하고 자료 수집, 제작, 납품, 판매 확정을 진행합니다.",
+    accent: "#06B6D4",
+  },
+  {
+    title: "방송인 고객",
+    body: "완성된 PR 홈페이지를 검토하고 방송사, PD, 에이전시 제출용으로 활용합니다.",
+    accent: "#10B981",
+  },
+];
+
+const partnerFeatures = [
+  {
     title: "방송인 고객 관리",
-    desc: "고객별 자료 제출 상태, 제작 단계, 판매 진행을 한 화면에서 관리",
+    desc: "고객별 포지션, 자료 제출 여부, 제작 상태, 판매 확정 흐름을 한 화면에서 관리합니다.",
     color: "#7C5CFC",
   },
   {
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="3" />
-        <path d="M3 9h18M9 21V9" />
-      </svg>
-    ),
-    title: "PR 홈페이지 빌더",
-    desc: "7가지 전문 테마로 방송인 고객에게 납품할 결과물을 빠르게 제작",
+    title: "자료 수집 링크",
+    desc: "로그인 없는 제출 링크로 사진, 소개, 경력, 포트폴리오 자료를 정리해서 받습니다.",
     color: "#06B6D4",
   },
   {
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-        <circle cx="12" cy="12" r="3" />
-      </svg>
-    ),
-    title: "검토 링크 전달",
-    desc: "완성 전 페이지를 보내 수정 요청과 최종 승인을 받을 수 있습니다",
+    title: "PR 홈페이지 빌더",
+    desc: "7가지 전문 테마를 바탕으로 고객 이미지에 맞는 결과물을 빠르게 제작합니다.",
     color: "#10B981",
   },
   {
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="5" width="20" height="14" rx="2" />
-        <path d="M2 10h20" />
-        <circle cx="16" cy="14" r="1" fill="currentColor" stroke="none" />
-      </svg>
-    ),
-    title: "판매 확정 관리",
-    desc: "실제 판매금액 기준으로 수수료와 정산 금액을 확인합니다",
+    title: "검토 링크 전달",
+    desc: "완성 전 페이지를 고객에게 보내 수정 요청과 최종 승인을 받을 수 있도록 준비합니다.",
     color: "#F59E0B",
   },
   {
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="3" />
-        <path d="M3 9h18M9 21V9M12 6v1M16 6v1" />
-      </svg>
-    ),
-    title: "공개 URL & QR 납품",
-    desc: "최종 공개 URL과 QR 카드로 방송사·PD·에이전시에 바로 공유",
+    title: "공개 URL 및 QR 납품",
+    desc: "최종 링크와 QR 카드로 방송사, PD, 에이전시 제출용 결과물을 전달합니다.",
     color: "#EC4899",
   },
   {
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-        <polyline points="16 7 22 7 22 13" />
-      </svg>
-    ),
-    title: "정산 관리",
-    desc: "판매 확정 건 기준으로 파트너 수익과 플랫폼 수수료를 집계",
+    title: "판매 및 정산 관리",
+    desc: "판매 확정 금액 기준으로 파트너 수익과 플랫폼 수수료를 바로 확인할 수 있습니다.",
     color: "#8B5CF6",
   },
 ];
 
-const steps = [
-  { num: "01", title: "방송인 고객 등록", desc: "이름, 포지션, 연락처를 등록합니다" },
-  { num: "02", title: "자료 요청 링크 발송", desc: "로그인 없는 제출 링크를 고객에게 전달합니다" },
-  { num: "03", title: "자료 자동 수집", desc: "사진, 소개, 경력, 영상 자료를 한 번에 받습니다" },
-  { num: "04", title: "Builder 반영", desc: "제출 자료를 버튼 한 번으로 PR 페이지 초안에 반영합니다" },
-  { num: "05", title: "검토 · 납품", desc: "검토 링크 전달 후 공개 URL과 QR로 납품합니다" },
-  { num: "06", title: "판매 확정 · 정산", desc: "판매 확정 건만 15% 수수료가 계산됩니다" },
+const workflow = [
+  { step: "01", title: "방송인 고객 등록", desc: "이름, 포지션, 연락처를 등록하고 제작 흐름을 시작합니다." },
+  { step: "02", title: "자료 요청 링크 발송", desc: "로그인 없이 제출 가능한 링크를 고객에게 보내 자료를 받습니다." },
+  { step: "03", title: "자료 자동 수집", desc: "사진, 소개, 경력, 영상 링크를 한 번에 정리된 형태로 받습니다." },
+  { step: "04", title: "Builder 반영", desc: "제출 자료를 PR 홈페이지 초안으로 가져와 복붙 시간을 줄입니다." },
+  { step: "05", title: "검토 및 납품", desc: "검토 링크와 최종 공개 URL로 고객 확인과 납품을 진행합니다." },
+  { step: "06", title: "판매 확정 및 정산", desc: "판매가 확정된 건만 수수료를 계산하고 정산 흐름을 관리합니다." },
 ];
 
 const faqs = [
-  { q: "Castfolio는 방송인이 직접 사용하는 서비스인가요?", a: "아닙니다. Castfolio는 방송인 PR 홈페이지를 제작·판매하는 파트너를 위한 B2B SaaS입니다. 방송인 고객은 자료 제출 링크와 검토 링크만 이용합니다." },
-  { q: "파트너가 판매 가격을 직접 정할 수 있나요?", a: "네. 파트너가 고객에게 제안하는 제작 가격은 자유롭게 설정할 수 있고, 판매 확정 금액 기준으로 수수료가 계산됩니다." },
-  { q: "방송인 고객도 회원가입이 필요한가요?", a: "아닙니다. 방송인 고객은 로그인 없이 자료 제출 링크와 검토 링크를 통해 필요한 정보만 입력하면 됩니다." },
-  { q: "수수료는 언제 발생하나요?", a: "홈페이지를 만들거나 편집하는 것만으로는 수수료가 발생하지 않습니다. 파트너가 판매 확정을 입력한 시점에만 15% 플랫폼 수수료가 계산됩니다." },
-  { q: "완성된 홈페이지는 어떻게 납품하나요?", a: "최종 공개 URL과 QR 카드로 납품할 수 있으며, 방송인 고객은 이를 방송사 PD나 에이전시에 바로 공유할 수 있습니다." },
+  {
+    q: "Castfolio는 방송인이 직접 사용하는 서비스인가요?",
+    a: "아닙니다. Castfolio는 방송인 PR 홈페이지를 제작·판매하는 파트너를 위한 B2B SaaS입니다. 방송인 고객은 자료 제출 링크, 검토 링크, 최종 공개 페이지만 이용합니다.",
+  },
+  {
+    q: "파트너가 판매 가격을 직접 정할 수 있나요?",
+    a: "네. 파트너가 고객에게 제안하는 제작 가격을 직접 정하고, 판매 확정 금액 기준으로 플랫폼 수수료가 계산됩니다.",
+  },
+  {
+    q: "방송인 고객도 회원가입이 필요한가요?",
+    a: "아닙니다. 로그인 없이 자료 제출과 검토가 가능하도록 링크 기반 흐름으로 운영됩니다.",
+  },
+  {
+    q: "수수료는 언제 발생하나요?",
+    a: "홈페이지 생성만으로는 발생하지 않습니다. 파트너가 판매 확정을 입력한 시점에만 수수료가 계산됩니다.",
+  },
+  {
+    q: "완성된 홈페이지는 어떻게 납품하나요?",
+    a: "최종 공개 URL과 QR 카드로 전달할 수 있어 방송사, PD, 에이전시 제출 흐름에 바로 활용할 수 있습니다.",
+  },
 ];
 
 export default function LandingPage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-base)", color: "var(--text-primary)" }}>
-      {/* ─── Ambient glow ─── */}
       <div
         aria-hidden
         style={{
           position: "fixed",
-          top: "-20%",
+          top: "-15%",
           left: "50%",
           transform: "translateX(-50%)",
-          width: 900,
-          height: 600,
-          background: "radial-gradient(ellipse, rgba(124,92,252,0.12) 0%, transparent 70%)",
+          width: 920,
+          height: 620,
+          background: "radial-gradient(ellipse, rgba(124,92,252,0.14) 0%, transparent 72%)",
           pointerEvents: "none",
           zIndex: 0,
         }}
       />
 
-      {/* ─── Header ─── */}
       <header
         className="glass fixed top-0 left-0 right-0 z-50"
         style={{ borderBottom: "1px solid var(--border-subtle)", height: 60 }}
       >
         <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5">
             <div
               className="rounded-lg flex items-center justify-center font-bold text-sm text-white"
               style={{
@@ -139,39 +135,25 @@ export default function LandingPage() {
             <span className="font-bold text-base tracking-tight" style={{ color: "var(--text-primary)" }}>
               Castfolio
             </span>
-          </div>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/guide" className="text-sm transition-colors" style={{ color: "var(--text-secondary)" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
-              onMouseLeave={e => (e.currentTarget.style.color = "var(--text-secondary)")}
-            >
-              기능 가이드
+            <Link href="/guide" className="text-sm transition-colors" style={{ color: "var(--text-secondary)" }}>
+              파트너 운영 가이드
             </Link>
-            <Link href="/demo" className="text-sm transition-colors" style={{ color: "var(--text-secondary)" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
-              onMouseLeave={e => (e.currentTarget.style.color = "var(--text-secondary)")}
-            >
-              데모
+            <Link href="/demo" className="text-sm transition-colors" style={{ color: "var(--text-secondary)" }}>
+              샘플 갤러리
             </Link>
           </nav>
 
-          <Link
-            href="/login"
-            className="btn-primary px-4 py-2 rounded-lg text-sm"
-            style={{ background: "var(--accent)" }}
-          >
-            로그인
+          <Link href="/login" className="btn-primary px-4 py-2 rounded-lg text-sm" style={{ background: "var(--accent)" }}>
+            파트너 로그인
           </Link>
         </div>
       </header>
 
-      {/* ─── Hero ─── */}
-      <section
-        className="relative dot-grid"
-        style={{ paddingTop: 140, paddingBottom: 100, zIndex: 1 }}
-      >
-        <div className="max-w-4xl mx-auto px-6 text-center">
+      <section className="relative dot-grid" style={{ paddingTop: 138, paddingBottom: 88, zIndex: 1 }}>
+        <div className="max-w-5xl mx-auto px-6 text-center">
           <div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6"
             style={{
@@ -181,55 +163,35 @@ export default function LandingPage() {
               letterSpacing: "0.06em",
             }}
           >
-            <span
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ background: "#7C5CFC", boxShadow: "0 0 6px #7C5CFC" }}
-            />
-            파트너용 방송인 PR 홈페이지 빌더
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#7C5CFC", boxShadow: "0 0 6px #7C5CFC" }} />
+            방송인 PR 홈페이지 제작·판매 파트너용 SaaS
           </div>
 
-          <h1
-            className="font-bold leading-tight mb-6"
-            style={{ fontSize: "clamp(2.2rem, 5vw, 3.8rem)", color: "var(--text-primary)" }}
-          >
-            방송인 PR 홈페이지 제작을<br />
+          <h1 className="font-bold leading-tight mb-6" style={{ fontSize: "clamp(2.2rem, 5vw, 4.1rem)" }}>
+            방송인 PR 홈페이지 제작을
+            <br />
             <span className="text-gradient-violet">수익화하는 파트너용 빌더</span>
           </h1>
 
-          <p
-            className="text-base leading-relaxed mb-10 mx-auto"
-            style={{ maxWidth: 520, color: "var(--text-secondary)" }}
-          >
-            Castfolio는 아나운서, 쇼호스트, MC, 리포터 고객에게<br />
-            전문 PR 홈페이지를 제작·판매하는 파트너를 위한 B2B SaaS입니다.
+          <p className="text-base leading-relaxed mb-10 mx-auto" style={{ maxWidth: 700, color: "var(--text-secondary)" }}>
+            Castfolio는 아나운서, 쇼호스트, MC, 리포터 고객에게 전문 PR 홈페이지를 제작·판매하는 파트너를 위한 B2B SaaS입니다.
+            <br />
+            고객 자료 수집부터 제작, 검토, 납품, 판매 확정, 정산 관리까지 하나의 흐름으로 운영하세요.
           </p>
 
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link
-              href="/demo"
-              className="btn-ghost px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2"
-            >
-              샘플 PR 페이지 보기
+            <Link href="/login" className="btn-primary px-7 py-3 rounded-xl text-sm flex items-center gap-2" style={{ background: "var(--accent)" }}>
+              파트너로 시작하기
               <ArrowRight />
             </Link>
-            <Link
-              href="/login"
-              className="btn-primary px-7 py-3 rounded-xl text-sm flex items-center gap-2"
-              style={{ background: "var(--accent)" }}
-            >
-              파트너로 시작하기
+            <Link href="/demo" className="btn-ghost px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2">
+              샘플 PR 페이지 보기
               <ArrowRight />
             </Link>
           </div>
 
-          {/* Trust badges */}
           <div className="flex items-center justify-center gap-6 mt-12 flex-wrap">
-            {[
-              "7가지 전문 테마",
-              "로그인 없는 자료 제출 링크",
-              "판매 확정 시에만 15%",
-              "파트너 수익 85%",
-            ].map(badge => (
+            {["월정액 없음", "로그인 없는 자료 제출 링크", "판매 확정 시에만 15%", "파트너 수익 85%"].map((badge) => (
               <div key={badge} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--text-muted)" }}>
                 <span style={{ color: "var(--accent-emerald)" }}>
                   <CheckIcon />
@@ -241,45 +203,57 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Features ─── */}
-      <section className="relative py-24" style={{ zIndex: 1 }}>
+      <section className="py-10 relative" style={{ zIndex: 1 }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "#7C5CFC" }}>
+              Structure
+            </p>
+            <h2 className="font-bold text-2xl md:text-3xl">Castfolio는 이렇게 운영됩니다</h2>
+            <p className="mt-3 text-sm md:text-base" style={{ color: "var(--text-secondary)" }}>
+              관리자, 제작 파트너, 방송인 고객의 역할을 분리해 제작과 판매 흐름을 명확하게 관리합니다.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {roles.map((item) => (
+              <div key={item.title} className="rounded-2xl p-6" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}>
+                <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: item.accent }}>
+                  Role
+                </div>
+                <h3 className="font-semibold text-base mb-2">{item.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className="rounded-2xl px-5 py-4 mt-4 text-sm md:text-base"
+            style={{ background: "var(--bg-surface)", border: "1px dashed rgba(124,92,252,0.3)", color: "var(--text-secondary)" }}
+          >
+            Castfolio 운영자 → 제작 파트너 → 방송인 고객 → 방송사 / PD / 에이전시 제출
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 relative" style={{ zIndex: 1 }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "#7C5CFC" }}>
-              핵심 기능
+              Workflow Features
             </p>
-            <h2 className="font-bold text-2xl md:text-3xl" style={{ color: "var(--text-primary)" }}>
-              제작부터 납품까지 모든 것
-            </h2>
+            <h2 className="font-bold text-2xl md:text-3xl">파트너가 실제로 쓰는 제작 업무 흐름</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {features.map(f => (
-              <div
-                key={f.title}
-                className="card-hover rounded-2xl p-6"
-                style={{
-                  background: "var(--bg-surface)",
-                  border: "1px solid var(--border-default)",
-                }}
-              >
-                <div
-                  className="rounded-xl flex items-center justify-center mb-4"
-                  style={{
-                    width: 40,
-                    height: 40,
-                    background: `${f.color}18`,
-                    border: `1px solid ${f.color}28`,
-                    color: f.color,
-                  }}
-                >
-                  {f.icon}
-                </div>
-                <h3 className="font-semibold mb-1.5 text-sm" style={{ color: "var(--text-primary)" }}>
-                  {f.title}
-                </h3>
+            {partnerFeatures.map((feature) => (
+              <div key={feature.title} className="card-hover rounded-2xl p-6" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}>
+                <div className="rounded-xl mb-4" style={{ width: 40, height: 40, background: `${feature.color}18`, border: `1px solid ${feature.color}28` }} />
+                <h3 className="font-semibold mb-2 text-sm">{feature.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                  {f.desc}
+                  {feature.desc}
                 </p>
               </div>
             ))}
@@ -287,48 +261,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Workflow Steps ─── */}
       <section className="py-24 relative" style={{ zIndex: 1 }}>
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(180deg, transparent, rgba(124,92,252,0.04), transparent)",
-            pointerEvents: "none",
-          }}
-        />
-        <div className="max-w-5xl mx-auto px-6 relative">
+        <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "#7C5CFC" }}>
-              워크플로우
+              Process
             </p>
-            <h2 className="font-bold text-2xl md:text-3xl" style={{ color: "var(--text-primary)" }}>
-              6단계 원스톱 프로세스
-            </h2>
+            <h2 className="font-bold text-2xl md:text-3xl">고객 등록부터 판매 확정까지 6단계</h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-            {steps.map((s, i) => (
-              <div
-                key={s.num}
-                className="rounded-2xl p-5"
-                style={{
-                  background: "var(--bg-surface)",
-                  border: "1px solid var(--border-default)",
-                  animationDelay: `${i * 0.06}s`,
-                }}
-              >
-                <div
-                  className="font-mono font-bold text-xs mb-3"
-                  style={{ color: "#7C5CFC", letterSpacing: "0.08em" }}
-                >
-                  {s.num}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            {workflow.map((item) => (
+              <div key={item.step} className="rounded-2xl p-5" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}>
+                <div className="font-mono font-bold text-xs mb-3" style={{ color: "#7C5CFC", letterSpacing: "0.08em" }}>
+                  {item.step}
                 </div>
-                <h3 className="font-semibold text-sm mb-1" style={{ color: "var(--text-primary)" }}>
-                  {s.title}
-                </h3>
+                <h3 className="font-semibold text-sm mb-1">{item.title}</h3>
                 <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                  {s.desc}
+                  {item.desc}
                 </p>
               </div>
             ))}
@@ -336,16 +286,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Pricing ─── */}
       <section className="py-24" style={{ zIndex: 1, position: "relative" }}>
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-10">
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "#7C5CFC" }}>
-              파트너 수익 구조
+              Pricing
             </p>
-            <h2 className="font-bold text-2xl md:text-3xl" style={{ color: "var(--text-primary)" }}>
-              판매 확정 시에만 수수료 발생
-            </h2>
+            <h2 className="font-bold text-2xl md:text-3xl">파트너 수익 85%, 플랫폼 수수료 15%</h2>
           </div>
 
           <div
@@ -356,37 +303,22 @@ export default function LandingPage() {
               boxShadow: "0 0 60px rgba(124,92,252,0.08)",
             }}
           >
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                top: -60,
-                right: -60,
-                width: 200,
-                height: 200,
-                background: "radial-gradient(ellipse, rgba(124,92,252,0.15), transparent 70%)",
-                pointerEvents: "none",
-              }}
-            />
-            <div
-              className="font-bold mb-1"
-              style={{ fontSize: "4rem", color: "var(--text-primary)", lineHeight: 1 }}
-            >
+            <div className="font-bold mb-1" style={{ fontSize: "4rem", color: "var(--text-primary)", lineHeight: 1 }}>
               15<span style={{ fontSize: "2rem" }}>%</span>
             </div>
             <p className="mb-1" style={{ color: "#C4B5FD", fontSize: "0.95rem" }}>
-              플랫폼 수수료
+              판매 확정 시에만 계산되는 플랫폼 수수료
             </p>
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              판매 확정 금액의 <strong style={{ color: "var(--text-secondary)" }}>85%</strong>는 파트너 수익이며, 플랫폼 수수료는 15%입니다.
+              홈페이지 생성 자체에는 비용이 없고, 판매 확정 금액의 85%는 파트너 수익으로 집계됩니다.
             </p>
 
-            <div className="flex justify-center gap-8 mt-8 pt-8" style={{ borderTop: "1px solid rgba(124,92,252,0.2)" }}>
+            <div className="flex justify-center gap-8 mt-8 pt-8 flex-wrap" style={{ borderTop: "1px solid rgba(124,92,252,0.2)" }}>
               {[
-                { label: "별도 월정액", value: "없음" },
+                { label: "월정액", value: "없음" },
                 { label: "수수료 기준", value: "판매 확정" },
                 { label: "파트너 수익", value: "85%" },
-              ].map(item => (
+              ].map((item) => (
                 <div key={item.label} className="text-center">
                   <p className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>{item.value}</p>
                   <p className="text-xs" style={{ color: "var(--text-muted)" }}>{item.label}</p>
@@ -397,31 +329,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── FAQ ─── */}
       <section className="py-24" style={{ zIndex: 1, position: "relative" }}>
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "#7C5CFC" }}>
               FAQ
             </p>
-            <h2 className="font-bold text-2xl md:text-3xl" style={{ color: "var(--text-primary)" }}>
-              자주 묻는 질문
-            </h2>
+            <h2 className="font-bold text-2xl md:text-3xl">자주 묻는 질문</h2>
           </div>
 
           <div className="space-y-3">
-            {faqs.map((faq, i) => (
-              <div
-                key={i}
-                className="rounded-2xl p-5"
-                style={{
-                  background: "var(--bg-surface)",
-                  border: "1px solid var(--border-default)",
-                }}
-              >
-                <p className="font-semibold text-sm mb-2" style={{ color: "var(--text-primary)" }}>
-                  Q. {faq.q}
-                </p>
+            {faqs.map((faq) => (
+              <div key={faq.q} className="rounded-2xl p-5" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}>
+                <p className="font-semibold text-sm mb-2">Q. {faq.q}</p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                   A. {faq.a}
                 </p>
@@ -431,38 +351,30 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── CTA Banner ─── */}
       <section className="py-16 px-6" style={{ zIndex: 1, position: "relative" }}>
         <div
           className="max-w-3xl mx-auto rounded-3xl p-10 text-center"
-          style={{
-            background: "linear-gradient(135deg, #4A36B8 0%, #7C5CFC 50%, #9D71FF 100%)",
-            boxShadow: "0 20px 80px rgba(124,92,252,0.25)",
-          }}
+          style={{ background: "linear-gradient(135deg, #4A36B8 0%, #7C5CFC 50%, #9D71FF 100%)", boxShadow: "0 20px 80px rgba(124,92,252,0.25)" }}
         >
-          <h2 className="font-bold text-2xl md:text-3xl mb-3 text-white">
-            지금 바로 시작하세요
-          </h2>
-          <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.75)" }}>
-            방송인 고객에게 판매할 고급 PR 홈페이지를 더 빠르게 제작하고 납품해보세요.
+          <h2 className="font-bold text-2xl md:text-3xl mb-3 text-white">파트너 운영을 바로 시작하세요</h2>
+          <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.78)" }}>
+            자료 요청, 제작, 납품, 판매 확정을 한 흐름으로 연결해 방송인 PR 홈페이지 제작 업무를 더 빠르게 운영할 수 있습니다.
           </p>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-sm transition-all"
-            style={{ background: "white", color: "#4A36B8" }}
-          >
-            파트너로 시작하기
-            <ArrowRight />
-          </Link>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Link href="/login" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-sm" style={{ background: "white", color: "#4A36B8" }}>
+              파트너로 시작하기
+              <ArrowRight />
+            </Link>
+            <Link href="/guide" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-sm" style={{ background: "rgba(255,255,255,0.14)", color: "white", border: "1px solid rgba(255,255,255,0.2)" }}>
+              운영 가이드 보기
+              <ArrowRight />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ─── Footer ─── */}
-      <footer
-        className="py-8 text-center text-xs"
-        style={{ color: "var(--text-muted)", borderTop: "1px solid var(--border-subtle)" }}
-      >
-        © 2026 Castfolio. Powered by Castfolio.
+      <footer className="py-8 text-center text-xs" style={{ color: "var(--text-muted)", borderTop: "1px solid var(--border-subtle)" }}>
+        © 2026 Castfolio. Partner workflow platform for broadcast PR pages.
       </footer>
     </div>
   );
