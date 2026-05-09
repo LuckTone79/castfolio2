@@ -48,42 +48,46 @@ export async function POST(request: Request, { params }: { params: { token: stri
     }
 
     if (action === "ACCEPT") {
-      // Update quote to ACCEPTED
-      await prisma.quote.update({
-        where: { id: quote.id },
-        data: { status: "ACCEPTED" },
-      });
-
-      // Create an Order with PAYMENT_PENDING status
+      // 원자적 처리: quote 상태를 ACCEPTED로 변경 + Order 생성 (race condition 방지)
       const commissionRate = Number(quote.user.commissionRate ?? 0.15);
       const totalAmount = Number(quote.totalAmount);
       const commissionAmount = Math.round(totalAmount * commissionRate);
       const userAmount = totalAmount - commissionAmount;
-
       const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
 
-      await prisma.order.create({
-        data: {
-          projectId: quote.projectId,
-          userId: quote.userId,
-          quoteId: quote.id,
-          orderNumber,
-          status: "PAYMENT_PENDING",
-          totalAmount,
-          commissionRate,
-          commissionAmount,
-          userAmount,
-          pricingSnapshot: {
-            lineItems: quote.lineItems.map(li => ({
-              description: li.description,
-              amount: Number(li.amount),
-              quantity: li.quantity,
-            })),
-            totalAmount,
-            commissionRate,
-          },
-        },
-      });
+      try {
+        await prisma.$transaction([
+          prisma.quote.update({
+            where: { id: quote.id, status: "SENT" }, // status 조건으로 동시 요청 중 하나만 통과
+            data: { status: "ACCEPTED" },
+          }),
+          prisma.order.create({
+            data: {
+              projectId: quote.projectId,
+              userId: quote.userId,
+              quoteId: quote.id,
+              orderNumber,
+              status: "PAYMENT_PENDING",
+              totalAmount,
+              commissionRate,
+              commissionAmount,
+              userAmount,
+              pricingSnapshot: {
+                lineItems: quote.lineItems.map(li => ({
+                  description: li.description,
+                  amount: Number(li.amount),
+                  quantity: li.quantity,
+                })),
+                totalAmount,
+                commissionRate,
+              },
+            },
+          }),
+        ]);
+      } catch {
+        // 트랜잭션 실패 = 이미 다른 요청이 처리했거나 상태 불일치
+        return NextResponse.json({ error: "이미 처리된 견적서입니다." }, { status: 409 });
+      }
 
       await logTimeline({
         projectId: quote.projectId,

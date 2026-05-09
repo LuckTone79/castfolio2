@@ -11,7 +11,7 @@ interface ConfirmPaymentButtonProps {
 export function ConfirmPaymentButton({ orderId, orderNumber, onConfirmed }: ConfirmPaymentButtonProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
+  const [paymentMethod, setPaymentMethod] = useState("OFFLINE_TRANSFER");
   const [paidAt, setPaidAt] = useState(new Date().toISOString().slice(0, 10));
   const [proofUrl, setProofUrl] = useState("");
   const [done, setDone] = useState(false);
@@ -79,10 +79,13 @@ export function ConfirmPaymentButton({ orderId, orderNumber, onConfirmed }: Conf
                   className="w-full px-3 py-2 rounded-lg text-sm"
                   style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)" }}
                 >
-                  <option value="bank_transfer">계좌이체</option>
-                  <option value="card">카드</option>
-                  <option value="cash">현금</option>
-                  <option value="other">기타</option>
+                  <option value="OFFLINE_TRANSFER">계좌이체</option>
+                  <option value="ONLINE_CARD">카드 (온라인)</option>
+                  <option value="ONLINE_TRANSFER">계좌이체 (온라인)</option>
+                  <option value="ONLINE_KAKAO">카카오페이</option>
+                  <option value="ONLINE_NAVER">네이버페이</option>
+                  <option value="OFFLINE_CASH">현금</option>
+                  <option value="OFFLINE_OTHER">기타 오프라인</option>
                 </select>
               </div>
 

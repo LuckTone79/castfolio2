@@ -14,6 +14,11 @@ export async function POST(request: Request, { params }: { params: { id: string 
   });
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  // 중복 처리 방지: PAYMENT_PENDING 상태에서만 결제 확인 가능
+  if (order.status !== "PAYMENT_PENDING") {
+    return NextResponse.json({ error: "이미 처리된 주문입니다." }, { status: 409 });
+  }
+
   const body = await request.json();
   const { paymentMethod, paidAt, proofUrl } = body;
 

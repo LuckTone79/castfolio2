@@ -32,6 +32,11 @@ export async function POST(request: Request, { params }: { params: { token: stri
     const body = await request.json();
     const { action, revisionNote } = body;
 
+    // 이미 승인된 경우 재처리 차단
+    if (form.project.verificationStatus === "APPROVED" && action === "APPROVE") {
+      return NextResponse.json({ error: "이미 승인된 검토입니다." }, { status: 409 });
+    }
+
     if (action === "APPROVE") {
       await prisma.project.update({
         where: { id: form.projectId },
