@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useBuilderStore, ActiveSection } from "@/stores/builderStore";
 import { Button, Input, Textarea, FormField, Badge, Select } from "@/components/ui";
+import { ImageCropEditor } from "@/components/ui/ImageCropEditor";
 import { PRPageRenderer } from "@/components/page/pr-page-renderer";
 import { DEFAULT_PAGE_THEME_ID, PAGE_THEME_OPTIONS } from "@/lib/page-themes";
 import { cn } from "@/lib/utils";
@@ -358,6 +359,11 @@ function SectionEditor({ section, content }: { section: ActiveSection; content: 
               onChange={(e) => store.updateSection("hero", { ctaSecondary: { ...content.hero.ctaSecondary, label: e.target.value } })}
             />
           </FormField>
+          <ImageCropEditor
+            label="히어로 이미지"
+            value={content.hero.heroImageId}
+            onChange={(url) => store.updateSection("hero", { heroImageId: url })}
+          />
         </div>
       );
 
@@ -372,6 +378,13 @@ function SectionEditor({ section, content }: { section: ActiveSection; content: 
               rows={6}
             />
           </FormField>
+          <ImageCropEditor
+            label="프로필 이미지"
+            value={content.profile.profileImageId}
+            onChange={(url) => store.updateSection("profile", { profileImageId: url })}
+            outputWidth={400}
+            outputHeight={400}
+          />
         </div>
       );
 

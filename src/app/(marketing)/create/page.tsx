@@ -3,8 +3,9 @@
 import { useCallback, useMemo, useRef, useState, Suspense, type MutableRefObject } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Crop, Eye, GripVertical, Image as ImageIcon, Monitor, Plus, QrCode, Smartphone, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, GripVertical, Monitor, Plus, QrCode, Smartphone, Trash2 } from "lucide-react";
 import { Button, FormField, Input, Select, Stepper } from "@/components/ui";
+import { ImageCropEditor } from "@/components/ui/ImageCropEditor";
 import type { PageContent } from "@/types/page-content";
 import { APP_VERSION } from "@/lib/version";
 
@@ -215,16 +216,16 @@ function DemoPreview({ content, name, nameEn, theme, sectionRefs, pageUrl, qrUrl
 
 function SectionEditor({ section, content, updateSection }: { section: ActiveSection; content: PageContent; updateSection: <K extends keyof PageContent>(section: K, data: Partial<PageContent[K]>) => void }) {
   if (section === "hero") {
-    return <div className="space-y-4"><FormField label="포지션"><Input value={content.hero.position} onChange={(e) => updateSection("hero", { position: e.target.value })} /></FormField><FormField label="한 줄 소개"><Input value={content.hero.tagline} onChange={(e) => updateSection("hero", { tagline: e.target.value })} /></FormField><ImageEditor label="히어로 이미지" value={content.hero.heroImageId} onChange={(url) => updateSection("hero", { heroImageId: url })} /></div>;
+    return <div className="space-y-4"><FormField label="포지션"><Input value={content.hero.position} onChange={(e) => updateSection("hero", { position: e.target.value })} /></FormField><FormField label="한 줄 소개"><Input value={content.hero.tagline} onChange={(e) => updateSection("hero", { tagline: e.target.value })} /></FormField><ImageCropEditor label="히어로 이미지" value={content.hero.heroImageId} onChange={(url) => updateSection("hero", { heroImageId: url })} /></div>;
   }
   if (section === "profile") {
-    return <div className="space-y-4"><FormField label="자기소개"><textarea className="h-28 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm" value={content.profile.intro} onChange={(e) => updateSection("profile", { intro: e.target.value })} /></FormField><ImageEditor label="프로필 이미지" value={content.profile.profileImageId} onChange={(url) => updateSection("profile", { profileImageId: url })} /></div>;
+    return <div className="space-y-4"><FormField label="자기소개"><textarea className="h-28 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm" value={content.profile.intro} onChange={(e) => updateSection("profile", { intro: e.target.value })} /></FormField><ImageCropEditor label="프로필 이미지" value={content.profile.profileImageId} onChange={(url) => updateSection("profile", { profileImageId: url })} outputWidth={400} outputHeight={400} /></div>;
   }
   if (section === "career") {
-    return <div><div className="mb-3 flex items-center justify-between"><label className="text-xs text-gray-400">경력</label><button onClick={() => updateSection("career", { items: [...content.career.items, { period: "", title: "", description: "", imageId: "" }] })} className="text-xs text-blue-400"><Plus size={12} className="inline" /> 추가</button></div>{content.career.items.map((item, i) => <div key={i} className="mb-3 space-y-2 rounded-lg border border-gray-800 p-3"><div className="flex justify-end"><button onClick={() => updateSection("career", { items: content.career.items.filter((_, idx) => idx !== i) })}><Trash2 size={13} className="text-gray-500" /></button></div><Input placeholder="기간" value={item.period} onChange={(e) => { const items = [...content.career.items]; items[i] = { ...item, period: e.target.value }; updateSection("career", { items }); }} /><Input placeholder="직함" value={item.title} onChange={(e) => { const items = [...content.career.items]; items[i] = { ...item, title: e.target.value }; updateSection("career", { items }); }} /><Input placeholder="설명" value={item.description} onChange={(e) => { const items = [...content.career.items]; items[i] = { ...item, description: e.target.value }; updateSection("career", { items }); }} /><ImageEditor label="경력 이미지" value={item.imageId || ""} onChange={(url) => { const items = [...content.career.items]; items[i] = { ...item, imageId: url }; updateSection("career", { items }); }} /></div>)}</div>;
+    return <div><div className="mb-3 flex items-center justify-between"><label className="text-xs text-gray-400">경력</label><button onClick={() => updateSection("career", { items: [...content.career.items, { period: "", title: "", description: "", imageId: "" }] })} className="text-xs text-blue-400"><Plus size={12} className="inline" /> 추가</button></div>{content.career.items.map((item, i) => <div key={i} className="mb-3 space-y-2 rounded-lg border border-gray-800 p-3"><div className="flex justify-end"><button onClick={() => updateSection("career", { items: content.career.items.filter((_, idx) => idx !== i) })}><Trash2 size={13} className="text-gray-500" /></button></div><Input placeholder="기간" value={item.period} onChange={(e) => { const items = [...content.career.items]; items[i] = { ...item, period: e.target.value }; updateSection("career", { items }); }} /><Input placeholder="직함" value={item.title} onChange={(e) => { const items = [...content.career.items]; items[i] = { ...item, title: e.target.value }; updateSection("career", { items }); }} /><Input placeholder="설명" value={item.description} onChange={(e) => { const items = [...content.career.items]; items[i] = { ...item, description: e.target.value }; updateSection("career", { items }); }} /><ImageCropEditor label="경력 이미지" value={item.imageId || ""} onChange={(url) => { const items = [...content.career.items]; items[i] = { ...item, imageId: url }; updateSection("career", { items }); }} /></div>)}</div>;
   }
   if (section === "portfolio") {
-    return <div className="space-y-4"><ImageEditor label="포트폴리오 이미지" value="" onChange={(url) => updateSection("portfolio", { photos: [...content.portfolio.photos, url] })} /><div className="grid grid-cols-2 gap-2">{content.portfolio.photos.map((photo, i) => <div key={i} className="relative"><img src={photo} alt="portfolio" className="h-20 w-full rounded object-cover" /><button onClick={() => updateSection("portfolio", { photos: content.portfolio.photos.filter((_, idx) => idx !== i) })} className="absolute right-1 top-1 rounded bg-black/60 p-1"><Trash2 size={12} /></button></div>)}</div></div>;
+    return <div className="space-y-4"><ImageCropEditor label="포트폴리오 이미지" value="" onChange={(url) => updateSection("portfolio", { photos: [...content.portfolio.photos, url] })} /><div className="grid grid-cols-2 gap-2">{content.portfolio.photos.map((photo, i) => <div key={i} className="relative"><img src={photo} alt="portfolio" className="h-20 w-full rounded object-cover" /><button onClick={() => updateSection("portfolio", { photos: content.portfolio.photos.filter((_, idx) => idx !== i) })} className="absolute right-1 top-1 rounded bg-black/60 p-1"><Trash2 size={12} /></button></div>)}</div></div>;
   }
   if (section === "strength") {
     return <div><div className="mb-3 flex items-center justify-between"><label className="text-xs text-gray-400">강점 카드</label><button onClick={() => updateSection("strength", { cards: [...content.strength.cards, { icon: "⭐", title: "", description: "" }] })} className="text-xs text-blue-400"><Plus size={12} className="inline" /> 추가</button></div>{content.strength.cards.map((card, i) => <div key={i} className="mb-2 space-y-2 rounded border border-gray-800 p-3"><Input placeholder="제목" value={card.title} onChange={(e) => { const cards = [...content.strength.cards]; cards[i] = { ...card, title: e.target.value }; updateSection("strength", { cards }); }} /><Input placeholder="설명" value={card.description} onChange={(e) => { const cards = [...content.strength.cards]; cards[i] = { ...card, description: e.target.value }; updateSection("strength", { cards }); }} /></div>)}</div>;
@@ -232,56 +233,6 @@ function SectionEditor({ section, content, updateSection }: { section: ActiveSec
   return <div><div className="mb-3 flex items-center justify-between"><label className="text-xs text-gray-400">연락처</label><button onClick={() => updateSection("contact", { channels: [...content.contact.channels, { type: "email", value: "", label: "" }] })} className="text-xs text-blue-400"><Plus size={12} className="inline" /> 추가</button></div>{content.contact.channels.map((ch, i) => <div key={i} className="mb-2 space-y-2 rounded border border-gray-800 p-3"><Select value={ch.type} onChange={(e) => { const channels = [...content.contact.channels]; channels[i] = { ...ch, type: e.target.value as typeof ch.type }; updateSection("contact", { channels }); }}>{["email", "phone", "instagram", "youtube", "other"].map((t) => <option key={t} value={t}>{t}</option>)}</Select><Input placeholder="값" value={ch.value} onChange={(e) => { const channels = [...content.contact.channels]; channels[i] = { ...ch, value: e.target.value }; updateSection("contact", { channels }); }} /></div>)}</div>;
 }
 
-function ImageEditor({ label, value, onChange }: { label: string; value: string; onChange: (url: string) => void }) {
-  const [rawDataUrl, setRawDataUrl] = useState(value);
-  const [cropX, setCropX] = useState(0);
-  const [cropY, setCropY] = useState(0);
-  const [cropSize, setCropSize] = useState(100);
-  const [outputWidth, setOutputWidth] = useState(900);
-  const [outputHeight, setOutputHeight] = useState(600);
-
-  const onFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = () => setRawDataUrl(String(reader.result || ""));
-    reader.readAsDataURL(file);
-  };
-
-  const applyCrop = () => {
-    if (!rawDataUrl) return;
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = outputWidth;
-      canvas.height = outputHeight;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      const cropW = (img.width * cropSize) / 100;
-      const cropH = (img.height * cropSize) / 100;
-      const sx = (img.width * cropX) / 100;
-      const sy = (img.height * cropY) / 100;
-      ctx.drawImage(img, sx, sy, cropW, cropH, 0, 0, outputWidth, outputHeight);
-      const result = canvas.toDataURL("image/jpeg", 0.9);
-      onChange(result);
-    };
-    img.src = rawDataUrl;
-  };
-
-  return (
-    <div className="rounded-lg border border-gray-800 p-3">
-      <p className="mb-2 text-xs text-gray-400">{label}</p>
-      <label className="inline-flex cursor-pointer items-center gap-2 rounded border border-gray-700 px-3 py-1 text-xs"><ImageIcon size={13} /> 이미지 첨부<input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} /></label>
-      {rawDataUrl && (
-        <div className="mt-3 space-y-2">
-          <img src={rawDataUrl} alt="source" className="max-h-28 w-full rounded object-cover" />
-          <div className="grid grid-cols-3 gap-2 text-xs"><label>X<input type="range" min={0} max={100} value={cropX} onChange={(e) => setCropX(Number(e.target.value))} /></label><label>Y<input type="range" min={0} max={100} value={cropY} onChange={(e) => setCropY(Number(e.target.value))} /></label><label>영역<input type="range" min={20} max={100} value={cropSize} onChange={(e) => setCropSize(Number(e.target.value))} /></label></div>
-          <div className="grid grid-cols-2 gap-2 text-xs"><Input type="number" value={String(outputWidth)} onChange={(e) => setOutputWidth(Number(e.target.value) || 900)} /><Input type="number" value={String(outputHeight)} onChange={(e) => setOutputHeight(Number(e.target.value) || 600)} /></div>
-          <Button size="sm" variant="secondary" onClick={applyCrop}><Crop size={13} /> 크기조정 + 자르기 적용</Button>
-        </div>
-      )}
-      {value && <img src={value} alt="result" className="mt-3 max-h-28 w-full rounded border border-gray-800 object-cover" />}
-    </div>
-  );
-}
 
 export default function CreatePage() {
   return (
