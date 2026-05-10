@@ -15,6 +15,8 @@ import {
   getPageTheme,
 } from "@/lib/page-themes";
 import { cn } from "@/lib/utils";
+import { Type1Layout } from "@/components/page/layouts/Type1Layout";
+import { Type2Layout } from "@/components/page/layouts/Type2Layout";
 
 type SectionKey = (typeof DEFAULT_PAGE_SECTION_ORDER)[number];
 
@@ -101,6 +103,52 @@ export function PRPageRenderer({
 
   if (theme.layout === "curated-atelier") {
     return <CuratedAtelierPage context={context} cssTokens={cssTokens} className={className} />;
+  }
+
+  if (theme.layout === "type1-warm") {
+    const photoUrls: Record<string, string> = {};
+    for (const asset of mediaAssets) {
+      const url = asset.optimizedUrl || asset.originalUrl || asset.thumbnailUrl;
+      if (url) photoUrls[asset.id] = url;
+    }
+    return (
+      <div className={className}>
+        <Type1Layout
+          content={content}
+          accentColor={accent}
+          talentName={talentNameKo}
+          talentNameEn={talentNameEn ?? undefined}
+          heroImageUrl={heroImageUrl}
+          profileImageUrl={profileImageUrl}
+          photoUrls={photoUrls}
+          sectionOrder={orderedSections as string[]}
+          disabledSections={disabledSections}
+        />
+      </div>
+    );
+  }
+
+  if (theme.layout === "type2-skyblue") {
+    const photoUrls: Record<string, string> = {};
+    for (const asset of mediaAssets) {
+      const url = asset.optimizedUrl || asset.originalUrl || asset.thumbnailUrl;
+      if (url) photoUrls[asset.id] = url;
+    }
+    return (
+      <div className={className}>
+        <Type2Layout
+          content={content}
+          accentColor={accent}
+          talentName={talentNameKo}
+          talentNameEn={talentNameEn ?? undefined}
+          heroImageUrl={heroImageUrl}
+          profileImageUrl={profileImageUrl}
+          photoUrls={photoUrls}
+          sectionOrder={orderedSections as string[]}
+          disabledSections={disabledSections}
+        />
+      </div>
+    );
   }
 
   return <ClassicThemePage context={context} themeColor={theme.color} cssTokens={cssTokens} className={className} />;

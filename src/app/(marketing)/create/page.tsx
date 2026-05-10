@@ -18,6 +18,8 @@ const THEMES = [
   { id: "modern-mono", name: "Modern Mono", desc: "모던 모노 미니멀", color: "#0d1117", accent: "#58a6ff" },
   { id: "classic-gold", name: "Classic Gold", desc: "클래식 골드 포멀", color: "#1c1c1c", accent: "#ffd700" },
   { id: "curated-atelier", name: "Curated Atelier", desc: "에디토리얼 레이아웃", color: "#fdf9f4", accent: "#460609" },
+  { id: "warm-pink", name: "Warm Pink", desc: "방송인 핑크/플럼 멀티섹션", color: "#3D1E2C", accent: "#C4607E" },
+  { id: "sky-blue", name: "Sky Blue", desc: "모바일 슬라이드형 스카이블루", color: "#1A2A3A", accent: "#5BB8F5" },
 ];
 
 const EMPTY_CONTENT: PageContent = {

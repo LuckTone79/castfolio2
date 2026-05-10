@@ -1,4 +1,4 @@
-export type PageThemeLayout = "classic-dark" | "curated-atelier";
+export type PageThemeLayout = "classic-dark" | "curated-atelier" | "type1-warm" | "type2-skyblue";
 
 export interface PageThemeOption {
   id: string;
@@ -139,6 +139,34 @@ export const PAGE_THEME_OPTIONS: PageThemeOption[] = [
     border: "#dac1bf",
     text: "#1c1c19",
     textMuted: "#554241",
+  },
+  {
+    id: "warm-pink",
+    name: "Warm Pink",
+    nameKo: "웜 핑크",
+    desc: "방송인 전용 핑크/플럼 멀티섹션 레이아웃",
+    color: "#3D1E2C",
+    accent: "#C4607E",
+    layout: "type1-warm",
+    background: "#FDF5F0",
+    surface: "#F5EBE4",
+    border: "rgba(196,96,126,0.15)",
+    text: "#2A1520",
+    textMuted: "#8A6272",
+  },
+  {
+    id: "sky-blue",
+    name: "Sky Blue",
+    nameKo: "스카이 블루",
+    desc: "모바일 친화 슬라이드형 스카이블루 레이아웃",
+    color: "#1A2A3A",
+    accent: "#5BB8F5",
+    layout: "type2-skyblue",
+    background: "#F0F5FC",
+    surface: "#E4EDF7",
+    border: "rgba(91,184,245,0.2)",
+    text: "#1A2A3A",
+    textMuted: "#5A7A9A",
   },
 ];
 
