@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logAudit, logTimeline } from "@/lib/audit";
-import { sendNotification, notifyTalent } from "@/lib/notify";
+import { sendNotification } from "@/lib/notify";
 import { sendEmail } from "@/lib/mail";
 import { deliveryCompleteTemplate } from "@/lib/email-templates";
 import { generateQRPng, generateQRSvg } from "@/lib/qr";
