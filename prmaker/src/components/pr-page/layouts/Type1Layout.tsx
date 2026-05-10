@@ -546,7 +546,6 @@ const GallerySection = ({
 /* ─── CONTACT ────────────────────────────────────────── */
 const ContactSection = ({
   channels,
-  showPhone: _showPhone,
 }: {
   channels: PageContent["contact"]["channels"];
   showPhone?: boolean;

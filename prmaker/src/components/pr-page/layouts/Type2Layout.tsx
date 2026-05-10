@@ -811,7 +811,6 @@ export const Type2Layout: React.FC<Type2LayoutProps> = ({
   profileImageUrl,
   photoUrls = {},
   watermark,
-  showPhone: _showPhone,
   sectionOrder,
   disabledSections,
 }) => {
