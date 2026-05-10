@@ -5,10 +5,13 @@ import { freshSky } from "./fresh-sky";
 import { softBlush } from "./soft-blush";
 import { naturalGreen } from "./natural-green";
 import { warmCoral } from "./warm-coral";
+import { warmPink } from "./warm-pink";
+import { skyBlue } from "./sky-blue";
 import { ThemeConfig } from "@/types/theme";
 
 export const ALL_THEMES: ThemeConfig[] = [
-  anchorClean, prestigeBlack, luxeMarble, freshSky, softBlush, naturalGreen, warmCoral
+  anchorClean, prestigeBlack, luxeMarble, freshSky, softBlush, naturalGreen, warmCoral,
+  warmPink, skyBlue,
 ];
 
 export const getTheme = (id: string): ThemeConfig => {
@@ -17,4 +20,4 @@ export const getTheme = (id: string): ThemeConfig => {
   return t;
 };
 
-export { anchorClean, prestigeBlack, luxeMarble, freshSky, softBlush, naturalGreen, warmCoral };
+export { anchorClean, prestigeBlack, luxeMarble, freshSky, softBlush, naturalGreen, warmCoral, warmPink, skyBlue };

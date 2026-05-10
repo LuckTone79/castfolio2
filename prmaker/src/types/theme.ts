@@ -33,4 +33,11 @@ export interface ThemeConfig {
   maxWidth?: string;
   /** Base font size (sets --font-size-base) */
   fontSizeBase?: string;
+  /**
+   * Layout variant — determines the overall page structure.
+   * "default"      : standard card-based layout (all existing themes)
+   * "type1-warm"   : Type.1 featured-video hero + alternating dark/light sections
+   * "type2-skyblue": Type.2 slideshow hero + tab-based video + flip-cert cards
+   */
+  layoutVariant?: "default" | "type1-warm" | "type2-skyblue";
 }

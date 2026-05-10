@@ -9,6 +9,8 @@ import { PortfolioSection } from "./PortfolioSection";
 import { StrengthSection } from "./StrengthSection";
 import { ContactSection } from "./ContactSection";
 import { FooterSection } from "./FooterSection";
+import { Type1Layout } from "./layouts/Type1Layout";
+import { Type2Layout } from "./layouts/Type2Layout";
 
 interface PRPageRendererProps {
   content: PageContent;
@@ -67,6 +69,47 @@ export const PRPageRenderer: React.FC<PRPageRendererProps> = ({
   watermark,
   locale = "ko",
 }) => {
+  // ── 레이아웃 변형 분기 ──────────────────────────────────
+  if (theme.layoutVariant === "type1-warm") {
+    return (
+      <Type1Layout
+        content={content}
+        theme={theme}
+        accentColor={accentColor}
+        talentName={talentName}
+        talentNameEn={talentNameEn}
+        sectionOrder={sectionOrder}
+        disabledSections={disabledSections}
+        heroImageUrl={heroImageUrl}
+        profileImageUrl={profileImageUrl}
+        photoUrls={photoUrls}
+        watermark={watermark}
+        showPhone={showPhone}
+        emailBotProtect={emailBotProtect}
+      />
+    );
+  }
+
+  if (theme.layoutVariant === "type2-skyblue") {
+    return (
+      <Type2Layout
+        content={content}
+        theme={theme}
+        accentColor={accentColor}
+        talentName={talentName}
+        talentNameEn={talentNameEn}
+        sectionOrder={sectionOrder}
+        disabledSections={disabledSections}
+        heroImageUrl={heroImageUrl}
+        profileImageUrl={profileImageUrl}
+        photoUrls={photoUrls}
+        watermark={watermark}
+        showPhone={showPhone}
+        emailBotProtect={emailBotProtect}
+      />
+    );
+  }
+  // ───────────────────────────────────────────────────────
   const sectionTitles =
     locale === "en" ? SECTION_TITLES_EN :
     locale === "zh" ? SECTION_TITLES_ZH :

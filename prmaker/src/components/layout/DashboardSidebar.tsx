@@ -213,7 +213,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ user }) => {
           <Link href="/privacy" className="text-center" style={{ fontSize: "0.6rem", color: "var(--text-muted)", opacity: 0.5 }}>개인정보처리방침</Link>
         </div>
         <p className="text-center mt-1" style={{ fontSize: "0.6rem", color: "var(--text-muted)", opacity: 0.5 }}>
-          v1.6.0
+          v1.7.0
         </p>
       </div>
     </aside>
