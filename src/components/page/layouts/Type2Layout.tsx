@@ -848,8 +848,10 @@ export const Type2Layout: React.FC<Type2LayoutProps> = ({
         photos={content.portfolio.photos}
       />
 
-      {!isDisabled("strength") && content.strength.cards.length > 0 && (
-        <StatsSection cards={content.strength.cards} />
+      {!isDisabled("strength") && (
+        content.strength.cards.length > 0
+          ? <StatsSection cards={content.strength.cards} />
+          : <div id="t2-strength" />
       )}
 
       {!isDisabled("career") && (

@@ -111,6 +111,12 @@ export function PRPageRenderer({
       const url = asset.optimizedUrl || asset.originalUrl || asset.thumbnailUrl;
       if (url) photoUrls[asset.id] = url;
     }
+    // Include inline data/http URLs from portfolio.photos (create wizard stores URLs directly)
+    for (const photo of content.portfolio.photos) {
+      if (photo.startsWith("data:") || photo.startsWith("http")) {
+        photoUrls[photo] = photo;
+      }
+    }
     return (
       <div className={className}>
         <Type1Layout
@@ -133,6 +139,12 @@ export function PRPageRenderer({
     for (const asset of mediaAssets) {
       const url = asset.optimizedUrl || asset.originalUrl || asset.thumbnailUrl;
       if (url) photoUrls[asset.id] = url;
+    }
+    // Include inline data/http URLs from portfolio.photos (create wizard stores URLs directly)
+    for (const photo of content.portfolio.photos) {
+      if (photo.startsWith("data:") || photo.startsWith("http")) {
+        photoUrls[photo] = photo;
+      }
     }
     return (
       <div className={className}>
@@ -886,7 +898,7 @@ function resolveCtaHref(action: "portfolio" | "contact" | undefined, availableSe
 
 function resolveMediaUrl(mediaRef: string | undefined, mediaAssets: PageMediaAsset[]) {
   if (!mediaRef) return undefined;
-  if (mediaRef.startsWith("http://") || mediaRef.startsWith("https://")) return mediaRef;
+  if (mediaRef.startsWith("http://") || mediaRef.startsWith("https://") || mediaRef.startsWith("data:")) return mediaRef;
 
   const matchedAsset = mediaAssets.find((asset) => asset.id === mediaRef);
   if (!matchedAsset) return undefined;

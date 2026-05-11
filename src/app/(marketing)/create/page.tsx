@@ -1,11 +1,12 @@
 ﻿"use client";
 
-import { useCallback, useMemo, useRef, useState, Suspense, type MutableRefObject } from "react";
+import { useCallback, useMemo, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Eye, GripVertical, Monitor, Plus, QrCode, Smartphone, Trash2 } from "lucide-react";
 import { Button, FormField, Input, Select, Stepper } from "@/components/ui";
 import { ImageCropEditor } from "@/components/ui/ImageCropEditor";
+import { PRPageRenderer } from "@/components/page/pr-page-renderer";
 import type { PageContent } from "@/types/page-content";
 import { APP_VERSION } from "@/lib/version";
 
@@ -22,6 +23,8 @@ const THEMES = [
   { id: "warm-pink", name: "Warm Pink", desc: "방송인 핑크/플럼 멀티섹션", color: "#3D1E2C", accent: "#C4607E" },
   { id: "sky-blue", name: "Sky Blue", desc: "모바일 슬라이드형 스카이블루", color: "#1A2A3A", accent: "#5BB8F5" },
 ];
+
+const DEFAULT_SECTION_ORDER = ["hero", "profile", "career", "portfolio", "strength", "contact", "footer"];
 
 const EMPTY_CONTENT: PageContent = {
   hero: { tagline: "", position: "", heroImageId: "", ctaPrimary: { label: "포트폴리오 보기", action: "portfolio" }, ctaSecondary: { label: "연락하기", action: "contact" } },
@@ -46,14 +49,7 @@ function CreatePageInner() {
   const [previewMode, setPreviewMode] = useState<PreviewMode>("desktop");
   const [content, setContent] = useState<PageContent>(EMPTY_CONTENT);
 
-  const sectionRefs = {
-    hero: useRef<HTMLElement | null>(null),
-    profile: useRef<HTMLElement | null>(null),
-    career: useRef<HTMLElement | null>(null),
-    portfolio: useRef<HTMLElement | null>(null),
-    strength: useRef<HTMLElement | null>(null),
-    contact: useRef<HTMLElement | null>(null),
-  };
+  const previewScrollRef = useRef<HTMLDivElement>(null);
 
   const theme = THEMES.find((t) => t.id === themeId) || THEMES[0];
   const previewTheme = THEMES.find((t) => t.id === themePreviewId) || theme;
@@ -74,10 +70,27 @@ function CreatePageInner() {
     setContent((prev) => ({ ...prev, [section]: { ...(prev[section] as object), ...data } }));
   }, []);
 
+  // Map generic section key → actual DOM element ID (theme-aware)
+  // Type1Layout: t1-hero, t1-strength, t1-career, t1-portfolio, t1-profile(=gallery), t1-contact
+  // Type2Layout: t2-hero, t2-strength, t2-career, t2-portfolio, t2-certs, t2-gallery, t2-sns, t2-contact
+  const getSectionDomId = (section: ActiveSection): string => {
+    if (themeId === "warm-pink") return `t1-${section}`;
+    if (themeId === "sky-blue") {
+      // Type2 has no "t2-profile" — the gallery section is closest equivalent
+      if (section === "profile") return "t2-gallery";
+      return `t2-${section}`;
+    }
+    return section; // classic / curated-atelier use bare IDs
+  };
+
   const scrollToSection = (section: ActiveSection) => {
     setActiveSection(section);
-    const target = sectionRefs[section].current;
-    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (section === "hero") {
+      previewScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    const el = document.getElementById(getSectionDomId(section));
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   if (step === 1) {
@@ -147,9 +160,16 @@ function CreatePageInner() {
           <Button className="mt-3 w-full" size="sm" onClick={() => goStep(4)}><Eye size={14} /> 미리보기</Button>
         </aside>
 
-        <main className="flex-1 overflow-y-auto bg-gray-900 p-5">
+        <main ref={previewScrollRef} className="flex-1 overflow-y-auto bg-gray-900 p-5">
           <div className={`mx-auto overflow-hidden rounded-xl border border-gray-800 ${previewMode === "mobile" ? "w-[390px]" : "w-full max-w-4xl"}`}>
-            <DemoPreview content={content} name={nameKo} nameEn={nameEn} theme={theme} sectionRefs={sectionRefs} pageUrl={pageUrl} qrUrl={qrUrl} />
+            <PRPageRenderer
+              themeId={themeId}
+              content={content}
+              talentNameKo={nameKo}
+              talentNameEn={nameEn}
+              sectionOrder={DEFAULT_SECTION_ORDER}
+              disabledSections={[]}
+            />
           </div>
         </main>
 
@@ -174,8 +194,20 @@ function CreatePageInner() {
       </div>
       <div className="mx-auto flex max-w-6xl justify-center px-4 py-8">
         <div className={`overflow-hidden rounded-xl border border-gray-800 ${previewMode === "mobile" ? "w-[390px]" : "w-full max-w-4xl"}`}>
-          <DemoPreview content={content} name={nameKo} nameEn={nameEn} theme={theme} sectionRefs={sectionRefs} pageUrl={pageUrl} qrUrl={qrUrl} />
+          <PRPageRenderer
+            themeId={themeId}
+            content={content}
+            talentNameKo={nameKo}
+            talentNameEn={nameEn}
+            sectionOrder={DEFAULT_SECTION_ORDER}
+            disabledSections={[]}
+          />
         </div>
+      </div>
+      <div className="py-10 text-center">
+        <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-gray-700 px-3 py-1 text-xs text-gray-300"><QrCode size={14} /> 홈페이지 QR</div>
+        <img src={qrUrl} alt="qr" className="mx-auto h-44 w-44 rounded bg-white p-2" />
+        <a href={pageUrl} target="_blank" rel="noopener noreferrer" className="mt-3 block text-sm text-blue-300 underline">{pageUrl}</a>
       </div>
       <div className="pb-16 text-center"><Link href="/"><Button>완료</Button></Link></div>
     </div>
@@ -189,27 +221,6 @@ function ThemeMiniPreview({ name, nameEn, position, theme }: { name: string; nam
       <p className="text-2xl font-bold text-white">{name || "이름"}</p>
       <p className="text-gray-400">{nameEn || "Name"}</p>
       <p className="mt-1" style={{ color: theme.accent }}>{position || "포지션"}</p>
-    </div>
-  );
-}
-
-function DemoPreview({ content, name, nameEn, theme, sectionRefs, pageUrl, qrUrl }: { content: PageContent; name: string; nameEn: string; theme: { color: string; accent: string }; sectionRefs: Record<ActiveSection, MutableRefObject<HTMLElement | null>>; pageUrl: string; qrUrl: string }) {
-  return (
-    <div>
-      <section ref={sectionRefs.hero} className="px-6 py-16 text-center" style={{ background: theme.color }}>
-        {content.hero.heroImageId ? <img src={content.hero.heroImageId} alt="hero" className="mx-auto mb-4 h-24 w-24 rounded-full object-cover" /> : <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full" style={{ background: `${theme.accent}22`, color: theme.accent }}>{name[0]}</div>}
-        <h1 className="text-3xl font-bold text-white">{name}</h1><p className="text-gray-400">{nameEn}</p>
-      </section>
-      <section ref={sectionRefs.profile} className="border-t border-gray-800 px-6 py-12"><h2 className="mb-4 text-xl text-white">프로필</h2>{content.profile.profileImageId && <img src={content.profile.profileImageId} alt="profile" className="mb-4 h-40 w-full rounded-lg object-cover" />}<p className="text-gray-300">{content.profile.intro}</p></section>
-      <section ref={sectionRefs.career} className="border-t border-gray-800 px-6 py-12"><h2 className="mb-4 text-xl text-white">경력</h2>{content.career.items.map((item, i) => <div key={i} className="mb-4 rounded-lg border border-gray-800 p-3 text-white">{item.imageId && <img src={item.imageId} alt="career" className="mb-2 h-32 w-full rounded object-cover" />}<p>{item.period} · {item.title}</p><p className="text-sm text-gray-400">{item.description}</p></div>)}</section>
-      <section ref={sectionRefs.portfolio} className="border-t border-gray-800 px-6 py-12"><h2 className="mb-4 text-xl text-white">포트폴리오</h2><div className="grid gap-3 md:grid-cols-2">{content.portfolio.photos.map((p, i) => <img key={i} src={p} alt="portfolio" className="h-40 w-full rounded-lg object-cover" />)}</div></section>
-      <section ref={sectionRefs.strength} className="border-t border-gray-800 px-6 py-12"><h2 className="mb-4 text-xl text-white">강점</h2><div className="grid gap-3 md:grid-cols-3">{content.strength.cards.map((c, i) => <div key={i} className="rounded-lg border border-gray-800 p-3 text-white"><p>{c.title}</p><p className="text-xs text-gray-400">{c.description}</p></div>)}</div></section>
-      <section ref={sectionRefs.contact} className="border-t border-gray-800 px-6 py-12"><h2 className="mb-4 text-xl text-white">연락처</h2>{content.contact.channels.map((c, i) => <p key={i} className="text-gray-300">{c.label || c.type}: {c.value}</p>)}</section>
-      <section className="border-t border-gray-800 px-6 py-12 text-center">
-        <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-gray-700 px-3 py-1 text-xs text-gray-300"><QrCode size={14} /> 홈페이지 QR</div>
-        <img src={qrUrl} alt="qr" className="mx-auto h-44 w-44 rounded bg-white p-2" />
-        <a href={pageUrl} target="_blank" rel="noopener noreferrer" className="mt-3 block text-sm text-blue-300 underline">{pageUrl}</a>
-      </section>
     </div>
   );
 }
