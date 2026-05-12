@@ -152,6 +152,10 @@ function CreatePageInner() {
     return (
       <div className="flex h-[calc(100vh-56px)] overflow-hidden bg-gray-950 text-white">
         <aside className="w-52 shrink-0 border-r border-gray-800 p-2">
+          <Button variant="ghost" size="sm" className="mb-2 w-full justify-start text-gray-400" onClick={() => goStep(2)}>
+            <ArrowLeft size={14} /> 테마 선택
+          </Button>
+          <div className="mb-2 h-px bg-gray-800" />
           {sections.map((s) => (
             <button key={s.key} onClick={() => scrollToSection(s.key)} className={`mb-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm ${activeSection === s.key ? "bg-gray-800" : "text-gray-300 hover:bg-gray-800/60"}`}>
               <GripVertical size={12} className="text-gray-600" />{s.label}
