@@ -13,6 +13,7 @@ import {
   DEFAULT_PAGE_SECTION_ORDER,
   DEFAULT_PAGE_THEME_ID,
   getPageTheme,
+  getColorTheme,
 } from "@/lib/page-themes";
 import { cn } from "@/lib/utils";
 import { Type1Layout } from "@/components/page/layouts/Type1Layout";
@@ -105,7 +106,8 @@ export function PRPageRenderer({
     return <CuratedAtelierPage context={context} cssTokens={cssTokens} className={className} />;
   }
 
-  if (theme.layout === "type1-warm") {
+  if (theme.layout === "type1-warm" || theme.layout === "type2-skyblue") {
+    const colorTheme = getColorTheme(themeId ?? undefined);
     const photoUrls: Record<string, string> = {};
     for (const asset of mediaAssets) {
       const url = asset.optimizedUrl || asset.originalUrl || asset.thumbnailUrl;
@@ -117,38 +119,11 @@ export function PRPageRenderer({
         photoUrls[photo] = photo;
       }
     }
-    return (
-      <div className={className}>
-        <Type1Layout
-          content={content}
-          accentColor={accent}
-          talentName={talentNameKo}
-          talentNameEn={talentNameEn ?? undefined}
-          heroImageUrl={heroImageUrl}
-          profileImageUrl={profileImageUrl}
-          photoUrls={photoUrls}
-          sectionOrder={orderedSections as string[]}
-          disabledSections={disabledSections}
-        />
-      </div>
-    );
-  }
 
-  if (theme.layout === "type2-skyblue") {
-    const photoUrls: Record<string, string> = {};
-    for (const asset of mediaAssets) {
-      const url = asset.optimizedUrl || asset.originalUrl || asset.thumbnailUrl;
-      if (url) photoUrls[asset.id] = url;
-    }
-    // Include inline data/http URLs from portfolio.photos (create wizard stores URLs directly)
-    for (const photo of content.portfolio.photos) {
-      if (photo.startsWith("data:") || photo.startsWith("http")) {
-        photoUrls[photo] = photo;
-      }
-    }
+    const LayoutComponent = theme.layout === "type1-warm" ? Type1Layout : Type2Layout;
     return (
       <div className={className}>
-        <Type2Layout
+        <LayoutComponent
           content={content}
           accentColor={accent}
           talentName={talentNameKo}
@@ -158,6 +133,7 @@ export function PRPageRenderer({
           photoUrls={photoUrls}
           sectionOrder={orderedSections as string[]}
           disabledSections={disabledSections}
+          colorTheme={colorTheme}
         />
       </div>
     );

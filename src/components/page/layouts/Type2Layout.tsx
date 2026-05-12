@@ -1,7 +1,10 @@
 "use client";
 /**
- * Type.2 Sky Blue 레이아웃
+ * Type.2 슬라이드형 레이아웃
  * 원본 참조: https://kokoboppppp2017-svg.github.io/Type.2/
+ *
+ * v2.0: React Context 기반 동적 컬러 테마 지원
+ *       ColorTheme prop → Type2Colors 매핑 → Provider로 모든 서브컴포넌트에 공급
  *
  * 구조:
  *  Nav → Hero (슬라이드 이미지 + 이름/태그라인)
@@ -14,9 +17,11 @@
  *    → Contact (카카오 + 이메일 + PDF)
  *    → Footer
  */
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageContent } from "@/types/page-content";
+import { hexToRgba } from "@/lib/utils";
+import type { ColorTheme } from "@/lib/page-themes";
 
 interface Type2LayoutProps {
   content: PageContent;
@@ -31,21 +36,47 @@ interface Type2LayoutProps {
   emailBotProtect?: boolean;
   sectionOrder: string[];
   disabledSections: string[];
+  colorTheme?: ColorTheme;
 }
 
-/* ─── 색상 상수 (원본 그대로) ─────────────────────────── */
-const C = {
-  bg:     "#F0F5FC",
-  bgAlt:  "#E4EDF7",
-  card:   "#FFFFFF",
-  text:   "#1A2A3A",
-  muted:  "#5A7A9A",
-  muted2: "#8AABB8",
-  blue:   "#5BB8F5",
-  blueDk: "#2A7BC8",
-  border: "rgba(91,184,245,0.2)",
-  dark:   "#1A2A3A",
+/* ─── 컬러 시스템 (Context 기반) ─────────────────────────── */
+interface Type2Colors {
+  bg: string;
+  bgAlt: string;
+  card: string;
+  text: string;
+  muted: string;
+  muted2: string;
+  accent: string;
+  accentDk: string;
+  border: string;
+  dark: string;
+}
+
+const DEFAULT_COLORS: Type2Colors = {
+  bg:       "#F0F5FC",
+  bgAlt:    "#E4EDF7",
+  card:     "#FFFFFF",
+  text:     "#1A2A3A",
+  muted:    "#5A7A9A",
+  muted2:   "#8AABB8",
+  accent:   "#5BB8F5",
+  accentDk: "#2A7BC8",
+  border:   "rgba(91,184,245,0.2)",
+  dark:     "#1A2A3A",
 };
+
+function colorThemeToType2(ct: ColorTheme): Type2Colors {
+  return {
+    bg: ct.bg, bgAlt: ct.bgAlt, card: ct.card,
+    text: ct.text, muted: ct.muted, muted2: ct.muted2,
+    accent: ct.accent, accentDk: ct.accentDark,
+    border: ct.border, dark: ct.dark,
+  };
+}
+
+const ColorCtx = createContext<Type2Colors>(DEFAULT_COLORS);
+const useC = () => useContext(ColorCtx);
 
 /* ─── 네비게이션 ─────────────────────────────────────── */
 const NavBar = ({
@@ -57,6 +88,7 @@ const NavBar = ({
   sections: string[];
   isDisabled: (k: string) => boolean;
 }) => {
+  const C = useC();
   const LABELS: Record<string, string> = {
     hero: "홈", strength: "자격증", career: "경력",
     portfolio: "영상", profile: "갤러리", contact: "연락",
@@ -64,7 +96,7 @@ const NavBar = ({
   return (
     <nav style={{
       position: "sticky", top: 0, zIndex: 100,
-      background: "rgba(240,245,252,0.93)",
+      background: hexToRgba(C.bg, 0.93),
       backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
       borderBottom: `1px solid ${C.border}`,
     }}>
@@ -111,6 +143,7 @@ const HeroSection = ({
   photoUrls?: Record<string, string>;
   photos: string[];
 }) => {
+  const C = useC();
   const [slide, setSlide] = useState(0);
 
   // 슬라이드 이미지 목록 (최대 3장) — useMemo로 참조 안정화
@@ -142,10 +175,10 @@ const HeroSection = ({
         >
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(91,184,245,0.12)",
-            border: `1px solid rgba(91,184,245,0.3)`,
+            background: hexToRgba(C.accent, 0.12),
+            border: `1px solid ${hexToRgba(C.accent, 0.3)}`,
             borderRadius: 99, padding: "4px 12px",
-            fontSize: 11, fontWeight: 700, color: C.blue,
+            fontSize: 11, fontWeight: 700, color: C.accent,
             marginBottom: 12,
           }}>
             ✦ {content.position || "쇼호스트 & 아나운서"}
@@ -166,7 +199,7 @@ const HeroSection = ({
 
           {content.tagline && (
             <div style={{
-              borderLeft: `3px solid ${C.blue}`,
+              borderLeft: `3px solid ${C.accent}`,
               paddingLeft: 14,
               marginBottom: 16,
               fontFamily: "'나눔명조', Georgia, serif",
@@ -235,7 +268,7 @@ const HeroSection = ({
                     style={{
                       width: i === slide ? 20 : 6, height: 6,
                       borderRadius: 99, border: "none", cursor: "pointer",
-                      background: i === slide ? C.blue : "rgba(255,255,255,0.5)",
+                      background: i === slide ? C.accent : "rgba(255,255,255,0.5)",
                       transition: "all 0.3s",
                       padding: 0,
                     }}
@@ -275,6 +308,7 @@ const HeroSection = ({
 
 /* ─── STATS (성과 수치) ─────────────────────────────── */
 const StatsSection = ({ cards }: { cards: PageContent["strength"]["cards"] }) => {
+  const C = useC();
   const defaults = [
     { icon: "100만+", title: "유튜브", description: "누적 조회수" },
     { icon: "120+", title: "라이브", description: "진행 횟수" },
@@ -286,7 +320,7 @@ const StatsSection = ({ cards }: { cards: PageContent["strength"]["cards"] }) =>
     <section id="t2-strength" style={{ background: C.bg, padding: "48px 0 0" }}>
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 20px" }}>
         <div style={{ marginBottom: 24 }}>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.blue, marginBottom: 6 }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accent, marginBottom: 6 }}>
             PERFORMANCE
           </p>
           <h2 style={{
@@ -294,7 +328,7 @@ const StatsSection = ({ cards }: { cards: PageContent["strength"]["cards"] }) =>
             fontSize: 24, fontWeight: 700, color: C.text, lineHeight: 1.2,
           }}>
             숫자가 말해주는<br />
-            <span style={{ color: C.blue }}>성과</span>
+            <span style={{ color: C.accent }}>성과</span>
           </h2>
         </div>
 
@@ -328,61 +362,65 @@ const StatsSection = ({ cards }: { cards: PageContent["strength"]["cards"] }) =>
 };
 
 /* ─── CAREER ─────────────────────────────────────────── */
-const CareerSection = ({ items }: { items: PageContent["career"]["items"] }) => (
-  <section id="t2-career" style={{ background: C.bg, padding: "48px 0 0" }}>
-    <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 20px" }}>
-      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.blue, marginBottom: 6 }}>
-        CAREER
-      </p>
-      <h2 style={{
-        fontFamily: "'나눔명조', Georgia, serif",
-        fontSize: 22, fontWeight: 700, color: C.text, marginBottom: 20,
-      }}>
-        경력 사항
-      </h2>
+const CareerSection = ({ items }: { items: PageContent["career"]["items"] }) => {
+  const C = useC();
+  return (
+    <section id="t2-career" style={{ background: C.bg, padding: "48px 0 0" }}>
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 20px" }}>
+        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accent, marginBottom: 6 }}>
+          CAREER
+        </p>
+        <h2 style={{
+          fontFamily: "'나눔명조', Georgia, serif",
+          fontSize: 22, fontWeight: 700, color: C.text, marginBottom: 20,
+        }}>
+          경력 사항
+        </h2>
 
-      <div style={{ position: "relative", paddingLeft: 20 }}>
-        {/* 타임라인 선 */}
-        <div style={{
-          position: "absolute", left: 6, top: 8, bottom: 8,
-          width: 2, background: `linear-gradient(to bottom, ${C.blue}, ${C.border})`,
-          borderRadius: 2,
-        }} />
+        <div style={{ position: "relative", paddingLeft: 20 }}>
+          {/* 타임라인 선 */}
+          <div style={{
+            position: "absolute", left: 6, top: 8, bottom: 8,
+            width: 2, background: `linear-gradient(to bottom, ${C.accent}, ${C.border})`,
+            borderRadius: 2,
+          }} />
 
-        {(items.length > 0 ? items : [
-          { period: "2022 – 현재", title: "프리랜서 쇼호스트", description: "라이브 커머스 전문 진행" },
-          { period: "2021 – 2022", title: "전속 쇼호스트", description: "S커머스 플랫폼 전속" },
-          { period: "2020 – 2021", title: "쇼호스트 양성 과정", description: "전문 교육 이수" },
-        ]).map((item, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -10 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.1 }}
-            style={{ marginBottom: 20, paddingLeft: 16, position: "relative" }}
-          >
-            {/* 타임라인 점 */}
-            <div style={{
-              position: "absolute", left: -20, top: 4,
-              width: 10, height: 10, borderRadius: "50%",
-              background: C.blue, border: `2px solid ${C.bg}`,
-              boxShadow: `0 0 0 2px ${C.blue}`,
-            }} />
-            <p style={{ fontSize: 11, fontWeight: 700, color: C.blue, marginBottom: 3 }}>{item.period}</p>
-            <p style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 2 }}>{item.title}</p>
-            {item.description && (
-              <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{item.description}</p>
-            )}
-          </motion.div>
-        ))}
+          {(items.length > 0 ? items : [
+            { period: "2022 – 현재", title: "프리랜서 쇼호스트", description: "라이브 커머스 전문 진행" },
+            { period: "2021 – 2022", title: "전속 쇼호스트", description: "S커머스 플랫폼 전속" },
+            { period: "2020 – 2021", title: "쇼호스트 양성 과정", description: "전문 교육 이수" },
+          ]).map((item, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              style={{ marginBottom: 20, paddingLeft: 16, position: "relative" }}
+            >
+              {/* 타임라인 점 */}
+              <div style={{
+                position: "absolute", left: -20, top: 4,
+                width: 10, height: 10, borderRadius: "50%",
+                background: C.accent, border: `2px solid ${C.bg}`,
+                boxShadow: `0 0 0 2px ${C.accent}`,
+              }} />
+              <p style={{ fontSize: 11, fontWeight: 700, color: C.accent, marginBottom: 3 }}>{item.period}</p>
+              <p style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 2 }}>{item.title}</p>
+              {item.description && (
+                <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{item.description}</p>
+              )}
+            </motion.div>
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 /* ─── VIDEOS (탭 기반) ───────────────────────────────── */
 const VideosSection = ({ videos }: { videos: PageContent["portfolio"]["videos"] }) => {
+  const C = useC();
   const TABS = ["라이브커머스 진행", "방송출연 · 자기소개", "브랜드 협업 콘텐츠"];
   const [activeTab, setActiveTab] = useState(0);
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
@@ -407,7 +445,7 @@ const VideosSection = ({ videos }: { videos: PageContent["portfolio"]["videos"] 
   return (
     <section id="t2-portfolio" style={{ background: C.bg, padding: "48px 0 0" }}>
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 20px" }}>
-        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.blue, marginBottom: 6 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accent, marginBottom: 6 }}>
           VIDEO
         </p>
         <h2 style={{
@@ -425,8 +463,8 @@ const VideosSection = ({ videos }: { videos: PageContent["portfolio"]["videos"] 
               onClick={() => { setActiveTab(i); setActiveVideo(null); }}
               style={{
                 padding: "6px 12px", borderRadius: 99,
-                border: `1px solid ${activeTab === i ? C.blue : C.border}`,
-                background: activeTab === i ? C.blue : "transparent",
+                border: `1px solid ${activeTab === i ? C.accent : C.border}`,
+                background: activeTab === i ? C.accent : "transparent",
                 color: activeTab === i ? "#fff" : C.muted,
                 fontSize: 11, fontWeight: 600, cursor: "pointer",
                 transition: "all 0.2s",
@@ -481,7 +519,7 @@ const VideosSection = ({ videos }: { videos: PageContent["portfolio"]["videos"] 
                   >
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%",
-                      background: C.blue,
+                      background: C.accent,
                       display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
                       <span style={{ color: "#fff", fontSize: 16, marginLeft: 3 }}>▶</span>
@@ -492,7 +530,7 @@ const VideosSection = ({ videos }: { videos: PageContent["portfolio"]["videos"] 
                 <div style={{ padding: "10px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                     <span style={{
-                      fontSize: 9, fontWeight: 700, background: C.blue, color: "#fff",
+                      fontSize: 9, fontWeight: 700, background: C.accent, color: "#fff",
                       padding: "2px 6px", borderRadius: 4, letterSpacing: "0.1em",
                     }}>LIVE</span>
                     <span style={{ fontSize: 11, color: C.muted }}>방송</span>
@@ -516,6 +554,7 @@ const CertsSection = ({
   cards: PageContent["strength"]["cards"];
   strengths: PageContent["profile"]["strengths"];
 }) => {
+  const C = useC();
   const [flipped, setFlipped] = useState<number | null>(null);
 
   // strength.cards가 있으면 사용, 없으면 profile.strengths 사용
@@ -526,7 +565,7 @@ const CertsSection = ({
   return (
     <section id="t2-certs" style={{ background: C.bg, padding: "48px 0 0" }}>
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 20px" }}>
-        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.blue, marginBottom: 6 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accent, marginBottom: 6 }}>
           CERTIFICATE
         </p>
         <h2 style={{
@@ -576,7 +615,7 @@ const CertsSection = ({
                   backfaceVisibility: "hidden",
                   WebkitBackfaceVisibility: "hidden",
                   transform: "rotateY(180deg)",
-                  background: C.blue, borderRadius: 14,
+                  background: C.accent, borderRadius: 14,
                   padding: 14,
                   display: "flex", flexDirection: "column",
                   justifyContent: "center",
@@ -602,65 +641,69 @@ const GallerySection = ({
 }: {
   photos: string[];
   photoUrls: Record<string, string>;
-}) => (
-  <section id="t2-gallery" style={{ background: C.bg, padding: "48px 0 0" }}>
-    <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 20px" }}>
-      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.blue, marginBottom: 6 }}>
-        GALLERY
-      </p>
-      <h2 style={{
-        fontFamily: "'나눔명조', Georgia, serif",
-        fontSize: 22, fontWeight: 700, color: C.text, marginBottom: 16,
-      }}>
-        포토 갤러리
-      </h2>
-
-      {photos.length === 0 ? (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-          {[0,1,2,3,4].map(i => (
-            <div key={i} style={{
-              borderRadius: 10, background: C.bgAlt,
-              aspectRatio: i === 0 ? "16/9" : "3/4",
-              gridColumn: i === 0 ? "1 / -1" : undefined,
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <span style={{ fontSize: 10, color: C.muted2 }}>사진 추가</span>
-            </div>
-          ))}
-        </div>
-      ) : (
-        // 수평 스크롤 갤러리
-        <div style={{
-          display: "flex", gap: 8,
-          overflowX: "auto", scrollSnapType: "x mandatory",
-          WebkitOverflowScrolling: "touch",
-          scrollbarWidth: "none", paddingBottom: 4,
+}) => {
+  const C = useC();
+  return (
+    <section id="t2-gallery" style={{ background: C.bg, padding: "48px 0 0" }}>
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 20px" }}>
+        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accent, marginBottom: 6 }}>
+          GALLERY
+        </p>
+        <h2 style={{
+          fontFamily: "'나눔명조', Georgia, serif",
+          fontSize: 22, fontWeight: 700, color: C.text, marginBottom: 16,
         }}>
-          {photos.map((id, i) => (
-            <motion.img
-              key={i}
-              src={photoUrls[id] || "https://placehold.co/300x400/E4EDF7/5BB8F5?text=Photo"}
-              alt={`Gallery ${i + 1}`}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              style={{
-                flex: "0 0 180px", height: 240,
-                objectFit: "cover", borderRadius: 12,
-                scrollSnapAlign: "start",
-              }}
-              loading="lazy"
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  </section>
-);
+          포토 갤러리
+        </h2>
+
+        {photos.length === 0 ? (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+            {[0,1,2,3,4].map(i => (
+              <div key={i} style={{
+                borderRadius: 10, background: C.bgAlt,
+                aspectRatio: i === 0 ? "16/9" : "3/4",
+                gridColumn: i === 0 ? "1 / -1" : undefined,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <span style={{ fontSize: 10, color: C.muted2 }}>사진 추가</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          // 수평 스크롤 갤러리
+          <div style={{
+            display: "flex", gap: 8,
+            overflowX: "auto", scrollSnapType: "x mandatory",
+            WebkitOverflowScrolling: "touch",
+            scrollbarWidth: "none", paddingBottom: 4,
+          }}>
+            {photos.map((id, i) => (
+              <motion.img
+                key={i}
+                src={photoUrls[id] || `https://placehold.co/300x400/${C.bgAlt.replace("#", "")}/${C.accent.replace("#", "")}?text=Photo`}
+                alt={`Gallery ${i + 1}`}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                style={{
+                  flex: "0 0 180px", height: 240,
+                  objectFit: "cover", borderRadius: 12,
+                  scrollSnapAlign: "start",
+                }}
+                loading="lazy"
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
 
 /* ─── SNS ─────────────────────────────────────────────── */
 const SNSSection = ({ channels }: { channels: PageContent["contact"]["channels"] }) => {
+  const C = useC();
   const snsList = channels.filter(c => ["instagram", "youtube", "tiktok"].includes(c.type));
   if (snsList.length === 0) return null;
 
@@ -682,7 +725,7 @@ const SNSSection = ({ channels }: { channels: PageContent["contact"]["channels"]
   return (
     <section id="t2-sns" style={{ background: C.bg, padding: "48px 0 0" }}>
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 20px" }}>
-        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.blue, marginBottom: 6 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accent, marginBottom: 6 }}>
           SNS CHANNEL
         </p>
         <h2 style={{
@@ -732,6 +775,7 @@ const ContactSection = ({
   channels: PageContent["contact"]["channels"];
   talentName: string;
 }) => {
+  const C = useC();
   const kakao = channels.find(c => c.type === "kakao");
   const email = channels.find(c => c.type === "email");
 
@@ -745,7 +789,7 @@ const ContactSection = ({
             lineHeight: 1.3, marginBottom: 8,
           }}>
             지금, 당신의 브랜드에<br />
-            <span style={{ color: C.blue }}>{talentName}</span>가 필요합니다.
+            <span style={{ color: C.accent }}>{talentName}</span>가 필요합니다.
           </h2>
           <p style={{ fontSize: 13, color: C.muted }}>채용 · 협업 · 광고 문의 모두 환영합니다. 편하게 연락 주세요 ✉️</p>
         </div>
@@ -783,7 +827,7 @@ const ContactSection = ({
             fontSize: 12, color: C.muted, textAlign: "center",
           }}>
             {email && (
-              <p>이메일 : <a href={`mailto:${email.value}`} style={{ color: C.blue, textDecoration: "none" }}>{email.value}</a></p>
+              <p>이메일 : <a href={`mailto:${email.value}`} style={{ color: C.accent, textDecoration: "none" }}>{email.value}</a></p>
             )}
           </div>
         </div>
@@ -793,16 +837,19 @@ const ContactSection = ({
 };
 
 /* ─── Footer ─────────────────────────────────────────── */
-const FooterBar = ({ name }: { name: string }) => (
-  <footer style={{
-    textAlign: "center", padding: "20px 20px",
-    background: C.dark,
-    fontSize: 11, color: "rgba(255,255,255,0.3)",
-    fontFamily: "나눔고딕, sans-serif",
-  }}>
-    <p>© {new Date().getFullYear()} {name} · All rights reserved</p>
-  </footer>
-);
+const FooterBar = ({ name }: { name: string }) => {
+  const C = useC();
+  return (
+    <footer style={{
+      textAlign: "center", padding: "20px 20px",
+      background: C.dark,
+      fontSize: 11, color: "rgba(255,255,255,0.3)",
+      fontFamily: "나눔고딕, sans-serif",
+    }}>
+      <p>© {new Date().getFullYear()} {name} · All rights reserved</p>
+    </footer>
+  );
+};
 
 /* ─── 메인 렌더러 ─────────────────────────────────────── */
 export const Type2Layout: React.FC<Type2LayoutProps> = ({
@@ -815,71 +862,75 @@ export const Type2Layout: React.FC<Type2LayoutProps> = ({
   watermark,
   sectionOrder,
   disabledSections,
+  colorTheme,
 }) => {
   const isDisabled = (key: string) => disabledSections.includes(key);
+  const colors = colorTheme ? colorThemeToType2(colorTheme) : DEFAULT_COLORS;
 
   return (
-    <div style={{
-      fontFamily: "나눔고딕, sans-serif",
-      fontSize: 14, background: C.bg, color: C.text, overflowX: "hidden",
-    }}>
-      {watermark && (
-        <div style={{
-          position: "fixed", inset: 0, pointerEvents: "none", zIndex: 40,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
+    <ColorCtx.Provider value={colors}>
+      <div style={{
+        fontFamily: "나눔고딕, sans-serif",
+        fontSize: 14, background: colors.bg, color: colors.text, overflowX: "hidden",
+      }}>
+        {watermark && (
           <div style={{
-            color: "#888", fontSize: 60, fontWeight: 700, opacity: 0.1,
-            transform: "rotate(-30deg)", whiteSpace: "nowrap", userSelect: "none",
-          }}>PREVIEW</div>
-        </div>
-      )}
+            position: "fixed", inset: 0, pointerEvents: "none", zIndex: 40,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <div style={{
+              color: "#888", fontSize: 60, fontWeight: 700, opacity: 0.1,
+              transform: "rotate(-30deg)", whiteSpace: "nowrap", userSelect: "none",
+            }}>PREVIEW</div>
+          </div>
+        )}
 
-      <NavBar talentName={talentName} sections={sectionOrder} isDisabled={isDisabled} />
+        <NavBar talentName={talentName} sections={sectionOrder} isDisabled={isDisabled} />
 
-      <HeroSection
-        content={content.hero}
-        strengths={content.profile.strengths}
-        talentName={talentName}
-        talentNameEn={talentNameEn}
-        heroImageUrl={heroImageUrl}
-        profileImageUrl={profileImageUrl}
-        photoUrls={photoUrls}
-        photos={content.portfolio.photos}
-      />
-
-      {!isDisabled("strength") && (
-        content.strength.cards.length > 0
-          ? <StatsSection cards={content.strength.cards} />
-          : <div id="t2-strength" />
-      )}
-
-      {!isDisabled("career") && (
-        <CareerSection items={content.career.items} />
-      )}
-
-      {!isDisabled("portfolio") && (
-        <VideosSection videos={content.portfolio.videos} />
-      )}
-
-      {!isDisabled("strength") && content.profile.strengths.length > 0 && (
-        <CertsSection
-          cards={content.strength.cards}
+        <HeroSection
+          content={content.hero}
           strengths={content.profile.strengths}
+          talentName={talentName}
+          talentNameEn={talentNameEn}
+          heroImageUrl={heroImageUrl}
+          profileImageUrl={profileImageUrl}
+          photoUrls={photoUrls}
+          photos={content.portfolio.photos}
         />
-      )}
 
-      {!isDisabled("profile") && (
-        <GallerySection photos={content.portfolio.photos} photoUrls={photoUrls} />
-      )}
+        {!isDisabled("strength") && (
+          content.strength.cards.length > 0
+            ? <StatsSection cards={content.strength.cards} />
+            : <div id="t2-strength" />
+        )}
 
-      <SNSSection channels={content.contact.channels} />
+        {!isDisabled("career") && (
+          <CareerSection items={content.career.items} />
+        )}
 
-      {!isDisabled("contact") && (
-        <ContactSection channels={content.contact.channels} talentName={talentName} />
-      )}
+        {!isDisabled("portfolio") && (
+          <VideosSection videos={content.portfolio.videos} />
+        )}
 
-      <FooterBar name={talentNameEn || talentName} />
-    </div>
+        {!isDisabled("strength") && content.profile.strengths.length > 0 && (
+          <CertsSection
+            cards={content.strength.cards}
+            strengths={content.profile.strengths}
+          />
+        )}
+
+        {!isDisabled("profile") && (
+          <GallerySection photos={content.portfolio.photos} photoUrls={photoUrls} />
+        )}
+
+        <SNSSection channels={content.contact.channels} />
+
+        {!isDisabled("contact") && (
+          <ContactSection channels={content.contact.channels} talentName={talentName} />
+        )}
+
+        <FooterBar name={talentNameEn || talentName} />
+      </div>
+    </ColorCtx.Provider>
   );
 };

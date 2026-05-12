@@ -1,27 +1,42 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useMemo, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Eye, GripVertical, Monitor, Plus, QrCode, Smartphone, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Eye, GripVertical, Monitor, Plus, QrCode, Smartphone, Trash2 } from "lucide-react";
 import { Button, FormField, Input, Select, Stepper } from "@/components/ui";
 import { ImageCropEditor } from "@/components/ui/ImageCropEditor";
 import { PRPageRenderer } from "@/components/page/pr-page-renderer";
 import type { PageContent } from "@/types/page-content";
 import { APP_VERSION } from "@/lib/version";
+import {
+  DESIGN_LAYOUTS,
+  COLOR_THEMES,
+  type DesignLayoutId,
+  type ColorTheme,
+} from "@/lib/page-themes";
 
 const STEP_LABELS = ["정보 입력", "테마 선택", "페이지 편집", "미리보기"];
 type PreviewMode = "desktop" | "mobile";
 type ActiveSection = "hero" | "profile" | "career" | "portfolio" | "strength" | "contact";
 
-const THEMES = [
-  { id: "anchor-clean", name: "Anchor Clean", desc: "깔끔한 뉴스 앵커 스타일", color: "#1a1a2e", accent: "#e94560" },
-  { id: "warm-natural", name: "Warm Natural", desc: "따뜻한 내추럴 톤", color: "#2d2d2d", accent: "#f4a261" },
-  { id: "modern-mono", name: "Modern Mono", desc: "모던 모노 미니멀", color: "#0d1117", accent: "#58a6ff" },
-  { id: "classic-gold", name: "Classic Gold", desc: "클래식 골드 포멀", color: "#1c1c1c", accent: "#ffd700" },
-  { id: "curated-atelier", name: "Curated Atelier", desc: "에디토리얼 레이아웃", color: "#fdf9f4", accent: "#460609" },
-  { id: "warm-pink", name: "Warm Pink", desc: "방송인 핑크/플럼 멀티섹션", color: "#3D1E2C", accent: "#C4607E" },
-  { id: "sky-blue", name: "Sky Blue", desc: "모바일 슬라이드형 스카이블루", color: "#1A2A3A", accent: "#5BB8F5" },
+/* ─── 레이아웃별 사이드바 섹션 순서 ─────────────────── */
+const TYPE1_SECTIONS: Array<{ key: ActiveSection; label: string }> = [
+  { key: "hero", label: "히어로" },
+  { key: "strength", label: "강점" },
+  { key: "career", label: "경력" },
+  { key: "portfolio", label: "포트폴리오" },
+  { key: "profile", label: "갤러리" },
+  { key: "contact", label: "연락처" },
+];
+
+const TYPE2_SECTIONS: Array<{ key: ActiveSection; label: string }> = [
+  { key: "hero", label: "히어로" },
+  { key: "strength", label: "강점" },
+  { key: "career", label: "경력" },
+  { key: "portfolio", label: "포트폴리오" },
+  { key: "profile", label: "갤러리" },
+  { key: "contact", label: "연락처" },
 ];
 
 const DEFAULT_SECTION_ORDER = ["hero", "profile", "career", "portfolio", "strength", "contact", "footer"];
@@ -43,16 +58,19 @@ function CreatePageInner() {
   const [step, setStep] = useState(initialStep);
   const [nameKo, setNameKo] = useState("카리나");
   const [nameEn, setNameEn] = useState("Karina");
-  const [themeId, setThemeId] = useState("anchor-clean");
-  const [themePreviewId, setThemePreviewId] = useState("anchor-clean");
+
+  // ── v2.0: 디자인 + 컬러 2단계 선택 ──
+  const [designLayout, setDesignLayout] = useState<DesignLayoutId>("type1");
+  const [colorThemeId, setColorThemeId] = useState("warm-pink");
+  const themeId = `${designLayout}-${colorThemeId}`;
+
   const [activeSection, setActiveSection] = useState<ActiveSection>("hero");
   const [previewMode, setPreviewMode] = useState<PreviewMode>("desktop");
   const [content, setContent] = useState<PageContent>(EMPTY_CONTENT);
 
   const previewScrollRef = useRef<HTMLDivElement>(null);
 
-  const theme = THEMES.find((t) => t.id === themeId) || THEMES[0];
-  const previewTheme = THEMES.find((t) => t.id === themePreviewId) || theme;
+  const selectedColor = COLOR_THEMES.find((c) => c.id === colorThemeId) ?? COLOR_THEMES[0];
 
   const pageUrl = useMemo(() => {
     const slug = nameEn.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "demo";
@@ -70,17 +88,12 @@ function CreatePageInner() {
     setContent((prev) => ({ ...prev, [section]: { ...(prev[section] as object), ...data } }));
   }, []);
 
-  // Map generic section key → actual DOM element ID (theme-aware)
-  // Type1Layout: t1-hero, t1-strength, t1-career, t1-portfolio, t1-profile(=gallery), t1-contact
-  // Type2Layout: t2-hero, t2-strength, t2-career, t2-portfolio, t2-certs, t2-gallery, t2-sns, t2-contact
+  // Map generic section key → actual DOM element ID (layout-aware)
   const getSectionDomId = (section: ActiveSection): string => {
-    if (themeId === "warm-pink") return `t1-${section}`;
-    if (themeId === "sky-blue") {
-      // Type2 has no "t2-profile" — the gallery section is closest equivalent
-      if (section === "profile") return "t2-gallery";
-      return `t2-${section}`;
-    }
-    return section; // classic / curated-atelier use bare IDs
+    if (designLayout === "type1") return `t1-${section}`;
+    // Type2
+    if (section === "profile") return "t2-gallery";
+    return `t2-${section}`;
   };
 
   const scrollToSection = (section: ActiveSection) => {
@@ -93,6 +106,7 @@ function CreatePageInner() {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // ═══════════════════════ STEP 1 ═══════════════════════
   if (step === 1) {
     return (
       <div className="min-h-screen bg-gray-950 text-white">
@@ -110,44 +124,136 @@ function CreatePageInner() {
     );
   }
 
+  // ═══════════════════════ STEP 2 ═══════════════════════
   if (step === 2) {
     return (
       <div className="min-h-screen bg-gray-950 text-white">
         <div className="mx-auto max-w-6xl px-6 pt-8 pb-16">
           <Stepper steps={STEP_LABELS} current={1} className="mx-auto mb-10 max-w-lg" />
-          <div className="mb-6 flex items-center justify-between"><h1 className="text-3xl font-bold">테마 선택</h1><Button variant="ghost" size="sm" onClick={() => goStep(1)}><ArrowLeft size={14} /> 이전</Button></div>
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {THEMES.map((t) => (
-                <button key={t.id} onMouseEnter={() => setThemePreviewId(t.id)} onFocus={() => setThemePreviewId(t.id)} onClick={() => { setThemeId(t.id); setThemePreviewId(t.id); }} className={`overflow-hidden rounded-2xl border text-left transition ${themeId === t.id ? "border-white ring-2 ring-white" : "border-gray-700 hover:border-gray-500"}`}>
-                  <div className="h-32 p-4" style={{ background: t.color }}>
-                    <div className="h-10 w-10 rounded-full border-2" style={{ borderColor: t.accent }} />
-                    <p className="mt-4 text-sm font-semibold" style={{ color: t.accent }}>{t.name}</p>
+          <div className="mb-6 flex items-center justify-between">
+            <h1 className="text-3xl font-bold">테마 선택</h1>
+            <Button variant="ghost" size="sm" onClick={() => goStep(1)}><ArrowLeft size={14} /> 이전</Button>
+          </div>
+
+          <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
+            {/* 좌측: 선택 UI */}
+            <div className="space-y-8">
+              {/* 1단계: 디자인 선택 */}
+              <div>
+                <p className="mb-3 text-sm font-semibold text-gray-300">1. 디자인 선택</p>
+                <div className="grid grid-cols-2 gap-4">
+                  {DESIGN_LAYOUTS.map((layout) => (
+                    <button
+                      key={layout.id}
+                      onClick={() => setDesignLayout(layout.id)}
+                      className={`relative overflow-hidden rounded-2xl border-2 p-5 text-left transition-all ${
+                        designLayout === layout.id
+                          ? "border-white bg-gray-800 shadow-lg shadow-white/5"
+                          : "border-gray-700 bg-gray-900 hover:border-gray-500"
+                      }`}
+                    >
+                      {designLayout === layout.id && (
+                        <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white">
+                          <Check size={14} className="text-gray-900" />
+                        </div>
+                      )}
+                      <div className="mb-3 flex h-16 items-center justify-center rounded-xl" style={{
+                        background: designLayout === layout.id
+                          ? `linear-gradient(135deg, ${selectedColor.accent}30, ${selectedColor.bg})`
+                          : "linear-gradient(135deg, #2a2a3a, #1a1a2a)",
+                      }}>
+                        <span className="text-2xl font-bold" style={{
+                          color: designLayout === layout.id ? selectedColor.accent : "#666",
+                        }}>
+                          {layout.id === "type1" ? "⬡" : "⬢"}
+                        </span>
+                      </div>
+                      <p className="text-sm font-bold">{layout.nameKo}</p>
+                      <p className="mt-1 text-xs text-gray-400">{layout.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 2단계: 컬러 선택 */}
+              <div>
+                <p className="mb-3 text-sm font-semibold text-gray-300">2. 컬러 테마 선택</p>
+                <div className="grid grid-cols-5 gap-3">
+                  {COLOR_THEMES.map((color) => (
+                    <button
+                      key={color.id}
+                      onClick={() => setColorThemeId(color.id)}
+                      className={`group relative flex flex-col items-center gap-2 rounded-xl border p-3 transition-all ${
+                        colorThemeId === color.id
+                          ? "border-white bg-gray-800"
+                          : "border-gray-700 bg-gray-900 hover:border-gray-500"
+                      }`}
+                    >
+                      <div
+                        className="relative h-10 w-10 rounded-full border-2 transition-transform group-hover:scale-110"
+                        style={{
+                          background: `linear-gradient(135deg, ${color.accent}, ${color.accentDark})`,
+                          borderColor: colorThemeId === color.id ? "#fff" : "transparent",
+                        }}
+                      >
+                        {colorThemeId === color.id && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Check size={16} className="text-white drop-shadow" />
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-gray-400 group-hover:text-gray-200">{color.nameKo}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 선택 정보 요약 */}
+              <div className="rounded-xl border border-gray-700 bg-gray-900/50 p-4">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="h-8 w-8 rounded-full"
+                    style={{ background: `linear-gradient(135deg, ${selectedColor.accent}, ${selectedColor.accentDark})` }}
+                  />
+                  <div>
+                    <p className="text-sm font-semibold">
+                      {DESIGN_LAYOUTS.find(l => l.id === designLayout)?.nameKo} · {selectedColor.nameKo}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      테마 ID: {themeId}
+                    </p>
                   </div>
-                  <div className="bg-gray-900 p-3"><p className="text-xs text-gray-400">{t.desc}</p></div>
-                </button>
-              ))}
+                </div>
+              </div>
             </div>
+
+            {/* 우측: 미리보기 */}
             <div className="rounded-2xl border border-gray-700 bg-gray-900 p-4">
-              <p className="mb-2 text-xs text-gray-400">클릭/호버 테마 미리보기</p>
-              <ThemeMiniPreview name={nameKo} nameEn={nameEn} position={content.hero.position} theme={previewTheme} />
+              <p className="mb-3 text-xs text-gray-400">실시간 미리보기</p>
+              <div className="overflow-hidden rounded-xl border border-gray-800" style={{ maxHeight: 520, overflowY: "auto" }}>
+                <div style={{ transform: "scale(0.55)", transformOrigin: "top left", width: "182%", pointerEvents: "none" }}>
+                  <PRPageRenderer
+                    themeId={themeId}
+                    content={content}
+                    talentNameKo={nameKo}
+                    talentNameEn={nameEn}
+                    sectionOrder={DEFAULT_SECTION_ORDER}
+                    disabledSections={[]}
+                  />
+                </div>
+              </div>
             </div>
           </div>
+
           <Button className="mt-8 w-full" onClick={() => goStep(3)}>다음: 페이지 편집 <ArrowRight size={16} /></Button>
         </div>
       </div>
     );
   }
 
+  // ═══════════════════════ STEP 3 ═══════════════════════
   if (step === 3) {
-    const sections: Array<{ key: ActiveSection; label: string }> = [
-      { key: "hero", label: "히어로" },
-      { key: "profile", label: "프로필" },
-      { key: "career", label: "경력" },
-      { key: "portfolio", label: "포트폴리오" },
-      { key: "strength", label: "강점" },
-      { key: "contact", label: "연락처" },
-    ];
+    const sections = designLayout === "type1" ? TYPE1_SECTIONS : TYPE2_SECTIONS;
 
     return (
       <div className="flex h-[calc(100vh-56px)] overflow-hidden bg-gray-950 text-white">
@@ -191,6 +297,7 @@ function CreatePageInner() {
     );
   }
 
+  // ═══════════════════════ STEP 4 ═══════════════════════
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <div className="sticky top-14 z-30 border-b border-gray-800 bg-gray-950/90">
@@ -214,17 +321,6 @@ function CreatePageInner() {
         <a href={pageUrl} target="_blank" rel="noopener noreferrer" className="mt-3 block text-sm text-blue-300 underline">{pageUrl}</a>
       </div>
       <div className="pb-16 text-center"><Link href="/"><Button>완료</Button></Link></div>
-    </div>
-  );
-}
-
-function ThemeMiniPreview({ name, nameEn, position, theme }: { name: string; nameEn: string; position: string; theme: { color: string; accent: string } }) {
-  return (
-    <div className="rounded-xl p-6 text-center" style={{ background: theme.color }}>
-      <div className="mx-auto mb-4 h-14 w-14 rounded-full border-2" style={{ borderColor: theme.accent }} />
-      <p className="text-2xl font-bold text-white">{name || "이름"}</p>
-      <p className="text-gray-400">{nameEn || "Name"}</p>
-      <p className="mt-1" style={{ color: theme.accent }}>{position || "포지션"}</p>
     </div>
   );
 }

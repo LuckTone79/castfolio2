@@ -41,6 +41,15 @@ export function detectVideoPlatform(url: string): "youtube" | "navertv" | null {
   return null;
 }
 
+/** Hex → rgba 변환. 레이아웃 컴포넌트에서 동적 컬러 투명도 적용에 사용 */
+export function hexToRgba(hex: string, alpha: number): string {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 // 서버 전용: IP 익명화 (SHA-256). 클라이언트에서 호출 금지.
 export function hashIp(ip: string): string {
   const salt = process.env.IP_HASH_SALT ?? "";
