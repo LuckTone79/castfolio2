@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CastFolio Site Separation Architecture</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #0f0f14; color: #e0e0e8; line-height: 1.6; padding: 32px; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; color: #fff; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; color: #fff; }
+  h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .subtitle { font-size: 14px; color: #888; margin-bottom: 32px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; }
+  .badge-critical { background: #ff3b5c20; color: #ff3b5c; border: 1px solid #ff3b5c40; }
+  .badge-high { background: #ff8c0020; color: #ff8c00; border: 1px solid #ff8c0040; }
+  .badge-medium { background: #ffd60020; color: #ffd600; border: 1px solid #ffd60040; }
+  .badge-low { background: #4ade8020; color: #4ade80; border: 1px solid #4ade8040; }
+
+  /* ─── Architecture Diagram ─── */
+  .arch-grid { display: grid; grid-template-columns: 1fr 80px 1fr; gap: 0; margin: 24px 0; }
+  .site-box { border-radius: 16px; padding: 24px; position: relative; }
+  .site-partner { background: linear-gradient(135deg, #1a1a2e, #16213e); border: 1px solid #334155; }
+  .site-client { background: linear-gradient(135deg, #1a2e1a, #1e3a2e); border: 1px solid #2d5a3d; }
+  .site-shared { background: linear-gradient(135deg, #2e2a1a, #3a351e); border: 1px solid #5a5020; }
+  .site-label { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 4px; }
+  .site-partner .site-label { color: #818cf8; }
+  .site-client .site-label { color: #4ade80; }
+  .site-shared .site-label { color: #fbbf24; }
+  .site-domain { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 16px; }
+  .route-list { list-style: none; }
+  .route-list li { padding: 6px 10px; margin: 3px 0; border-radius: 8px; font-size: 12px; font-family: 'SF Mono', 'Fira Code', monospace; display: flex; align-items: center; gap: 8px; }
+  .route-list li .path { color: #c0c0d0; }
+  .route-list li .desc { color: #777; font-family: -apple-system, sans-serif; }
+  .route-partner li { background: #818cf810; }
+  .route-client li { background: #4ade8010; }
+  .route-shared li { background: #fbbf2410; }
+  .icon { font-size: 14px; flex-shrink: 0; }
+
+  .arrow-col { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 0 8px; }
+  .arrow-col .arr { color: #555; font-size: 20px; }
+  .arrow-col .arr-label { font-size: 9px; color: #555; writing-mode: vertical-lr; letter-spacing: 0.1em; }
+
+  /* ─── Flow Diagram ─── */
+  .flow-row { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; align-items: stretch; }
+  .flow-card { flex: 1; min-width: 140px; padding: 16px; border-radius: 12px; text-align: center; position: relative; }
+  .flow-card .step-num { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+  .flow-card p { font-size: 11px; color: #aaa; }
+  .flow-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .flow-partner { background: #818cf815; border: 1px solid #818cf830; }
+  .flow-partner .step-num { color: #818cf8; }
+  .flow-client { background: #4ade8015; border: 1px solid #4ade8030; }
+  .flow-client .step-num { color: #4ade80; }
+  .flow-shared { background: #fbbf2415; border: 1px solid #fbbf2430; }
+  .flow-shared .step-num { color: #fbbf24; }
+  .flow-arrow { display: flex; align-items: center; color: #444; font-size: 20px; flex-shrink: 0; }
+
+  /* ─── Current vs New ─── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+  .compare-box { border-radius: 14px; padding: 20px; }
+  .compare-old { background: #ff3b5c10; border: 1px solid #ff3b5c25; }
+  .compare-new { background: #4ade8010; border: 1px solid #4ade8025; }
+  .compare-box h3 { margin-bottom: 12px; }
+  .compare-old h3 { color: #ff6b7f; }
+  .compare-new h3 { color: #4ade80; }
+  .compare-box ul { list-style: none; font-size: 12px; }
+  .compare-box li { padding: 4px 0; display: flex; gap: 8px; align-items: flex-start; }
+  .compare-box li::before { flex-shrink: 0; }
+  .compare-old li::before { content: "✕"; color: #ff3b5c; font-weight: 700; }
+  .compare-new li::before { content: "✓"; color: #4ade80; font-weight: 700; }
+
+  /* ─── Review Findings ─── */
+  .findings { margin: 20px 0; }
+  .finding { display: grid; grid-template-columns: 80px 120px 1fr; gap: 12px; padding: 10px 14px; margin: 4px 0; border-radius: 10px; background: #ffffff06; border: 1px solid #ffffff08; font-size: 12px; align-items: center; }
+  .finding .reviewer { color: #888; font-weight: 600; }
+  .finding .issue { color: #ccc; }
+
+  /* ─── Migration ─── */
+  .phase-list { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+  .phase { padding: 14px 18px; border-radius: 12px; background: #ffffff06; border: 1px solid #ffffff0a; display: grid; grid-template-columns: 60px 1fr; gap: 12px; align-items: center; }
+  .phase-num { font-size: 22px; font-weight: 900; color: #818cf8; }
+  .phase h4 { font-size: 13px; font-weight: 700; color: #fff; }
+  .phase p { font-size: 11px; color: #888; }
+
+  .divider { border: none; border-top: 1px solid #ffffff10; margin: 40px 0; }
+
+  /* ─── Middleware Box ─── */
+  .mw-box { background: #1e1b2e; border: 1px dashed #818cf840; border-radius: 14px; padding: 20px; margin: 20px 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: #c0b8e8; line-height: 1.8; }
+  .mw-box .comment { color: #666; }
+  .mw-box .keyword { color: #c792ea; }
+  .mw-box .string { color: #c3e88d; }
+  .mw-box .fn { color: #82aaff; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>CastFolio Site Separation Architecture</h1>
+<p class="subtitle">3-Model Cross Review Complete | Opus (Architecture) + Sonnet (Security) + Haiku (UX/DX)</p>
+
+<!-- ═══════════════════════ BEFORE / AFTER ═══════════════════════ -->
+<h2>Before vs After</h2>
+<div class="compare">
+  <div class="compare-box compare-old">
+    <h3>BEFORE: Single Domain</h3>
+    <p style="font-size:13px; font-weight:700; color:#ff6b7f; margin-bottom:10px;">castfolio.wideget.net</p>
+    <ul>
+      <li>Partner B2B landing + Client token pages on same domain</li>
+      <li>Client sees "Partner SaaS" when visiting homepage</li>
+      <li>/submit/[token] shares domain with /app/dashboard</li>
+      <li>/create wizard - unclear who it's for</li>
+      <li>One branding tone for two completely different users</li>
+    </ul>
+  </div>
+  <div class="compare-box compare-new">
+    <h3>AFTER: Split Domains</h3>
+    <p style="font-size:13px; font-weight:700; color:#4ade80; margin-bottom:10px;">castfolio.kr + partner.castfolio.kr</p>
+    <ul>
+      <li>Each user group has dedicated domain & branding</li>
+      <li>Client sees warm, friendly landing on castfolio.kr</li>
+      <li>Token pages isolated on client domain</li>
+      <li>/create clearly lives on client site as self-service tool</li>
+      <li>Single codebase, single deployment (Vercel)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ARCHITECTURE DIAGRAM ═══════════════════════ -->
+<h2>Route Architecture</h2>
+<div class="arch-grid">
+  <!-- Partner Site -->
+  <div class="site-box site-partner">
+    <div class="site-label">Site A - Partner (Creator)</div>
+    <div class="site-domain">partner.castfolio.kr</div>
+    <ul class="route-list route-partner">
+      <li><span class="icon">🏠</span> <span class="path">/</span> <span class="desc">B2B SaaS Landing</span></li>
+      <li><span class="icon">🔑</span> <span class="path">/login</span> <span class="desc">Partner Login (Supabase)</span></li>
+      <li><span class="icon">📖</span> <span class="path">/guide</span> <span class="desc">Operation Guide</span></li>
+      <li><span class="icon">🎨</span> <span class="path">/demo</span> <span class="desc">Sample Gallery</span></li>
+      <li style="margin-top:8px; border-top: 1px solid #334155; padding-top: 10px;">
+        <span class="icon">📊</span> <span class="path">/app/*</span> <span class="desc">Dashboard (AUTH)</span>
+      </li>
+      <li><span class="icon">👥</span> <span class="path">/app/talents</span> <span class="desc">Talent Management</span></li>
+      <li><span class="icon">📥</span> <span class="path">/app/intake</span> <span class="desc">Intake Management</span></li>
+      <li><span class="icon">💰</span> <span class="path">/app/sales</span> <span class="desc">Sales</span></li>
+      <li><span class="icon">🏗️</span> <span class="path">/app/builder/[id]</span> <span class="desc">PR Builder</span></li>
+      <li style="margin-top:8px; border-top: 1px solid #334155; padding-top: 10px;">
+        <span class="icon">⚙️</span> <span class="path">/admin/*</span> <span class="desc">Admin Panel (ADMIN)</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Arrow Column -->
+  <div class="arrow-col">
+    <span class="arr">⟷</span>
+    <span class="arr-label">middleware rewrite</span>
+  </div>
+
+  <!-- Client Site -->
+  <div class="site-box site-client">
+    <div class="site-label">Site B - Client (Talent)</div>
+    <div class="site-domain">castfolio.kr</div>
+    <ul class="route-list route-client">
+      <li><span class="icon">🏠</span> <span class="path">/</span> <span class="desc">Talent Landing (NEW)</span></li>
+      <li><span class="icon">❓</span> <span class="path">/faq</span> <span class="desc">Client FAQ (NEW)</span></li>
+      <li><span class="icon">🎭</span> <span class="path">/create</span> <span class="desc">Self-service Wizard</span></li>
+      <li style="margin-top:8px; border-top: 1px solid #2d5a3d; padding-top: 10px;">
+        <span class="icon">📝</span> <span class="path">/submit/[token]</span> <span class="desc">Material Submit (NO AUTH)</span>
+      </li>
+      <li><span class="icon">👁️</span> <span class="path">/review/[token]</span> <span class="desc">Page Review</span></li>
+      <li><span class="icon">📦</span> <span class="path">/delivered/[token]</span> <span class="desc">Delivery Confirm</span></li>
+      <li><span class="icon">💵</span> <span class="path">/quote/[token]</span> <span class="desc">Quote View</span></li>
+    </ul>
+    <div style="margin-top: 16px; padding: 12px; background: #fbbf2410; border: 1px solid #fbbf2425; border-radius: 10px;">
+      <div style="font-size:10px; font-weight:700; color:#fbbf24; letter-spacing:0.1em;">SHARED (Both Domains)</div>
+      <ul class="route-list route-shared" style="margin-top:4px;">
+        <li><span class="icon">🌐</span> <span class="path">/p/[slug]</span> <span class="desc">Public PR Page</span></li>
+        <li><span class="icon">🎯</span> <span class="path">/p/demo</span> <span class="desc">Demo Page</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MIDDLEWARE LOGIC ═══════════════════════ -->
+<h2>Middleware Domain Routing</h2>
+<div class="mw-box">
+<span class="comment">// middleware.ts - hostname-based route isolation</span><br>
+<span class="keyword">const</span> hostname = request.headers.<span class="fn">get</span>(<span class="string">"host"</span>)<br><br>
+<span class="keyword">if</span> (hostname.<span class="fn">includes</span>(<span class="string">"partner."</span>)) {<br>
+&nbsp;&nbsp;<span class="comment">// Site A: block client routes, serve partner routes</span><br>
+&nbsp;&nbsp;<span class="keyword">if</span> (<span class="string">/submit|review|delivered|quote/</span>) → <span class="fn">redirect</span>(<span class="string">"castfolio.kr"</span> + path)<br>
+&nbsp;&nbsp;<span class="keyword">if</span> (path === <span class="string">"/"</span>) → <span class="fn">rewrite</span>(<span class="string">"/(partner)/page"</span>)<br>
+} <span class="keyword">else if</span> (hostname.<span class="fn">includes</span>(<span class="string">"castfolio.kr"</span>)) {<br>
+&nbsp;&nbsp;<span class="comment">// Site B: block partner routes, serve client routes</span><br>
+&nbsp;&nbsp;<span class="keyword">if</span> (<span class="string">/app|admin|login/</span>) → <span class="fn">redirect</span>(<span class="string">"partner.castfolio.kr"</span> + path)<br>
+&nbsp;&nbsp;<span class="keyword">if</span> (path === <span class="string">"/"</span>) → <span class="fn">rewrite</span>(<span class="string">"/(client)/page"</span>)<br>
+} <span class="keyword">else</span> {<br>
+&nbsp;&nbsp;<span class="comment">// Unknown hostname → default deny (Security: Sonnet #7)</span><br>
+&nbsp;&nbsp;<span class="keyword">return</span> <span class="fn">NextResponse.json</span>({error: <span class="string">"forbidden"</span>}, {status: 403})<br>
+}<br><br>
+<span class="comment">// /p/[slug] → shared, accessible from both domains</span><br>
+<span class="comment">// Canonical: always castfolio.kr/p/[slug] (SEO: Opus #4)</span>
+</div>
+
+<!-- ═══════════════════════ WORKFLOW FLOW ═══════════════════════ -->
+<h2>User Journey Flow</h2>
+<div class="flow-row">
+  <div class="flow-card flow-partner">
+    <div class="step-num">1</div>
+    <h4>Partner</h4>
+    <p>partner.castfolio.kr<br>Login + Register talent</p>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-card flow-partner">
+    <div class="step-num">2</div>
+    <h4>Send Link</h4>
+    <p>Generate submit token<br>Email to talent</p>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-card flow-client">
+    <div class="step-num">3</div>
+    <h4>Talent Submit</h4>
+    <p>castfolio.kr/submit/[token]<br>No login needed</p>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-card flow-partner">
+    <div class="step-num">4</div>
+    <h4>Build Page</h4>
+    <p>partner.castfolio.kr<br>/app/builder/[id]</p>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-card flow-client">
+    <div class="step-num">5</div>
+    <h4>Talent Review</h4>
+    <p>castfolio.kr/review/[token]<br>Approve or request edits</p>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-card flow-shared">
+    <div class="step-num">6</div>
+    <h4>Published</h4>
+    <p>castfolio.kr/p/[slug]<br>Public PR page</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════ REVIEW FINDINGS ═══════════════════════ -->
+<h2>3-Model Review Findings (Consolidated)</h2>
+
+<h3 style="color:#ff3b5c; margin-top:20px;">CRITICAL (Must fix before split)</h3>
+<div class="findings">
+  <div class="finding"><span class="badge badge-critical">CRITICAL</span> <span class="reviewer">Opus</span> <span class="issue">Supabase cookie domain conflict — cookies set on partner.* invisible to castfolio.kr</span></div>
+  <div class="finding"><span class="badge badge-critical">CRITICAL</span> <span class="reviewer">Opus</span> <span class="issue">NEXT_PUBLIC_APP_URL hardcoded — token email links will point to wrong domain</span></div>
+  <div class="finding"><span class="badge badge-critical">CRITICAL</span> <span class="reviewer">Sonnet</span> <span class="issue">Auth cookies httpOnly: false — JS can read auth tokens (XSS risk)</span></div>
+  <div class="finding"><span class="badge badge-critical">CRITICAL</span> <span class="reviewer">Sonnet</span> <span class="issue">Middleware auth check is cookie-name-only — forgeable, no signature verification</span></div>
+</div>
+
+<h3 style="color:#ff8c00; margin-top:20px;">HIGH (Fix during split)</h3>
+<div class="findings">
+  <div class="finding"><span class="badge badge-high">HIGH</span> <span class="reviewer">Opus</span> <span class="issue">Route group layout collision — root layout shared, can't vary &lt;html&gt; per domain</span></div>
+  <div class="finding"><span class="badge badge-high">HIGH</span> <span class="reviewer">Opus</span> <span class="issue">/p/[slug] SEO — responds on both domains, needs canonical + 301 redirect</span></div>
+  <div class="finding"><span class="badge badge-high">HIGH</span> <span class="reviewer">Opus + Haiku</span> <span class="issue">/create wizard ambiguous — partner tool or client self-service?</span></div>
+  <div class="finding"><span class="badge badge-high">HIGH</span> <span class="reviewer">Sonnet</span> <span class="issue">OAuth callback open redirect via //evil.com trick</span></div>
+  <div class="finding"><span class="badge badge-high">HIGH</span> <span class="reviewer">Sonnet</span> <span class="issue">In-memory rate limiter bypassed on serverless (per-instance)</span></div>
+  <div class="finding"><span class="badge badge-high">HIGH</span> <span class="reviewer">Sonnet</span> <span class="issue">/delivered/[token] leaks partner PII (name, email, phone)</span></div>
+  <div class="finding"><span class="badge badge-high">HIGH</span> <span class="reviewer">Sonnet</span> <span class="issue">No security headers (CSP, X-Frame-Options, etc.) on either domain</span></div>
+  <div class="finding"><span class="badge badge-high">HIGH</span> <span class="reviewer">Haiku</span> <span class="issue">Client landing missing trust signals, turnaround time estimate, "before/after"</span></div>
+</div>
+
+<h3 style="color:#ffd600; margin-top:20px;">MEDIUM</h3>
+<div class="findings">
+  <div class="finding"><span class="badge badge-medium">MEDIUM</span> <span class="reviewer">Opus</span> <span class="issue">4-domain redirect chain (wideget.net → castfolio.kr) needs documentation</span></div>
+  <div class="finding"><span class="badge badge-medium">MEDIUM</span> <span class="reviewer">Opus</span> <span class="issue">Legacy route redirect map complexity (/dashboard/*, /public/*)</span></div>
+  <div class="finding"><span class="badge badge-medium">MEDIUM</span> <span class="reviewer">Sonnet</span> <span class="issue">Hostname rewrite has no default-deny fallback</span></div>
+  <div class="finding"><span class="badge badge-medium">MEDIUM</span> <span class="reviewer">Sonnet</span> <span class="issue">CORS not configured on /api/public/* for cross-domain</span></div>
+  <div class="finding"><span class="badge badge-medium">MEDIUM</span> <span class="reviewer">Haiku</span> <span class="issue">Route group split increases middleware complexity vs flat routes</span></div>
+</div>
+
+<h3 style="color:#4ade80; margin-top:20px;">LOW</h3>
+<div class="findings">
+  <div class="finding"><span class="badge badge-low">LOW</span> <span class="reviewer">Opus</span> <span class="issue">Single deployment = single failure domain for both sites</span></div>
+  <div class="finding"><span class="badge badge-low">LOW</span> <span class="reviewer">Opus</span> <span class="issue">Local dev needs NEXT_PUBLIC_DEV_DOMAIN_MODE env var</span></div>
+  <div class="finding"><span class="badge badge-low">LOW</span> <span class="reviewer">Sonnet</span> <span class="issue">Locale cookie missing SameSite + Secure flags</span></div>
+  <div class="finding"><span class="badge badge-low">LOW</span> <span class="reviewer">Haiku</span> <span class="issue">Branding consistency — /p/[slug] needs neutral tone for both contexts</span></div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════ MIGRATION PHASES ═══════════════════════ -->
+<h2>Migration Phases</h2>
+<div class="phase-list">
+  <div class="phase">
+    <div class="phase-num">P0</div>
+    <div><h4>Security Pre-fix (Before Split)</h4><p>httpOnly cookies, auth signature verification, OAuth redirect validation, security headers</p></div>
+  </div>
+  <div class="phase">
+    <div class="phase-num">P1</div>
+    <div><h4>Route Group Reorganization</h4><p>(partner)/ (client)/ (shared)/ directory structure + independent layout.tsx per group</p></div>
+  </div>
+  <div class="phase">
+    <div class="phase-num">P2</div>
+    <div><h4>Client Landing Page</h4><p>New castfolio.kr homepage for talents — warm tone, token input, FAQ, demo showcase</p></div>
+  </div>
+  <div class="phase">
+    <div class="phase-num">P3</div>
+    <div><h4>Middleware Domain Routing</h4><p>Hostname-based rewrite + cross-domain redirects + NEXT_PUBLIC_CLIENT_URL env var</p></div>
+  </div>
+  <div class="phase">
+    <div class="phase-num">P4</div>
+    <div><h4>Vercel Domain Setup</h4><p>castfolio.kr + partner.castfolio.kr + legacy wideget.net 301 redirects</p></div>
+  </div>
+  <div class="phase">
+    <div class="phase-num">P5</div>
+    <div><h4>Legacy URL Migration</h4><p>/dashboard/* → /app/*, /public/* → castfolio.kr/*, SEO canonicals, 301 map</p></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════ RECOMMENDED ACTION ═══════════════════════ -->
+<h2>Recommended Actions Summary</h2>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0;">
+  <div style="padding:16px; border-radius:12px; background:#ff3b5c10; border:1px solid #ff3b5c25;">
+    <h3 style="color:#ff3b5c; margin-bottom:8px;">Must Do (Before Split)</h3>
+    <ul style="font-size:12px; list-style:none;">
+      <li style="padding:3px 0;">1. Set httpOnly: true on all auth cookies</li>
+      <li style="padding:3px 0;">2. Replace cookie-name check with getUser() in middleware</li>
+      <li style="padding:3px 0;">3. Fix OAuth next param open redirect</li>
+      <li style="padding:3px 0;">4. Add NEXT_PUBLIC_CLIENT_URL for token links</li>
+      <li style="padding:3px 0;">5. Keep cookie domain separate (NOT .castfolio.kr)</li>
+    </ul>
+  </div>
+  <div style="padding:16px; border-radius:12px; background:#4ade8010; border:1px solid #4ade8025;">
+    <h3 style="color:#4ade80; margin-bottom:8px;">Consensus Decisions</h3>
+    <ul style="font-size:12px; list-style:none;">
+      <li style="padding:3px 0;">1. Method B (Route Groups + Middleware) ← all 3 agree</li>
+      <li style="padding:3px 0;">2. /create → client site (castfolio.kr) ← Opus + Haiku</li>
+      <li style="padding:3px 0;">3. /p/[slug] canonical → castfolio.kr only ← Opus</li>
+      <li style="padding:3px 0;">4. Root layout stays minimal ← Opus + Haiku</li>
+      <li style="padding:3px 0;">5. Default-deny for unknown hostnames ← Sonnet</li>
+    </ul>
+  </div>
+</div>
+
+<p style="margin-top: 32px; font-size: 11px; color: #555; text-align: center;">
+  CastFolio Site Separation Plan v1.0 | Reviewed by: Opus (Architecture) + Sonnet (Security) + Haiku (UX/DX) | 2026-05-13
+</p>
+
+</div>
+</body>
+</html>

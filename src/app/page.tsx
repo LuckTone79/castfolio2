@@ -169,6 +169,12 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-2">
             <Link
+              href="/client"
+              className="hidden rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 sm:inline-flex"
+            >
+              고객 전용 페이지
+            </Link>
+            <Link
               href="/guide"
               className="hidden rounded-2xl border border-black/10 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-white sm:inline-flex"
             >
