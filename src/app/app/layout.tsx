@@ -11,7 +11,7 @@ const buildAgentNav = (writeEnabled: boolean): NavItem[] => [
   { href: "/app/intake", label: "자료 수집", icon: "intake", badge: writeEnabled ? undefined : "read-only" },
   { href: "/app/sales", label: "매출 관리", icon: "sales", badge: writeEnabled ? undefined : "read-only" },
   { href: "/app/settlements", label: "정산 내역", icon: "settlements" },
-  { href: undefined, label: "PR 빌더는 고객 상세에서 진입", icon: "builder", badge: "info" },
+  { href: "/app/build", label: "직접 제작", icon: "builder", badge: writeEnabled ? undefined : "read-only" },
 ];
 
 export default async function AgentAppLayout({ children }: { children: React.ReactNode }) {

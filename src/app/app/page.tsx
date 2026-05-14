@@ -74,7 +74,7 @@ export default async function AgentDashboardPage() {
   const quickActions = [
     { href: "/app/talents", label: "방송인 고객 추가", icon: Users, disabled: !writeEnabled },
     { href: "/app/intake", label: "자료 요청 링크 만들기", icon: FileInput, disabled: !writeEnabled },
-    { href: "/app/talents", label: "PR 홈페이지 제작", icon: SquarePen, disabled: !writeEnabled },
+    { href: "/app/build", label: "PR 홈페이지 제작", icon: SquarePen, disabled: !writeEnabled },
     { href: "/app/sales", label: "판매 확정 입력", icon: ReceiptText, disabled: !writeEnabled },
   ];
 

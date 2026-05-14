@@ -10,6 +10,9 @@ coverage/
 .next/
 out/
 build/
+# Allow source directories named 'build' inside src/
+!src/**/build/
+!src/**/build/**
 
 # Misc
 .DS_Store
