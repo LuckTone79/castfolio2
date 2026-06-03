@@ -17,6 +17,9 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Legacy partner workspace consolidated into a single /app workspace.
+      { source: "/dashboard", destination: "/app", permanent: true },
+      { source: "/dashboard/:path*", destination: "/app/:path*", permanent: true },
       // Shareable entry URL: https://www.wideget.net/castfolio -> https://castfolio.wideget.net
       {
         source: "/castfolio",

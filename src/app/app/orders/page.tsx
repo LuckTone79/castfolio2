@@ -66,7 +66,7 @@ export default function OrdersPage() {
             </thead>
             <tbody className="divide-y divide-gray-800">
               {filtered.map((o) => (
-                <tr key={o.id} className="hover:bg-gray-800/50 cursor-pointer transition-colors" onClick={() => router.push(`/dashboard/orders/${o.id}`)}>
+                <tr key={o.id} className="hover:bg-gray-800/50 cursor-pointer transition-colors" onClick={() => router.push(`/app/orders/${o.id}`)}>
                   <td className="px-5 py-3 text-sm font-mono text-white">{o.orderNumber}</td>
                   <td className="px-5 py-3">
                     <p className="text-sm text-white">{o.project?.name || "-"}</p>

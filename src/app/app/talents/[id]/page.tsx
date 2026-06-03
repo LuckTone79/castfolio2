@@ -2,10 +2,11 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
+import { IntakeLinkButton } from "@/components/app/intake-link-button";
 import { Badge } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
-import { Mail, Phone, MessageCircle } from "lucide-react";
+import { Mail, Phone, MessageCircle, SquarePen } from "lucide-react";
 
 export default async function TalentDetailPage({ params }: { params: { id: string } }) {
   const user = await requireUser();
@@ -27,9 +28,21 @@ export default async function TalentDetailPage({ params }: { params: { id: strin
         title={talent.nameKo}
         description={talent.position || undefined}
         breadcrumbs={[
-          { label: "탤런트", href: "/dashboard/talents" },
+          { label: "방송인 고객", href: "/app/talents" },
           { label: talent.nameKo },
         ]}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <IntakeLinkButton talentId={talent.id} />
+            <Link
+              href="/app/build"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-gray-100"
+            >
+              <SquarePen className="h-4 w-4" />
+              PR 홈페이지 제작
+            </Link>
+          </div>
+        }
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -80,22 +93,28 @@ export default async function TalentDetailPage({ params }: { params: { id: strin
           ) : (
             <div className="divide-y divide-gray-800">
               {talent.projects.map((p) => (
-                <Link
+                <div
                   key={p.id}
-                  href={`/dashboard/projects/${p.id}`}
-                  className="flex items-center justify-between px-5 py-3 hover:bg-gray-800/50 transition-colors"
+                  className="flex items-center justify-between gap-4 px-5 py-3 transition-colors hover:bg-gray-800/50"
                 >
-                  <div>
-                    <p className="text-sm font-medium text-white">{p.name}</p>
+                  <Link href={`/app/projects/${p.id}`} className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-white hover:underline">{p.name}</p>
                     <p className="text-xs text-gray-500">{formatDate(p.createdAt)}</p>
+                  </Link>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <span className="text-xs text-gray-400">{p.status}</span>
+                      {p.page?.slug && <p className="text-xs text-emerald-400">/{p.page.slug}</p>}
+                    </div>
+                    <Link
+                      href={`/app/builder/${p.id}`}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-semibold text-gray-200 transition hover:bg-gray-800"
+                    >
+                      <SquarePen className="h-3.5 w-3.5" />
+                      빌더 열기
+                    </Link>
                   </div>
-                  <div className="text-right">
-                    <span className="text-xs text-gray-400">{p.status}</span>
-                    {p.page?.slug && (
-                      <p className="text-xs text-emerald-400">/{p.page.slug}</p>
-                    )}
-                  </div>
-                </Link>
+                </div>
               ))}
             </div>
           )}

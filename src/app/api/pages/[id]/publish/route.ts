@@ -90,7 +90,7 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
   await logAudit({ actorId: user.id, actorRole: user.role, action: "PUBLISH_PAGE", targetType: "Page", targetId: page.id });
   await logTimeline({ projectId: page.projectId, event: "PAGE_PUBLISHED", description: `PR 페이지 공개됨: /p/${page.slug}`, actorId: user.id, actorName: user.name });
 
-  await sendNotification({ userId: user.id, type: "delivery_complete", title: "PR 페이지 배포 완료", body: `${talent.nameKo}의 PR 페이지가 배포되었습니다.`, link: `/dashboard/projects/${page.projectId}` });
+  await sendNotification({ userId: user.id, type: "delivery_complete", title: "PR 페이지 배포 완료", body: `${talent.nameKo}의 PR 페이지가 배포되었습니다.`, link: `/app/projects/${page.projectId}` });
 
   await notifyTalent({ talentId: talent.id, type: "delivery_complete", title: "PR 페이지가 완성되었습니다!", body: `${talent.nameKo}님의 PR 페이지가 공개되었습니다. 링크: ${pageUrl}` });
 

@@ -7,11 +7,16 @@ import {
   ChevronLeft,
   ChevronRight,
   FileInput,
+  FileText,
+  FolderKanban,
   LayoutDashboard,
   ReceiptText,
+  Settings,
   Shield,
+  ShoppingCart,
   Sparkles,
   SquarePen,
+  Tags,
   Users,
   Wallet,
 } from "lucide-react";
@@ -25,6 +30,11 @@ const NAV_ICONS = {
   sales: ReceiptText,
   settlements: Wallet,
   builder: SquarePen,
+  projects: FolderKanban,
+  quotes: FileText,
+  orders: ShoppingCart,
+  pricing: Tags,
+  settings: Settings,
 } as const;
 
 export type NavIconName = keyof typeof NAV_ICONS;
@@ -32,9 +42,11 @@ export type NavIconName = keyof typeof NAV_ICONS;
 export interface NavItem {
   href?: string;
   label: string;
-  icon: NavIconName;
+  icon?: NavIconName;
   exact?: boolean;
   badge?: string;
+  /** Render as a non-interactive section heading that groups the items below it. */
+  section?: boolean;
 }
 
 interface SideNavProps {
@@ -62,7 +74,21 @@ export function SideNav({ items, brandLabel, brandTone }: SideNavProps) {
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
         {items.map((item) => {
-          const ItemIcon = NAV_ICONS[item.icon];
+          if (item.section) {
+            if (collapsed) {
+              return <div key={`sep-${item.label}`} className="my-2 border-t border-gray-800/70" />;
+            }
+            return (
+              <p
+                key={`sec-${item.label}`}
+                className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-600"
+              >
+                {item.label}
+              </p>
+            );
+          }
+
+          const ItemIcon = item.icon ? NAV_ICONS[item.icon] : Sparkles;
           const active = item.href
             ? item.exact
               ? pathname === item.href

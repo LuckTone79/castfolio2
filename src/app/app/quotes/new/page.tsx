@@ -54,14 +54,14 @@ export default function NewQuotePage() {
       body: JSON.stringify({ ...form, totalAmount: total, send: false }),
     });
     if (!res.ok) { setError("생성 실패"); setLoading(false); return; }
-    router.push("/dashboard/quotes");
+    router.push("/app/quotes");
   };
 
   return (
     <>
       <PageHeader
         title="견적서 작성"
-        breadcrumbs={[{ label: "견적서", href: "/dashboard/quotes" }, { label: "새 견적서" }]}
+        breadcrumbs={[{ label: "견적서", href: "/app/quotes" }, { label: "새 견적서" }]}
       />
       <div className="max-w-2xl">
         <form onSubmit={handleSubmit} className="space-y-6">

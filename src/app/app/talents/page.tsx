@@ -1,74 +1,190 @@
-import Link from "next/link";
-import { SquarePen, Users } from "lucide-react";
-import { IntakeLinkButton } from "@/components/app/intake-link-button";
-import { PageHeader } from "@/components/layout/page-header";
-import { requireAgentAppProfile } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { formatDate } from "@/lib/utils";
+"use client";
 
-export default async function AppTalentsPage() {
-  const profile = await requireAgentAppProfile();
-  const talents = await prisma.talent.findMany({
-    where: { userId: profile.id, status: { not: "DELETED" } },
-    orderBy: { updatedAt: "desc" },
-    take: 20,
-    include: {
-      _count: { select: { projects: true, intakeForms: true } },
-      intakeForms: { orderBy: { createdAt: "desc" }, take: 1 },
-    },
-  });
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { PageHeader } from "@/components/layout/page-header";
+import { Button, Input, Avatar, Badge, EmptyState, Modal, FormField } from "@/components/ui";
+import { Users, Plus, Search, MoreVertical, Pencil, Trash2 } from "lucide-react";
+
+interface Talent {
+  id: string;
+  nameKo: string;
+  nameEn: string | null;
+  position: string | null;
+  email: string | null;
+  phone: string | null;
+  status: string;
+  _count?: { projects: number };
+}
+
+export default function TalentsPage() {
+  const router = useRouter();
+  const [talents, setTalents] = useState<Talent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [showCreate, setShowCreate] = useState(false);
+
+  const fetchTalents = async () => {
+    const res = await fetch("/api/talents");
+    if (res.ok) {
+      const data = await res.json();
+      setTalents(data.talents || data);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchTalents(); }, []);
+
+  const filtered = talents.filter(
+    (t) =>
+      t.nameKo.includes(search) ||
+      (t.nameEn && t.nameEn.toLowerCase().includes(search.toLowerCase())) ||
+      (t.position && t.position.includes(search)),
+  );
 
   return (
     <>
       <PageHeader
-        title="방송인 고객"
-        description="고객별 프로필, 진행 상태, 자료 수집 이력을 파트너 관점에서 관리합니다."
+        title="탤런트"
+        description="방송인 프로필을 관리합니다"
+        actions={<Button onClick={() => setShowCreate(true)}><Plus size={16} /> 탤런트 등록</Button>}
       />
 
-      <div className="rounded-2xl border border-gray-800 bg-gray-900">
-        {talents.length === 0 ? (
-          <div className="px-6 py-12 text-center text-sm text-gray-500">
-            아직 등록된 방송인 고객이 없습니다. 고객이 등록되면 이곳에서 제작 흐름을 관리할 수 있습니다.
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-800">
-            {talents.map((talent) => (
-              <div key={talent.id} className="flex flex-col gap-4 px-6 py-5">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-gray-500" />
-                      <p className="text-sm font-semibold text-white">{talent.nameKo}</p>
-                      <span className="rounded-full border border-gray-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-300">
-                        {talent.status}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm text-gray-400">{talent.position || "포지션 정보가 아직 없습니다."}</p>
-                    <p className="mt-2 text-xs text-gray-500">
-                      프로젝트 {talent._count.projects}건 · 자료 요청 {talent._count.intakeForms}건 · 최근 업데이트 {formatDate(talent.updatedAt)}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap items-start gap-3">
-                    <IntakeLinkButton talentId={talent.id} />
-                    <Link
-                      href={`/app/builder/${talent.id}`}
-                      className="inline-flex items-center gap-2 rounded-xl border border-gray-700 px-4 py-2 text-sm font-medium text-gray-200 transition hover:bg-gray-800"
-                    >
-                      <SquarePen className="h-4 w-4" />
-                      빌더 열기
-                    </Link>
-                  </div>
-                </div>
-                {talent.intakeForms[0] && (
-                  <div className="rounded-xl bg-gray-950 px-4 py-3 text-xs text-gray-500">
-                    최근 자료 요청 링크 발급일 {formatDate(talent.intakeForms[0].createdAt)}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+      {/* Search */}
+      <div className="mb-4">
+        <div className="relative max-w-sm">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          <Input
+            placeholder="이름, 포지션 검색..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
       </div>
+
+      {/* Table */}
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-16 rounded-lg bg-gray-800 animate-pulse" />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          icon={Users}
+          title="탤런트가 없습니다"
+          description="첫 번째 탤런트를 등록하고 PR 페이지를 만들어 보세요"
+          actionLabel="탤런트 등록"
+          onAction={() => setShowCreate(true)}
+        />
+      ) : (
+        <div className="rounded-xl border border-gray-800 bg-gray-900 overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-800 text-left">
+                <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase">이름</th>
+                <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase">포지션</th>
+                <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase">연락처</th>
+                <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase">프로젝트</th>
+                <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase">상태</th>
+                <th className="px-5 py-3"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800">
+              {filtered.map((t) => (
+                <tr
+                  key={t.id}
+                  className="hover:bg-gray-800/50 cursor-pointer transition-colors"
+                  onClick={() => router.push(`/app/talents/${t.id}`)}
+                >
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar name={t.nameKo} size="sm" />
+                      <div>
+                        <p className="text-sm font-medium text-white">{t.nameKo}</p>
+                        {t.nameEn && <p className="text-xs text-gray-500">{t.nameEn}</p>}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3 text-sm text-gray-300">{t.position || "-"}</td>
+                  <td className="px-5 py-3 text-sm text-gray-400">{t.email || t.phone || "-"}</td>
+                  <td className="px-5 py-3 text-sm text-gray-400">{t._count?.projects ?? 0}개</td>
+                  <td className="px-5 py-3">
+                    <Badge color={t.status === "ACTIVE" ? "green" : "gray"}>
+                      {t.status === "ACTIVE" ? "활성" : "비활성"}
+                    </Badge>
+                  </td>
+                  <td className="px-5 py-3">
+                    <MoreVertical size={16} className="text-gray-500" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Create Modal */}
+      <CreateTalentModal
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        onCreated={() => { setShowCreate(false); fetchTalents(); }}
+      />
     </>
+  );
+}
+
+function CreateTalentModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
+  const [form, setForm] = useState({ nameKo: "", nameEn: "", position: "", email: "", phone: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.nameKo.trim()) { setError("한글 이름은 필수입니다"); return; }
+    setLoading(true);
+    setError("");
+    const res = await fetch("/api/talents", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || "생성 실패");
+      setLoading(false);
+      return;
+    }
+    setForm({ nameKo: "", nameEn: "", position: "", email: "", phone: "" });
+    setLoading(false);
+    onCreated();
+  };
+
+  return (
+    <Modal open={open} onClose={onClose} title="탤런트 등록" size="md">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <FormField label="한글 이름" required>
+          <Input value={form.nameKo} onChange={(e) => setForm({ ...form, nameKo: e.target.value })} placeholder="홍길동" />
+        </FormField>
+        <FormField label="영문 이름">
+          <Input value={form.nameEn} onChange={(e) => setForm({ ...form, nameEn: e.target.value })} placeholder="Hong Gil-dong" />
+        </FormField>
+        <FormField label="포지션" hint="예: 아나운서, MC, 리포터">
+          <Input value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} placeholder="아나운서" />
+        </FormField>
+        <FormField label="이메일">
+          <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="talent@email.com" />
+        </FormField>
+        <FormField label="전화번호">
+          <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="010-0000-0000" />
+        </FormField>
+        {error && <p className="text-sm text-red-400">{error}</p>}
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="button" variant="ghost" onClick={onClose}>취소</Button>
+          <Button type="submit" loading={loading}>등록</Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

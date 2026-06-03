@@ -137,7 +137,7 @@ export default function BuilderPage() {
       {/* Toolbar */}
       <div className="flex items-center justify-between px-4 h-12 border-b border-gray-800 bg-gray-950 shrink-0">
         <div className="flex items-center gap-3">
-          <Link href={`/dashboard/projects/${projectId}`} className="text-gray-400 hover:text-white">
+          <Link href={`/app/projects/${projectId}`} className="text-gray-400 hover:text-white">
             <ArrowLeft size={18} />
           </Link>
           <span className="text-sm font-medium text-white">{store.talentNameKo} PR</span>

@@ -29,7 +29,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
       <PageHeader
         title={`주문 ${order.orderNumber}`}
         breadcrumbs={[
-          { label: "주문", href: "/dashboard/orders" },
+          { label: "주문", href: "/app/orders" },
           { label: order.orderNumber },
         ]}
       />

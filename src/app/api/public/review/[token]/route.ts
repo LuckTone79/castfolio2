@@ -31,7 +31,7 @@ export async function POST(request: Request, { params }: { params: { token: stri
         where: { id: form.projectId },
         data: { verificationStatus: "REVISION_REQUESTED" },
       });
-      await sendNotification({ userId: form.project.userId, type: "revision_requested", title: "수정 요청 도착", body: `${form.talent.nameKo}: ${revisionNote}`, link: `/dashboard/projects/${form.projectId}`, emailTo: form.project.user.email });
+      await sendNotification({ userId: form.project.userId, type: "revision_requested", title: "수정 요청 도착", body: `${form.talent.nameKo}: ${revisionNote}`, link: `/app/projects/${form.projectId}`, emailTo: form.project.user.email });
       await logTimeline({ projectId: form.projectId, event: "REVISION_REQUESTED", description: `수정 요청: ${revisionNote}`, actorName: form.talent.nameKo });
     }
 

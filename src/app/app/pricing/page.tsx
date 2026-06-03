@@ -32,7 +32,7 @@ export default function PricingPage() {
       <PageHeader
         title="상품 관리"
         description="PR 페이지 제작 패키지를 관리합니다"
-        actions={<Button onClick={() => router.push("/dashboard/pricing/new")}><Plus size={16} /> 패키지 생성</Button>}
+        actions={<Button onClick={() => router.push("/app/pricing/new")}><Plus size={16} /> 패키지 생성</Button>}
       />
 
       {loading ? (
@@ -45,7 +45,7 @@ export default function PricingPage() {
           title="상품 패키지가 없습니다"
           description="견적서를 발송하려면 먼저 패키지를 만들어야 합니다"
           actionLabel="패키지 생성"
-          onAction={() => router.push("/dashboard/pricing/new")}
+          onAction={() => router.push("/app/pricing/new")}
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -55,7 +55,7 @@ export default function PricingPage() {
             return (
               <div
                 key={pkg.id}
-                onClick={() => router.push(`/dashboard/pricing/${pkg.id}`)}
+                onClick={() => router.push(`/app/pricing/${pkg.id}`)}
                 className="rounded-xl border border-gray-800 bg-gray-900 p-6 hover:border-gray-700 cursor-pointer transition-colors"
               >
                 <h3 className="text-lg font-semibold text-white">{pkg.name}</h3>
