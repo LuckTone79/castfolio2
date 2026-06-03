@@ -35,7 +35,7 @@ export default async function TalentDetailPage({ params }: { params: { id: strin
           <div className="flex flex-wrap items-center gap-2">
             <IntakeLinkButton talentId={talent.id} />
             <Link
-              href="/app/build"
+              href={`/app/build?talentId=${talent.id}`}
               className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-gray-100"
             >
               <SquarePen className="h-4 w-4" />

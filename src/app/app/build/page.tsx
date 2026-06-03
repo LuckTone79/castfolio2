@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button, Input, FormField } from "@/components/ui";
 import {
@@ -26,7 +26,17 @@ type Mode = "existing" | "new";
 type Step = 1 | 2;
 
 export default function QuickBuildPage() {
+  return (
+    <Suspense fallback={null}>
+      <QuickBuildView />
+    </Suspense>
+  );
+}
+
+function QuickBuildView() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const presetTalentId = searchParams.get("talentId");
   const [step, setStep] = useState<Step>(1);
   const [mode, setMode] = useState<Mode>("existing");
 
@@ -41,12 +51,22 @@ export default function QuickBuildPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 기존 고객 목록 로드
+  // 기존 고객 목록 로드 — talentId가 전달되면 해당 고객을 미리 선택
   useEffect(() => {
     fetch("/api/talents")
       .then((r) => r.json())
-      .then((d) => setTalents(d.talents || []));
-  }, []);
+      .then((d) => {
+        const list: Talent[] = d.talents || [];
+        setTalents(list);
+        if (presetTalentId) {
+          const preset = list.find((t) => t.id === presetTalentId);
+          if (preset) {
+            setMode("existing");
+            setSelected(preset);
+          }
+        }
+      });
+  }, [presetTalentId]);
 
   // 프로젝트명 자동 제안
   useEffect(() => {
