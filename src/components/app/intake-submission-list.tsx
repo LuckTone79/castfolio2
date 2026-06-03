@@ -116,7 +116,7 @@ export function IntakeSubmissionList({ initialForms }: IntakeSubmissionListProps
       await load();
 
       if (data.projectId) {
-        window.location.href = `/dashboard/builder/${data.projectId}`;
+        window.location.href = `/app/builder/${data.projectId}`;
       }
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : "Builder 불러오기 중 문제가 발생했습니다.");
@@ -216,10 +216,10 @@ export function IntakeSubmissionList({ initialForms }: IntakeSubmissionListProps
                         <Eye className="h-4 w-4" />
                         제출 자료 보기
                       </Button>
-                      <Link href={`/app/builder/${form.talentId}`}>
+                      <Link href={`/app/talents/${form.talentId}`}>
                         <Button size="sm" variant="outline" className="border-gray-700 text-gray-200 hover:bg-gray-800">
                           <ExternalLink className="h-4 w-4" />
-                          Builder 열기
+                          고객 작업실 열기
                         </Button>
                       </Link>
                       {form.latestPayload && (

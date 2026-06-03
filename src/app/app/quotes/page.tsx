@@ -38,7 +38,7 @@ export default function QuotesPage() {
       <PageHeader
         title="견적서"
         description="발송된 견적서를 관리합니다"
-        actions={<Button onClick={() => router.push("/dashboard/quotes/new")}><Plus size={16} /> 견적서 작성</Button>}
+        actions={<Button onClick={() => router.push("/app/quotes/new")}><Plus size={16} /> 견적서 작성</Button>}
       />
 
       <div className="flex items-center gap-3 mb-4">
@@ -55,7 +55,7 @@ export default function QuotesPage() {
       {loading ? (
         <div className="space-y-3">{[1, 2, 3].map((i) => <div key={i} className="h-16 rounded-lg bg-gray-800 animate-pulse" />)}</div>
       ) : filtered.length === 0 ? (
-        <EmptyState icon={FileText} title="견적서가 없습니다" description="패키지를 선택하여 견적서를 작성하세요" actionLabel="견적서 작성" onAction={() => router.push("/dashboard/quotes/new")} />
+        <EmptyState icon={FileText} title="견적서가 없습니다" description="패키지를 선택하여 견적서를 작성하세요" actionLabel="견적서 작성" onAction={() => router.push("/app/quotes/new")} />
       ) : (
         <div className="rounded-xl border border-gray-800 bg-gray-900 overflow-hidden">
           <table className="w-full">
@@ -69,7 +69,7 @@ export default function QuotesPage() {
             </thead>
             <tbody className="divide-y divide-gray-800">
               {filtered.map((q) => (
-                <tr key={q.id} className="hover:bg-gray-800/50 cursor-pointer transition-colors" onClick={() => router.push(`/dashboard/quotes/${q.id}`)}>
+                <tr key={q.id} className="hover:bg-gray-800/50 cursor-pointer transition-colors" onClick={() => router.push(`/app/quotes/${q.id}`)}>
                   <td className="px-5 py-3">
                     <p className="text-sm font-medium text-white">{q.project?.name || "-"}</p>
                     <p className="text-xs text-gray-500">{q.project?.talent?.nameKo}</p>

@@ -88,7 +88,7 @@ export default function QuickBuildPage() {
       }
 
       const { projectId } = await res.json();
-      router.push(`/dashboard/builder/${projectId}`);
+      router.push(`/app/builder/${projectId}`);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "오류가 발생했습니다");
       setLoading(false);

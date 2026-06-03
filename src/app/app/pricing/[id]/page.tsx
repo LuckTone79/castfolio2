@@ -25,7 +25,7 @@ export default async function PricingDetailPage({ params }: { params: { id: stri
         title={pkg.name}
         description={pkg.description || undefined}
         breadcrumbs={[
-          { label: "상품 관리", href: "/dashboard/pricing" },
+          { label: "상품 관리", href: "/app/pricing" },
           { label: pkg.name },
         ]}
       />

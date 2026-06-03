@@ -57,7 +57,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
   await logAudit({ actorId: user.id, actorRole: user.role, action: "CONFIRM_PAYMENT", targetType: "Order", targetId: order.id, before: { status: order.status }, after: { status: "PAID" } });
   await logTimeline({ projectId: order.projectId, event: "PAYMENT_CONFIRMED", description: `결제 확인됨: ${order.orderNumber}`, actorId: user.id, actorName: user.name });
 
-  await sendNotification({ userId: user.id, type: "payment_complete", title: "결제 확인 완료", body: `${order.project.talent.nameKo}의 주문 결제가 확인되었습니다.`, link: `/dashboard/projects/${order.projectId}` });
+  await sendNotification({ userId: user.id, type: "payment_complete", title: "결제 확인 완료", body: `${order.project.talent.nameKo}의 주문 결제가 확인되었습니다.`, link: `/app/projects/${order.projectId}` });
   await notifyTalent({ talentId: order.project.talentId, type: "payment_complete", title: "결제가 확인되었습니다", body: `결제가 확인되었습니다. 곧 PR 페이지가 완성됩니다!` });
 
   return NextResponse.json(updated);

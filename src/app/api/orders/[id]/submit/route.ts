@@ -29,9 +29,9 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
   await logTimeline({ projectId: order.projectId, event: "PAYMENT_PENDING", description: `주문 ${order.orderNumber} 결제 대기 상태로 전환`, actorId: user.id, actorName: user.name });
 
   const talent = order.project.talent;
-  await sendNotification({ userId: user.id, type: "payment_pending", title: "결제 대기 중", body: `${talent.nameKo} 주문 ${order.orderNumber}이 결제 대기 상태입니다.`, link: `/dashboard/orders/${order.id}` });
+  await sendNotification({ userId: user.id, type: "payment_pending", title: "결제 대기 중", body: `${talent.nameKo} 주문 ${order.orderNumber}이 결제 대기 상태입니다.`, link: `/app/orders/${order.id}` });
 
-  await notifyTalent({ talentId: talent.id, type: "payment_pending", title: "결제 요청이 도착했습니다", body: `견적 ${order.orderNumber}에 대한 결제를 완료해주세요.`, link: `/dashboard/orders/${order.id}` });
+  await notifyTalent({ talentId: talent.id, type: "payment_pending", title: "결제 요청이 도착했습니다", body: `견적 ${order.orderNumber}에 대한 결제를 완료해주세요.`, link: `/app/orders/${order.id}` });
 
   return NextResponse.json(updated);
 }

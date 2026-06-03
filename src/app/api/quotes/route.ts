@@ -80,7 +80,7 @@ export async function POST(request: Request) {
         type: "quote_sent",
         title: "견적서가 발송되었습니다",
         body: `${project.talent.nameKo}님께 견적서가 발송되었습니다.`,
-        link: `/dashboard/quotes/${quote.id}`,
+        link: `/app/quotes/${quote.id}`,
         emailTo: project.talent.email,
       });
     } else {
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
         type: "quote_sent_proxy",
         title: "견적서 발송 — 직접 전달 필요",
         body: `${project.talent.nameKo}님의 이메일이 등록되지 않았습니다. 견적서를 방송인에게 직접 전달해주세요.`,
-        link: `/dashboard/quotes/${quote.id}`,
+        link: `/app/quotes/${quote.id}`,
         emailTo: user.email,
       });
     }

@@ -27,7 +27,7 @@ export default function NewPricingPage() {
       setLoading(false);
       return;
     }
-    router.push("/dashboard/pricing");
+    router.push("/app/pricing");
   };
 
   return (
@@ -35,7 +35,7 @@ export default function NewPricingPage() {
       <PageHeader
         title="패키지 생성"
         breadcrumbs={[
-          { label: "상품 관리", href: "/dashboard/pricing" },
+          { label: "상품 관리", href: "/app/pricing" },
           { label: "새 패키지" },
         ]}
       />

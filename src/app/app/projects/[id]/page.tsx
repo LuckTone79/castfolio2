@@ -41,17 +41,17 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
         title={project.name}
         description={`${project.talent.nameKo} · ${project.talent.position || "방송인"}`}
         breadcrumbs={[
-          { label: "프로젝트", href: "/dashboard/projects" },
+          { label: "프로젝트", href: "/app/projects" },
           { label: project.name },
         ]}
         actions={
           <div className="flex items-center gap-2">
             {project.page ? (
-              <Link href={`/dashboard/builder/${project.id}`}>
+              <Link href={`/app/builder/${project.id}`}>
                 <Button variant="secondary" size="sm"><Edit3 size={14} /> 빌더 열기</Button>
               </Link>
             ) : (
-              <Link href={`/dashboard/builder/${project.id}`}>
+              <Link href={`/app/builder/${project.id}`}>
                 <Button size="sm"><Edit3 size={14} /> 페이지 만들기</Button>
               </Link>
             )}
@@ -132,7 +132,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                 {project.orders.map((o) => (
                   <Link
                     key={o.id}
-                    href={`/dashboard/orders/${o.id}`}
+                    href={`/app/orders/${o.id}`}
                     className="flex items-center justify-between px-5 py-3 hover:bg-gray-800/50 transition-colors"
                   >
                     <div>

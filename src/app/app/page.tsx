@@ -138,7 +138,7 @@ export default async function AgentDashboardPage() {
               {recentTalents.map((talent) => (
                 <Link
                   key={talent.id}
-                  href={`/app/builder/${talent.id}`}
+                  href={`/app/talents/${talent.id}`}
                   className="flex items-center justify-between px-5 py-4 transition hover:bg-gray-800/40"
                 >
                   <div>

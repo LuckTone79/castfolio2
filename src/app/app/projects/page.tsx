@@ -99,7 +99,7 @@ export default function ProjectsPage() {
             return (
               <div
                 key={p.id}
-                onClick={() => router.push(`/dashboard/projects/${p.id}`)}
+                onClick={() => router.push(`/app/projects/${p.id}`)}
                 className="rounded-xl border border-gray-800 bg-gray-900 p-5 hover:border-gray-700 hover:bg-gray-800/50 cursor-pointer transition-colors"
               >
                 <div className="flex items-start justify-between mb-3">

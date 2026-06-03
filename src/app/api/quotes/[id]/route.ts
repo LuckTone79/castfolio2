@@ -44,10 +44,10 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     await logTimeline({ projectId: quote.projectId, event: "QUOTE_SENT", description: "견적서가 발송되었습니다", actorId: user.id, actorName: user.name });
     if (quote.project.talent.email) {
       // Talent에게 이메일 알림
-      await sendNotification({ userId: user.id, type: "quote_sent", title: "견적서 발송 완료", body: `${quote.project.talent.nameKo}님께 견적서가 발송되었습니다.`, link: `/dashboard/quotes/${quote.id}`, emailTo: quote.project.talent.email });
+      await sendNotification({ userId: user.id, type: "quote_sent", title: "견적서 발송 완료", body: `${quote.project.talent.nameKo}님께 견적서가 발송되었습니다.`, link: `/app/quotes/${quote.id}`, emailTo: quote.project.talent.email });
     } else {
       // Talent 이메일 없음 → proxy 알림 (지침서 규칙 L)
-      await sendNotification({ userId: user.id, type: "quote_sent_proxy", title: "견적서 발송 — 직접 전달 필요", body: `${quote.project.talent.nameKo}님의 이메일이 없습니다. 견적서를 직접 전달해주세요.`, link: `/dashboard/quotes/${quote.id}`, emailTo: user.email });
+      await sendNotification({ userId: user.id, type: "quote_sent_proxy", title: "견적서 발송 — 직접 전달 필요", body: `${quote.project.talent.nameKo}님의 이메일이 없습니다. 견적서를 직접 전달해주세요.`, link: `/app/quotes/${quote.id}`, emailTo: user.email });
     }
     return NextResponse.json(updated);
   }
