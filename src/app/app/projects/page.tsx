@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button, Input, Badge, EmptyState, Modal, FormField, Select } from "@/components/ui";
 import { FolderKanban, Plus, Search } from "lucide-react";
@@ -26,11 +26,23 @@ const STATUS_MAP: Record<string, { label: string; color: "blue" | "yellow" | "pu
 };
 
 export default function ProjectsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProjectsView />
+    </Suspense>
+  );
+}
+
+function ProjectsView() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialStatus = searchParams.get("status");
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState(
+    initialStatus && STATUS_MAP[initialStatus] ? initialStatus : "ALL",
+  );
   const [showCreate, setShowCreate] = useState(false);
 
   const fetchProjects = async () => {
