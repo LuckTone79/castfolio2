@@ -10,6 +10,7 @@ coverage/
 .next/
 out/
 build/
+*.tsbuildinfo
 # Allow source directories named 'build' inside src/
 !src/**/build/
 !src/**/build/**
