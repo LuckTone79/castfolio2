@@ -170,7 +170,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/client"
-              className="hidden rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 sm:inline-flex"
+              className="inline-flex items-center rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 sm:px-4 sm:py-2.5 sm:text-sm"
             >
               고객 전용 페이지
             </Link>
@@ -182,7 +182,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center rounded-2xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+              className="inline-flex items-center rounded-2xl bg-slate-950 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-slate-800 sm:px-5 sm:py-3 sm:text-sm"
             >
               파트너로 시작하기
             </Link>
