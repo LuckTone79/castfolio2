@@ -4,10 +4,14 @@ import { logTimeline } from "@/lib/audit";
 import { normalizeIntakePayload, payloadToPageContent } from "@/lib/intake";
 import { sendNotification } from "@/lib/notify";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { requireIntakeToken } from "@/lib/tokens";
-import type { IntakePayload } from "@/types/intake";
+import { intakeSubmissionSchema } from "@/lib/validators";
 
-export async function GET(_: Request, { params }: { params: { token: string } }) {
+export async function GET(request: Request, { params }: { params: { token: string } }) {
+  const limit = rateLimit(`intake:get:${getClientIp(request)}`, 30, 5 * 60 * 1000);
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSeconds);
+
   try {
     const form = await requireIntakeToken(params.token);
     const latestSubmission = await prisma.intakeSubmission.findFirst({
@@ -31,16 +35,26 @@ export async function GET(_: Request, { params }: { params: { token: string } })
 }
 
 export async function POST(request: Request, { params }: { params: { token: string } }) {
+  const limit = rateLimit(`intake:post:${getClientIp(request)}`, 5, 5 * 60 * 1000);
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSeconds);
+
+  const parsed = intakeSubmissionSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "INVALID_PAYLOAD" }, { status: 400 });
+  }
+  const body = parsed.data;
+
   try {
     const form = await requireIntakeToken(params.token);
-    const body = (await request.json()) as IntakePayload;
     const payload = normalizeIntakePayload({
       ...body,
       pageContent: payloadToPageContent(body),
       meta: {
-        ...body.meta,
         submittedAt: new Date().toISOString(),
         importedAt: null,
+        submittedSections: [],
+        hasImages: false,
+        draftSavedAt: null,
       },
     });
 

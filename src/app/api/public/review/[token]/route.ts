@@ -3,8 +3,13 @@ import { requireReviewToken } from "@/lib/tokens";
 import { prisma } from "@/lib/prisma";
 import { logTimeline } from "@/lib/audit";
 import { sendNotification } from "@/lib/notify";
+import { getClientIp, rateLimit, tooManyRequests } from "@/lib/rate-limit";
+import { reviewActionSchema } from "@/lib/validators";
 
-export async function GET(_: Request, { params }: { params: { token: string } }) {
+export async function GET(request: Request, { params }: { params: { token: string } }) {
+  const limit = rateLimit(`review:get:${getClientIp(request)}`, 30, 5 * 60 * 1000);
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSeconds);
+
   try {
     const form = await requireReviewToken(params.token);
     const submission = form.submissions[0];
@@ -15,10 +20,17 @@ export async function GET(_: Request, { params }: { params: { token: string } })
 }
 
 export async function POST(request: Request, { params }: { params: { token: string } }) {
+  const limit = rateLimit(`review:post:${getClientIp(request)}`, 10, 5 * 60 * 1000);
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSeconds);
+
+  const parsed = reviewActionSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "INVALID_PAYLOAD" }, { status: 400 });
+  }
+  const { action, revisionNote } = parsed.data;
+
   try {
     const form = await requireReviewToken(params.token);
-    const body = await request.json();
-    const { action, revisionNote } = body;
 
     if (action === "APPROVE") {
       await prisma.project.update({

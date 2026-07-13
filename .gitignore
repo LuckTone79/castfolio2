@@ -41,6 +41,13 @@ yarn-error.log*
 # OS
 Thumbs.db
 
+# Build artifacts / scratch
+*.tsbuildinfo
+*.zip
+tmp_*.json
+
 # Secrets & API Keys
 .mcp.json
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/worktrees/

@@ -100,7 +100,9 @@ export function normalizeIntakePayload(payload: IntakePayload): IntakePayload {
   };
 }
 
-export function payloadToPageContent(payload: IntakePayload): PageContent {
+export function payloadToPageContent(
+  payload: Pick<IntakePayload, "basic" | "about" | "career" | "portfolio" | "strengths" | "contact">,
+): PageContent {
   const infoItems = [
     payload.about.birthYear ? { label: "출생연도", value: payload.about.birthYear } : null,
     payload.about.height ? { label: "키", value: payload.about.height } : null,

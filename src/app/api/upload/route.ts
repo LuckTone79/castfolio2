@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { processImage, validateImageFile } from "@/lib/image";
 import { createServiceClient } from "@/lib/supabase/server";
+import { CASTFOLIO_MEDIA_BUCKET } from "@/lib/supabase/buckets";
 
 export async function POST(request: NextRequest) {
   let user: Awaited<ReturnType<typeof requireUser>>;
@@ -31,12 +32,12 @@ export async function POST(request: NextRequest) {
   const basePath = `projects/${projectId}`;
 
   const [origRes, optRes, thumbRes] = await Promise.all([
-    supabase.storage.from("media").upload(`${basePath}/orig-${timestamp}.${file.name.split(".").pop()}`, buffer, { contentType: file.type, upsert: false }),
-    supabase.storage.from("media").upload(`${basePath}/opt-${timestamp}.webp`, processed.optimizedBuffer, { contentType: "image/webp", upsert: false }),
-    supabase.storage.from("media").upload(`${basePath}/thumb-${timestamp}.webp`, processed.thumbnailBuffer, { contentType: "image/webp", upsert: false }),
+    supabase.storage.from(CASTFOLIO_MEDIA_BUCKET).upload(`${basePath}/orig-${timestamp}.${file.name.split(".").pop()}`, buffer, { contentType: file.type, upsert: false }),
+    supabase.storage.from(CASTFOLIO_MEDIA_BUCKET).upload(`${basePath}/opt-${timestamp}.webp`, processed.optimizedBuffer, { contentType: "image/webp", upsert: false }),
+    supabase.storage.from(CASTFOLIO_MEDIA_BUCKET).upload(`${basePath}/thumb-${timestamp}.webp`, processed.thumbnailBuffer, { contentType: "image/webp", upsert: false }),
   ]);
 
-  const getUrl = (path: string) => supabase.storage.from("media").getPublicUrl(path).data.publicUrl;
+  const getUrl = (path: string) => supabase.storage.from(CASTFOLIO_MEDIA_BUCKET).getPublicUrl(path).data.publicUrl;
 
   const asset = await prisma.mediaAsset.create({
     data: {

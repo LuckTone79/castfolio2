@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
-export async function GET(_: Request, { params }: { params: { token: string } }) {
+export async function GET(request: Request, { params }: { params: { token: string } }) {
+  const limit = rateLimit(`delivered:get:${getClientIp(request)}`, 30, 5 * 60 * 1000);
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSeconds);
+
   if (!params.token || params.token.length < 8) {
     return NextResponse.json({ error: "INVALID_TOKEN" }, { status: 400 });
   }

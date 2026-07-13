@@ -3,11 +3,29 @@ import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
 
-const PROTECTED_PREFIXES = ["/app", "/admin", "/dashboard"];
+const PROTECTED_PREFIXES = ["/app", "/admin"];
 const AUTH_ROUTES = ["/login"];
+
+// /dashboard/* was retired in favor of /app/* (v2.2.0). Old emails/bookmarks
+// may still point here, so preserve the path instead of dropping it at /app.
+function legacyDashboardRedirectTarget(pathname: string): string | null {
+  if (pathname !== "/dashboard" && !pathname.startsWith("/dashboard/")) return null;
+  const rest = pathname.slice("/dashboard".length);
+  if (rest.startsWith("/builder/")) {
+    return `/app/builder/project${rest.slice("/builder".length)}`;
+  }
+  return `/app${rest}`;
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const legacyTarget = legacyDashboardRedirectTarget(pathname);
+  if (legacyTarget) {
+    const url = new URL(legacyTarget, request.url);
+    url.search = request.nextUrl.search;
+    return NextResponse.redirect(url, 308);
+  }
 
   let response = NextResponse.next({ request });
 

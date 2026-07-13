@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { requireQuoteToken } from "@/lib/tokens";
+import { getClientIp, rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
-export async function GET(_: Request, { params }: { params: { token: string } }) {
+export async function GET(request: Request, { params }: { params: { token: string } }) {
+  const limit = rateLimit(`quote:get:${getClientIp(request)}`, 30, 5 * 60 * 1000);
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSeconds);
+
   try {
     const quote = await requireQuoteToken(params.token);
     return NextResponse.json({

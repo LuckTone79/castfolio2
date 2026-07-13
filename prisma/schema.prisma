@@ -1,31 +1,36 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  schemas   = ["castfolio"]
 }
 
-// ═══════════════════════════════════════
-// 계정/권한
-// ═══════════════════════════════════════
-
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??// ?④쑴??亦낅슦釉?// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??
 enum UserRole {
   MASTER_ADMIN
   USER
+
+  @@schema("castfolio")
 }
 
 enum UserType {
   INDIVIDUAL
   SOLE_PROPRIETOR
   CORPORATION
+
+  @@schema("castfolio")
 }
 
 enum AccountStatus {
   ACTIVE
   SUSPENDED
   DELETED
+
+  @@schema("castfolio")
 }
 
 model User {
@@ -57,16 +62,18 @@ model User {
 
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
+
+  @@schema("castfolio")
 }
 
-// ═══════════════════════════════════════
-// 핵심 비즈니스
-// ═══════════════════════════════════════
-
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??// ???뼎 ??쑴已??됰뮞
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??
 enum TalentStatus {
   ACTIVE
   INACTIVE
   DELETED
+
+  @@schema("castfolio")
 }
 
 model Talent {
@@ -88,6 +95,8 @@ model Talent {
 
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+
+  @@schema("castfolio")
 }
 
 enum ProjectStatus {
@@ -99,12 +108,16 @@ enum ProjectStatus {
   DELIVERED
   CLOSED
   DISPUTED
+
+  @@schema("castfolio")
 }
 
 enum IntakeMode {
   SELF_SUBMISSION
   OPERATOR_ENTRY
   HYBRID
+
+  @@schema("castfolio")
 }
 
 enum SourceChannel {
@@ -114,6 +127,8 @@ enum SourceChannel {
   OFFLINE
   UPLOAD_LINK
   MIXED
+
+  @@schema("castfolio")
 }
 
 enum VerificationStatus {
@@ -121,12 +136,16 @@ enum VerificationStatus {
   REQUESTED
   APPROVED
   REVISION_REQUESTED
+
+  @@schema("castfolio")
 }
 
 enum DataEnteredBy {
   TALENT
   USER
   BOTH
+
+  @@schema("castfolio")
 }
 
 model Project {
@@ -156,6 +175,8 @@ model Project {
 
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
+
+  @@schema("castfolio")
 }
 
 enum PageStatus {
@@ -163,6 +184,8 @@ enum PageStatus {
   PREVIEW
   PUBLISHED
   INACTIVE
+
+  @@schema("castfolio")
 }
 
 model Page {
@@ -176,15 +199,15 @@ model Page {
   accentColor     String?
   status          PageStatus @default(DRAFT)
 
-  // 콘텐츠: 확정된 렌더링용 데이터 (Preview/Published에서 사용)
+  // ?꾩꼹?쀯㎘? ?類ㅼ젟?????쐭筌띻낯???怨쀬뵠??(Preview/Published?癒?퐣 ????
   contentKo       Json       @default("{}")
   contentEn       Json       @default("{}")
   contentCn       Json       @default("{}")
 
-  // Draft: 편집 중 임시 데이터 (자동 저장용, 3개 locale 통합)
+  // Draft: ?紐꾩춿 餓??袁⑸뻻 ?怨쀬뵠??(?癒?짗 ???關?? 3揶?locale ????)
   draftContent    Json?
 
-  // 섹션 설정
+  // ?諭????쇱젟
   sectionOrder    String[]   @default(["hero","profile","career","portfolio","strength","contact","footer"])
   disabledSections String[]  @default([])
 
@@ -201,6 +224,8 @@ model Page {
 
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
+
+  @@schema("castfolio")
 }
 
 model PageVersion {
@@ -217,18 +242,19 @@ model PageVersion {
   reason       String?
 
   createdAt    DateTime @default(now())
+
+  @@schema("castfolio")
 }
 
-// ═══════════════════════════════════════
-// 미디어
-// ═══════════════════════════════════════
-
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??// 沃섎챶逾??// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??
 enum MediaType {
   HERO_PHOTO
   PROFILE_PHOTO
   PORTFOLIO_PHOTO
   AUDIO_SAMPLE
   OTHER
+
+  @@schema("castfolio")
 }
 
 model MediaAsset {
@@ -248,12 +274,12 @@ model MediaAsset {
   uploadedBy   String
 
   createdAt    DateTime  @default(now())
+
+  @@schema("castfolio")
 }
 
-// ═══════════════════════════════════════
-// 자료 수집
-// ═══════════════════════════════════════
-
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??// ?癒?┷ ??륁춿
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??
 model IntakeForm {
   id          String   @id @default(uuid())
   projectId   String
@@ -268,12 +294,16 @@ model IntakeForm {
   submissions IntakeSubmission[]
 
   createdAt   DateTime @default(now())
+
+  @@schema("castfolio")
 }
 
 enum SubmissionStatus {
   PENDING
   PARTIAL
   COMPLETE
+
+  @@schema("castfolio")
 }
 
 model IntakeSubmission {
@@ -287,12 +317,11 @@ model IntakeSubmission {
   status      SubmissionStatus @default(PENDING)
 
   createdAt   DateTime         @default(now())
+
+  @@schema("castfolio")
 }
 
-// ═══════════════════════════════════════
-// 상품/가격
-// ═══════════════════════════════════════
-
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??// ?怨밸?/揶쎛野?// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??
 model ProductPackage {
   id          String   @id @default(uuid())
   userId      String
@@ -311,6 +340,8 @@ model ProductPackage {
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@schema("castfolio")
 }
 
 model PricingPolicyVersion {
@@ -329,6 +360,8 @@ model PricingPolicyVersion {
   changeSummary   String?
 
   createdAt       DateTime       @default(now())
+
+  @@schema("castfolio")
 }
 
 model RevisionPolicy {
@@ -345,6 +378,8 @@ model RevisionPolicy {
 
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
+
+  @@schema("castfolio")
 }
 
 model PricingChangeLog {
@@ -360,12 +395,12 @@ model PricingChangeLog {
   reason      String?
 
   createdAt   DateTime       @default(now())
+
+  @@schema("castfolio")
 }
 
-// ═══════════════════════════════════════
-// 상업/정산
-// ═══════════════════════════════════════
-
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??// ?怨몃씜/?類ㅺ텦
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??
 enum QuoteStatus {
   DRAFT
   SENT
@@ -373,6 +408,8 @@ enum QuoteStatus {
   SUPERSEDED
   ACCEPTED
   REJECTED
+
+  @@schema("castfolio")
 }
 
 model Quote {
@@ -394,6 +431,8 @@ model Quote {
 
   sentAt      DateTime?
   createdAt   DateTime    @default(now())
+
+  @@schema("castfolio")
 }
 
 model QuoteLineItem {
@@ -406,6 +445,8 @@ model QuoteLineItem {
   description String
   amount      Decimal
   quantity    Int            @default(1)
+
+  @@schema("castfolio")
 }
 
 enum OrderStatus {
@@ -417,6 +458,8 @@ enum OrderStatus {
   CANCELLED
   DISPUTED
   REFUNDED
+
+  @@schema("castfolio")
 }
 
 enum PaymentMethod {
@@ -427,6 +470,8 @@ enum PaymentMethod {
   OFFLINE_CASH
   OFFLINE_TRANSFER
   OFFLINE_OTHER
+
+  @@schema("castfolio")
 }
 
 model Order {
@@ -461,6 +506,8 @@ model Order {
   settledAt           DateTime?
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
+
+  @@schema("castfolio")
 }
 
 model OrderLineItem {
@@ -472,6 +519,8 @@ model OrderLineItem {
   amount      Decimal
   quantity    Int     @default(1)
   type        String
+
+  @@schema("castfolio")
 }
 
 model PaymentRecord {
@@ -486,6 +535,8 @@ model PaymentRecord {
   proofUrl    String?
 
   createdAt   DateTime      @default(now())
+
+  @@schema("castfolio")
 }
 
 model RefundRecord {
@@ -500,6 +551,8 @@ model RefundRecord {
   processedBy        String?
 
   createdAt          DateTime @default(now())
+
+  @@schema("castfolio")
 }
 
 model CommissionLedger {
@@ -518,12 +571,20 @@ model CommissionLedger {
   type             String
 
   createdAt        DateTime         @default(now())
+
+  // At most one ledger entry of a given type per order ??blocks duplicate
+  // "sale" entries from a repeated/concurrent payment confirmation.
+  @@unique([orderId, type])
+
+  @@schema("castfolio")
 }
 
 enum SettlementStatus {
   PENDING
   COMPLETED
   OVERDUE
+
+  @@schema("castfolio")
 }
 
 model SettlementBatch {
@@ -543,15 +604,21 @@ model SettlementBatch {
 
   completedAt     DateTime?
   createdAt       DateTime          @default(now())
+
+  // One batch per partner per period ??blocks duplicate batches from a
+  // re-run of the monthly settlement job.
+  @@unique([userId, periodStart])
+
+  @@schema("castfolio")
 }
 
-// ═══════════════════════════════════════
-// 알림
-// ═══════════════════════════════════════
-
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??// ???뵝
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??
 enum NotificationChannel {
   DASHBOARD
   EMAIL
+
+  @@schema("castfolio")
 }
 
 model Notification {
@@ -568,6 +635,8 @@ model Notification {
   metadata  Json?
 
   createdAt DateTime            @default(now())
+
+  @@schema("castfolio")
 }
 
 model NotificationTemplate {
@@ -581,12 +650,11 @@ model NotificationTemplate {
   bodyCn    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@schema("castfolio")
 }
 
-// ═══════════════════════════════════════
-// 운영/감사
-// ═══════════════════════════════════════
-
+// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??// ??곸겫/揶쏅Ŋ沅?// ?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름?癒λ름??
 model AuditLog {
   id           String   @id @default(uuid())
   actorId      String
@@ -600,6 +668,8 @@ model AuditLog {
   reason       String?
   ipAddress    String?
   createdAt    DateTime @default(now())
+
+  @@schema("castfolio")
 }
 
 model ProjectTimeline {
@@ -612,6 +682,8 @@ model ProjectTimeline {
   actorName   String?
   metadata    Json?
   createdAt   DateTime @default(now())
+
+  @@schema("castfolio")
 }
 
 model AdminNote {
@@ -623,6 +695,8 @@ model AdminNote {
   note        String
   isInternal  Boolean  @default(true)
   createdAt   DateTime @default(now())
+
+  @@schema("castfolio")
 }
 
 model RiskFlag {
@@ -634,6 +708,8 @@ model RiskFlag {
   resolvedAt  DateTime?
   resolvedBy  String?
   createdAt   DateTime  @default(now())
+
+  @@schema("castfolio")
 }
 
 model PageView {
@@ -647,6 +723,8 @@ model PageView {
   viewedAt  DateTime @default(now())
 
   @@index([pageId, ipHash, viewedAt])
+
+  @@schema("castfolio")
 }
 
 model QRAsset {
@@ -660,4 +738,7 @@ model QRAsset {
   nameDisplay String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@schema("castfolio")
 }
+

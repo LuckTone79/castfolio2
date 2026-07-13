@@ -6,6 +6,7 @@ import { sendNotification, notifyTalent } from "@/lib/notify";
 import { generateQRPng, generateQRSvg } from "@/lib/qr";
 import { generateQRCardPdf } from "@/lib/pdf";
 import { createServiceClient } from "@/lib/supabase/server";
+import { CASTFOLIO_QR_BUCKET } from "@/lib/supabase/buckets";
 
 export async function POST(_: Request, { params }: { params: { id: string } }) {
   let user: Awaited<ReturnType<typeof requireUser>>;
@@ -55,21 +56,21 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     const timestamp = Date.now();
 
     const [pngRes, svgRes, pdfRes] = await Promise.all([
-      supabase.storage.from("qr").upload(`${page.slug}/qr-${timestamp}.png`, qrPngBuffer, { contentType: "image/png", upsert: true }),
-      supabase.storage.from("qr").upload(`${page.slug}/qr-${timestamp}.svg`, Buffer.from(svgContent), { contentType: "image/svg+xml", upsert: true }),
-      supabase.storage.from("qr").upload(`${page.slug}/qr-card-${timestamp}.pdf`, pdfBuffer, { contentType: "application/pdf", upsert: true }),
+      supabase.storage.from(CASTFOLIO_QR_BUCKET).upload(`${page.slug}/qr-${timestamp}.png`, qrPngBuffer, { contentType: "image/png", upsert: true }),
+      supabase.storage.from(CASTFOLIO_QR_BUCKET).upload(`${page.slug}/qr-${timestamp}.svg`, Buffer.from(svgContent), { contentType: "image/svg+xml", upsert: true }),
+      supabase.storage.from(CASTFOLIO_QR_BUCKET).upload(`${page.slug}/qr-card-${timestamp}.pdf`, pdfBuffer, { contentType: "application/pdf", upsert: true }),
     ]);
 
     if (pngRes.data) {
-      const { data } = supabase.storage.from("qr").getPublicUrl(pngRes.data.path);
+      const { data } = supabase.storage.from(CASTFOLIO_QR_BUCKET).getPublicUrl(pngRes.data.path);
       pngUrl = data.publicUrl;
     }
     if (svgRes.data) {
-      const { data } = supabase.storage.from("qr").getPublicUrl(svgRes.data.path);
+      const { data } = supabase.storage.from(CASTFOLIO_QR_BUCKET).getPublicUrl(svgRes.data.path);
       svgUrl = data.publicUrl;
     }
     if (pdfRes.data) {
-      const { data } = supabase.storage.from("qr").getPublicUrl(pdfRes.data.path);
+      const { data } = supabase.storage.from(CASTFOLIO_QR_BUCKET).getPublicUrl(pdfRes.data.path);
       pdfUrl = data.publicUrl;
     }
 

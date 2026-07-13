@@ -1,4 +1,5 @@
-import { ReceiptText } from "lucide-react";
+import Link from "next/link";
+import { ChevronRight, ReceiptText } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { requireAgentAppProfile } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -30,7 +31,11 @@ export default async function AppSalesPage() {
         ) : (
           <div className="divide-y divide-gray-800">
             {orders.map((order) => (
-              <div key={order.id} className="flex flex-col gap-4 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
+              <Link
+                key={order.id}
+                href={`/app/orders/${order.id}`}
+                className="flex flex-col gap-4 px-6 py-5 transition hover:bg-gray-800/50 lg:flex-row lg:items-center lg:justify-between"
+              >
                 <div>
                   <div className="flex items-center gap-2">
                     <ReceiptText className="h-4 w-4 text-gray-500" />
@@ -43,11 +48,14 @@ export default async function AppSalesPage() {
                     {order.project.talent.nameKo} · {order.project.name}
                   </p>
                 </div>
-                <div className="text-left lg:text-right">
-                  <p className="text-sm font-semibold text-white">{formatCurrency(order.totalAmount.toString())}</p>
-                  <p className="mt-1 text-xs text-gray-500">{formatDate(order.createdAt)}</p>
+                <div className="flex items-center gap-3 lg:justify-end">
+                  <div className="text-left lg:text-right">
+                    <p className="text-sm font-semibold text-white">{formatCurrency(order.totalAmount.toString())}</p>
+                    <p className="mt-1 text-xs text-gray-500">{formatDate(order.createdAt)}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-gray-600" />
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
