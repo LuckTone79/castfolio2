@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
+import { buildAuthCallbackUrl } from "@/lib/auth-redirect";
 
 function sanitizeRedirectPath(value: string | null, fallback: string) {
   if (!value) return fallback;
@@ -14,8 +15,7 @@ function sanitizeRedirectPath(value: string | null, fallback: string) {
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const redirect = sanitizeRedirectPath(requestUrl.searchParams.get("redirect"), "/app");
-  const callbackUrl = new URL("/auth/callback", requestUrl.origin);
-  callbackUrl.searchParams.set("next", redirect);
+  const callbackUrl = buildAuthCallbackUrl(request.url, redirect);
 
   const cookiesToSet: Array<{ name: string; value: string; options?: CookieOptions }> = [];
   const supabase = createServerClient(

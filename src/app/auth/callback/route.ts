@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
-import { prisma } from "@/lib/prisma";
+import { ensureDbUserForSupabaseUser } from "@/lib/auth-profile";
 
 function sanitizeRedirectPath(value: string | null, fallback: string) {
   if (!value) return fallback;
@@ -75,36 +75,7 @@ export async function GET(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (user?.email) {
-    const displayName =
-      typeof user.user_metadata?.full_name === "string"
-        ? user.user_metadata.full_name
-        : typeof user.user_metadata?.name === "string"
-          ? user.user_metadata.name
-          : user.email.split("@")[0];
-
-    const dbUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ supabaseUid: user.id }, { email: user.email }],
-      },
-    });
-
-    if (dbUser) {
-      await prisma.user.update({
-        where: { id: dbUser.id },
-        data: {
-          supabaseUid: user.id,
-          name: dbUser.name || displayName,
-        },
-      });
-    } else {
-      await prisma.user.create({
-        data: {
-          email: user.email,
-          name: displayName,
-          supabaseUid: user.id,
-        },
-      });
-    }
+    await ensureDbUserForSupabaseUser(user);
   }
 
   return response;

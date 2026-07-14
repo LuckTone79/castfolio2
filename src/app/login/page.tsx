@@ -73,15 +73,25 @@ function LoginContent() {
     setLoading(true);
     resetFeedback();
 
-    const { error: signupError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: `${window.location.origin}/app` },
+    const signupResponse = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, redirect }),
     });
+    const signupResult = (await signupResponse.json().catch(() => null)) as {
+      error?: string;
+      needsConfirmation?: boolean;
+    } | null;
 
-    if (signupError) {
-      setError(signupError.message);
+    if (!signupResponse.ok || signupResult?.error) {
+      setError(signupResult?.error || "회원가입 처리 중 오류가 발생했습니다.");
       setLoading(false);
+      return;
+    }
+
+    if (signupResult?.needsConfirmation === false) {
+      router.push(redirect);
+      router.refresh();
       return;
     }
 
