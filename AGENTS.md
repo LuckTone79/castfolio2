@@ -105,3 +105,25 @@
 
 - `dev-toolkit-prep` 규칙이 있다면 해당 규칙보다 나중에 실행
 - `dev-version-manager` 규칙과 병행 동작
+
+
+<!-- BEGIN:wideget-search-before-build -->
+# WideGet Search Before Build
+
+비단순 기능(인증, 결제, 관리자, 피드백, 업로드, 알림, 지도, 분석, AI, 공통 UI 등)을 새로 만들기 전에 아래 순서를 따른다.
+
+1. 이 프로젝트 내부에 이미 구현된 코드/패키지가 있는지 확인한다.
+2. WideGet 공통 Kit/Registry에 재사용 가능한 검증 자산이 있는지 확인한다.
+3. 외부 서비스 기능이면 공식 SDK/공식 문서를 우선 확인한다.
+4. 부족할 때만 GitHub 오픈소스를 검색한다.
+5. 외부 코드는 라이선스, 보안, 유지보수, 현재 스택 호환성, 범위, 테스트/문서를 검토한다.
+6. 적합한 기존 구현이 없을 때만 처음부터 새로 구현한다.
+
+공통 기준의 원본은 `LuckTone79/WideGet` 저장소의 다음 파일이다.
+- `AGENTS.md`
+- `docs/development/SEARCH_BEFORE_BUILD.md`
+- `docs/feature-registry/REGISTRY.yaml`
+- `skills/wideget-feature-scout/SKILL.md`
+
+외부 코드를 채택할 때 stars 수만으로 선택하지 않는다. 라이선스가 없으면 기본적으로 사용하지 않고, GPL/AGPL/SSPL/custom/source-available 계열은 자동 채택하지 말고 검토 대상으로 둔다. 기존 인증/DB/라우팅/UI 아키텍처를 불필요하게 대체하지 않는다.
+<!-- END:wideget-search-before-build -->
